@@ -219,31 +219,22 @@ class Ebook:
         @param outputEpub: el epub donde está la toc.
         """        
         # La cubierta debe ser el primer título en la toc
-        outputEpub.addNavPoint(1, Ebook.COVER_EP_NAME, "Cubierta")
-        
-        playOrder = 2
+        outputEpub.addNavPoint(Ebook.COVER_EP_NAME, "Cubierta")
         
         for title in self._titles:
-            rootNavPoint = outputEpub.addNavPoint(playOrder, title.sectionName, title.text)
-            playOrder = self._addTitlesToToc(playOrder + 1, rootNavPoint, title.childTitles)
+            rootNavPoint = outputEpub.addNavPoint(title.titleLocation, title.text)
+            self._addTitlesToToc(rootNavPoint, title.childTitles)
 
-    def _addTitlesToToc(self, startPlayOrder, navPoint, titles):
+    def _addTitlesToToc(self, navPoint, titles):
         """
         Agrega los títulos de manera recursiva a la toc.
         
-        @param startPlayOrder: el número desde el cual se empiezan a agregar los playorder en los navpoints.
-        @param navPoint: el navpoint del epub padre, donde se van a agregar los navpoints hijos.
-        @param titles: los títulos a agregar a la toc.
-        
-        @return: el próximo playorder válido.
+        @param navPoint: un objeto NavPoint.
+        @param titles: una lista de Title.
         """
-        playOrder = startPlayOrder
-        
         for childTitle in titles:
-            childNavPoint = navPoint.addNavPoint(playOrder, childTitle.sectionName, childTitle.text)
-            playOrder = self._addTitlesToToc(playOrder + 1, childNavPoint, childTitle.childTitles)
-        
-        return playOrder
+            childNavPoint = navPoint.addNavPoint(childTitle.titleLocation, childTitle.text)
+            self._addTitlesToToc(childNavPoint, childTitle.childTitles)
 
     def _getOutputFileName(self):
         return "output.epub"

@@ -71,10 +71,12 @@ class Fi:
                 # Necesito obtener el número de heading
                 currentHeadingNumber = int(heading.tag[heading.tag.rindex("h") + 1:])
 
+                titleLocation = "{0}#{1}".format(ebookSection.name, heading.get("id"))
+
                 # Si el heading es 1, entonces es un título de primer nivel y debo guardarlo.
                 if currentHeadingNumber == 1:
                     titleText = self._getAllText(heading, "{{{0}}}a".format(Fi._XHTML_NS)).strip()
-                    title = ebook_data.Title(ebookSection.name, titleText)
+                    title = ebook_data.Title(titleLocation, titleText)
                     ebookRootTitles.append(title)   
                                                          
                     # Necesito un stack para manejar el anidamiento de títulos correctamente. Este stack va a
@@ -96,7 +98,7 @@ class Fi:
                         titlesStack.pop()      
                     
                     # Inserto finalmente el nuevo título.         
-                    titlesStack.append(titlesStack[-1].addTitle(ebookSection.name, heading.text))                                      
+                    titlesStack.append(titlesStack[-1].addTitle(titleLocation, heading.text))
                 previousHeadingNumber = currentHeadingNumber    
                                  
         return ebookRootTitles

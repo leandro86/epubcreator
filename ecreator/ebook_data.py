@@ -37,14 +37,15 @@ class File:
 
 class Title:
     
-    def __init__(self, sectionName, text):
+    def __init__(self, titleLocation, text):
         """
         Crea un nuevo Title.
 
-        @param sectionName: nombre del archivo donde se encuentra el título.
+        @param titleLocation: la ubicación del título (el nombre del archivo donde se encuentra).
+                              Ej: Section0000.xhtml#titulo1.
         @param text: el texto del título.
         """
-        self.sectionName = sectionName
+        self.titleLocation = titleLocation
         self.text = text
         self.childTitles = []
         

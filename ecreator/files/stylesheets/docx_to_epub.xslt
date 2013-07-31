@@ -35,6 +35,10 @@
 <xsl:variable name="footNotesDoc" select="document($footNotesXmlPath)"/>
 <xsl:variable name="stylesDoc" select="document($stylesXmlPath)"/>
 
+<xsl:variable name="headings" select="$stylesDoc/w:styles/w:style[starts-with(w:name/@w:val, 'heading') or 
+																  starts-with(w:name/@w:val, 'Encabezado')]/@w:styleId">
+</xsl:variable>
+
 <!--Una cosa es el id del estilo, y otra el nombre. En document.xml, se utiliza el id del estilo para referenciarlo.
 	Cada estilo está especificado en styles.xml: su id, nombre, formato, estilo padre, etc. Necesito hacer
 	un mapeo entre el id del estilo y su nombre.
@@ -145,7 +149,7 @@
 					styles.xml. (Ver arriba en la definición de "styles" por qué es necesario el
 					cambio de contexto.)-->
 				<xsl:for-each select="$stylesDoc">
-					<xsl:value-of select="translate(key('styles', $currentStyleId), $uppercase, $lowercase)"/>
+					<xsl:value-of select="key('styles', $currentStyleId)"/>
 				</xsl:for-each>
 			</xsl:variable>
 					
@@ -153,39 +157,44 @@
 				tag "h" o "p".-->
 			<xsl:variable name="tag">
 				<xsl:choose>
-					<!--El nombre del estilo ya fue convenientemente covertido a minúsculas...-->
-					<xsl:when test="starts-with($style, 'encabezado') or starts-with($style, 'heading')">
+					<xsl:when test="starts-with($style, 'Encabezado') or starts-with($style, 'heading')">
 						<xsl:value-of select="concat('h', substring($style, string-length($style), 1))"/>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:value-of select="'p'"/>
 					</xsl:otherwise>
 				</xsl:choose>
-			</xsl:variable>
+			</xsl:variable>			
 			
-			<xsl:variable name="classValue">
-				<xsl:if test="$ignoreEmptyParagraphs = 'N' and preceding-sibling::w:p[1][not(w:r/w:t[normalize-space(text()) != ''])]">
-					<xsl:text>salto</xsl:text>						
-					<xsl:choose>
-						<xsl:when test="preceding-sibling::w:p[2][not(w:r/w:t[normalize-space(text()) != ''])]">25 </xsl:when>
-						<xsl:otherwise>10 </xsl:otherwise>
-					</xsl:choose>
-				</xsl:if>
-				<!--Si un párrafo es un heading, entonces ya tiene un estilo asignado, y según parece, un
-					párrafo no puede tener más de un estilo simultáneamente: por eso pregunto que el tag
-					no sea un heading.-->
-				<xsl:if test="$tag != 'h' and starts-with($style, 'epub_')">
-					<xsl:value-of select="substring($style, 6)"/>
-				</xsl:if>
-			</xsl:variable>
-
 			<xsl:element name="{$tag}">
-				<!--Solamente si el tag no es un encabezado es cuando debo comprobar por los estilos, ya
-					que en el docx los títulos se especifican con estilos, y según parece, un párrafo no puede
-					tener aplicado dos o más estilos simultáneamente.-->
-				<xsl:if test="$classValue != ''">
-					<xsl:attribute name="class"><xsl:value-of select="$classValue"/></xsl:attribute>									
-				</xsl:if>
+				<xsl:choose>
+					<xsl:when test="$tag = 'p'">								
+						<xsl:variable name="classValue">
+							<xsl:if test="$ignoreEmptyParagraphs = 'N' and preceding-sibling::w:p[1][not(w:r/w:t[normalize-space(text()) != ''])]">
+								<xsl:text>salto</xsl:text>						
+								<xsl:choose>
+									<xsl:when test="preceding-sibling::w:p[2][not(w:r/w:t[normalize-space(text()) != ''])]">25 </xsl:when>
+									<xsl:otherwise>10 </xsl:otherwise>
+								</xsl:choose>
+							</xsl:if>						
+							<xsl:if test="starts-with($style, 'epub_')">
+								<xsl:value-of select="substring($style, 6)"/>
+							</xsl:if>
+						</xsl:variable>
+	
+						<xsl:if test="$classValue != ''">
+							<xsl:attribute name="class"><xsl:value-of select="$classValue"/></xsl:attribute>									
+						</xsl:if>								
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:variable name="headingsBeforeCount">
+							<xsl:call-template name="countHeadingsBefore">
+								<xsl:with-param name="paragraph" select="."/>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:attribute name="id">heading_id_<xsl:value-of select="$headingsBeforeCount + 1"/></xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
 				<xsl:apply-templates/>
 			</xsl:element>	
 		</xsl:when>
@@ -523,6 +532,14 @@
 	<xsl:value-of select="count($pWithBr) +
 						  count($pWithBreakBefore[not(preceding-sibling::w:p[1]/w:r/w:br[@w:type = 'page'])]) +
 						  count($paragraph[w:pPr/w:pageBreakBefore and not(preceding-sibling::w:p[1]/w:r/w:br[@w:type = 'page'])])"/>
+</xsl:template>
+
+<!--***********************************************************************************************
+	***********************************************************************************************-->
+<xsl:template name="countHeadingsBefore">
+	<xsl:param name="paragraph"/>
+
+	<xsl:value-of select="count(preceding-sibling::w:p/w:pPr/w:pStyle[@w:val = $headings])"/>
 </xsl:template>
 
 </xsl:stylesheet>
