@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GeneralPreferences</class>
+ <widget class="QWidget" name="GeneralPreferences">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>431</width>
+    <height>254</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="sigilPathInput"/>
+   </item>
+   <item row="1" column="2">
+    <widget class="QPushButton" name="changeSigilPathButton">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="preferences_general_widget.qrc">
+       <normaloff>:/preferences_general_widget/resources/images/search_16x16.png</normaloff>:/preferences_general_widget/resources/images/search_16x16.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>Editor</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="editorInput"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>Ruta de Sigil</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>editorInput</tabstop>
+  <tabstop>sigilPathInput</tabstop>
+  <tabstop>changeSigilPathButton</tabstop>
+ </tabstops>
+ <resources>
+  <include location="preferences_general_widget.qrc"/>
+ </resources>
+ <connections/>
+</ui>

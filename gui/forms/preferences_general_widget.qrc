@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="preferences_general_widget">
+    <file>../resources/images/search_16x16.png</file>
+  </qresource>
+</RCC>
