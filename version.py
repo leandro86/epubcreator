@@ -18,6 +18,6 @@
 VERSION = "0.1.0"
 
 APP_NAME = 'EpubCreator'
-DESCRIPTION = "BLABLA"
+DESCRIPTION = "Generador de ePubs de acuerdo a los estándares de epublibre.org."
 ORGANIZATION = "epublibre"
 ORGANIZATION_DOMAIN = "epublibre.org"

@@ -85,11 +85,22 @@
    <addaction name="generateEpubAction"/>
   </widget>
   <action name="openFileAction">
+   <property name="icon">
+    <iconset resource="main_window.qrc">
+     <normaloff>:/main_window/resources/images/open_24x24.png</normaloff>:/main_window/resources/images/open_24x24.png</iconset>
+   </property>
    <property name="text">
+    <string>Abrir</string>
+   </property>
+   <property name="toolTip">
     <string>Abrir</string>
    </property>
   </action>
   <action name="generateEpubAction">
+   <property name="icon">
+    <iconset resource="main_window.qrc">
+     <normaloff>:/main_window/resources/images/epub.png</normaloff>:/main_window/resources/images/epub.png</iconset>
+   </property>
    <property name="text">
     <string>Generar ePub</string>
    </property>
@@ -134,6 +145,11 @@
     <string>Log de Conversión</string>
    </property>
   </action>
+  <action name="showHelpAction">
+   <property name="text">
+    <string>Ver la Ayuda</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -143,6 +159,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="main_window.qrc"/>
+ </resources>
  <connections/>
 </ui>

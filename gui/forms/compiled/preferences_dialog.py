@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\preferences_dialog.ui'
 #
-# Created: Tue Aug  6 00:06:45 2013
+# Created: Tue Aug  6 11:12:11 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -83,4 +83,4 @@ class Ui_Preferences(object):
         item.setText(_translate("Preferences", "Conversión Docx", None))
         self.listWidget.setSortingEnabled(__sortingEnabled)
 
-from gui.preferences_widgets import GeneralPreferences, DocxPreferences
+from gui.preferences_widgets import DocxPreferences, GeneralPreferences

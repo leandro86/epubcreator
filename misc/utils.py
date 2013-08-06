@@ -74,7 +74,21 @@ class Utilities:
         msgBox.setStandardButtons(QtGui.QMessageBox.Close)
         msgBox.exec()
 
+    @staticmethod
+    def displayExceptionErrorDialog(exceptionMessage):
+        msgBox = QtGui.QMessageBox(QtGui.QApplication.activeWindow())
+        msgBox.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
+        msgBox.setModal(True)
+        msgBox.setIcon(QtGui.QMessageBox.Critical)
+        msgBox.setWindowTitle(version.APP_NAME)
 
+        # Agrego algunos espacios porque sino el diálogo es muy chico...
+        msgBox.setText("Se ha encontrado un problema desconocido.{0}".format(" " * 30))
+
+        msgBox.setInformativeText("Por favor, repórtalo a los desarrolladores.")
+        msgBox.setStandardButtons(QtGui.QMessageBox.Close)
+        msgBox.setDetailedText(exceptionMessage)
+        msgBox.exec()
 
 
 

@@ -153,6 +153,9 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
         # ningún nombre de serie especificado
         self._toggleCollectionVolumeInput("")
 
+        # Editorial por defecto.
+        self.publisherInput.setText("ePubLibre")
+
         # Por defecto, el combobox del lenguaje muestra "español"
         self.languageInput.setCurrentIndex(self.languageInput.findText(language.Language.getLanguageName("es")))
 

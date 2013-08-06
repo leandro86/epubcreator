@@ -47,7 +47,7 @@ class SettingsStore(QtCore.QSettings):
 
     @property
     def docxIgnoreEmptyParagraphs(self):
-        return self.value(SettingsStore._DOCX_IGNORE_EMPTY_PARAGRAPHS_SETTING, "") == "true"
+        return self.value(SettingsStore._DOCX_IGNORE_EMPTY_PARAGRAPHS_SETTING, "true") == "true"
 
     @docxIgnoreEmptyParagraphs.setter
     def docxIgnoreEmptyParagraphs(self, value):

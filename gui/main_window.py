@@ -20,7 +20,7 @@ import subprocess
 
 from PyQt4 import QtGui, QtCore
 
-from ecreator.transformers import transformer_base, docx_transformer
+from ecreator.transformers import docx_transformer
 from ecreator import ebook
 from misc import settings_store, utils
 from gui.forms.compiled import main_window
@@ -167,3 +167,4 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
         self._logWindow.visibilityChanged.connect(self.toggleLogWindowAction.setChecked)
         self.toggleToolBarAction.triggered.connect(self.toolBar.setVisible)
         self.toolBar.visibilityChanged.connect(self.toggleToolBarAction.setChecked)
+        self.quitAction.triggered.connect(QtGui.qApp.quit)

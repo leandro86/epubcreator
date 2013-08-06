@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\basic_metadata_widget.ui'
 #
-# Created: Tue Aug  6 00:06:45 2013
+# Created: Tue Aug  6 11:12:11 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
