@@ -40,10 +40,10 @@ class DocxTransformer(transformer_base.AbstractTransformer):
         self._prepareParams(self._params)
 
     def transform(self):
-        document, footnotes, styles, images = self._openDocx()
+        document, footnotes, styles, documentRels, images = self._openDocx()
 
         parser = etree.XMLParser()
-        parser.resolvers.add(_DocxResolver(footnotes, styles))
+        parser.resolvers.add(_DocxResolver(footnotes, styles, documentRels))
 
         docxXslt = etree.parse(config.DOCX_TO_EPUB_STYLESHEET_PATH, parser)
         transformer = etree.XSLT(docxXslt)
@@ -51,10 +51,19 @@ class DocxTransformer(transformer_base.AbstractTransformer):
         ffi = fi.Fi(str(transformer(document, **self._params)))
         files, titles = ffi.parse()
 
+        # Agrego las imágenes al principio de la lista de archivos
         for imageName, imageData in images:
             files.insert(0, ebook_data.File(imageName, ebook_data.File.FILE_TYPE.IMAGE, imageData))
 
-        return files, titles
+        # Parseo la lista de warnings y errores de la planilla, si los hay
+        logMessages = []
+        for msg in [w.message.split("**DOCX_WARNING**")[1] for w in transformer.error_log if
+                    w.message.startswith("**DOCX_WARNING**")]:
+            msgType = transformer_base.TransformerLogMessage.MSG_TYPE.WARNING
+            logMessage = transformer_base.TransformerLogMessage(msgType, msg)
+            logMessages.append(logMessage)
+
+        return files, titles, logMessages
 
     def _openDocx(self):
         """
@@ -64,7 +73,8 @@ class DocxTransformer(transformer_base.AbstractTransformer):
                     1:  el documento donde se encuentra el texto, un objeto lxml ElementTree.
                     2:  el documento con las notas, en bytes.
                     3:  el documento con los estilos, en bytes.
-                    4:  las imágenes, un tupla cuyo primer elemento es el nombre de la
+                    4:  el documento con las relaciones, en bytes.
+                    5:  las imágenes, un tupla cuyo primer elemento es el nombre de la
                         imagen, y el segundo el contenido de la misma en bytes.
         """
         with zipfile.ZipFile(self._inputFile) as docx:
@@ -78,13 +88,15 @@ class DocxTransformer(transformer_base.AbstractTransformer):
             except KeyError:
                 styles = None
 
+            documentRels = docx.read("word/_rels/document.xml.rels")
+
             document = etree.parse(docx.open("word/document.xml"))
 
-            imagesName = [image for image in docx.namelist() if image.startswith("word/media") and
-                                                                image.endswith(".png")]
+            imagesName = [imageName for imageName in docx.namelist() if imageName.startswith("word/media") and
+                                                                        imageName.endswith(fi.Fi.VALID_IMAGE_TYPES)]
             images = [(image.split("/")[-1], docx.read(image)) for image in imagesName]
 
-            return document, footnotes, styles, images
+            return document, footnotes, styles, documentRels, images
 
     def _prepareParams(self, params):
         # Solamente puedo pasarle a la planilla strings como parámetros, por eso debo convertir los booleans.
@@ -96,9 +108,10 @@ class DocxTransformer(transformer_base.AbstractTransformer):
 
 class _DocxResolver(etree.Resolver):
 
-    def __init__(self, footnotes, styles):
+    def __init__(self, footnotes, styles, documentRels):
         self._footnotes = footnotes
         self._styles = styles
+        self._documentRels = documentRels
 
     def resolve(self, url, pubid, context):
         if "footnotes_path" in url.lower():
@@ -111,3 +124,5 @@ class _DocxResolver(etree.Resolver):
                 return self.resolve_file(io.BytesIO(self._styles), context)
             else:
                 self.resolve_empty(context)
+        elif "rels_path" in url.lower():
+            return self.resolve_file(io.BytesIO(self._documentRels), context)

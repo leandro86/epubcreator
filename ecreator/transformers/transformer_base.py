@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from misc import utils
+
 
 class AbstractTransformer:
 
@@ -33,7 +35,8 @@ class AbstractTransformer:
         """
         Obtiene los archivos y títulos de algún documento de origen.
 
-        @return: un tupla de dos elementos que contiene: una lista de File y una lista de Title.
+        @return: un tupla de tres elementos que contiene: una lista de File, una lista de Title, y una lista de
+                 TransformerLogMessage, con los mensajes de error o advertencias producidos.
                  Por convención, la lista de File contiene primero las imágenes y demás archivos, y luego
                  vienen todos los htmls, en el orden en el cual deben ser insertados en el epub.
         """
@@ -46,3 +49,12 @@ class AbstractTransformer:
         @return: un objeto Metadata.
         """
         raise NotImplemented
+
+
+class TransformerLogMessage:
+
+    MSG_TYPE = utils.Utilities.enum(WARNING = 1, ERROR = 2)
+
+    def __init__(self, msgType, message):
+        self.msgType = msgType
+        self.message = message

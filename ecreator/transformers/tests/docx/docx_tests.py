@@ -20,69 +20,69 @@ import unittest
 
 from lxml import etree
 
-from ecreator.transformers import docx_transformer
+from ecreator.transformers import transformer_base, docx_transformer
 from ecreator import ebook_data
 
 
 class DocxTransformerTests(unittest.TestCase):
 
     def testOneParagraph(self):
-        textFiles = self._getOutput("one_paragraph.docx")[0]
+        files = self._getOutput("one_paragraph.docx")[0]
 
-        self.assertEqual(len(textFiles), 1)
-        self.assertTrue(self._compareTextFiles("one_paragraph.docx", textFiles))
+        self.assertEqual(len(files), 1)
+        self.assertTrue(self._comparefiles("one_paragraph.docx", files))
 
     def testPageBreaksWithBr(self):
-        textFiles = self._getOutput("pagebreaks_with_br.docx")[0]
+        files = self._getOutput("pagebreaks_with_br.docx")[0]
 
-        self.assertEqual(len(textFiles), 5)
-        self.assertTrue(self._compareTextFiles("pagebreaks_with_br.docx", textFiles))
+        self.assertEqual(len(files), 5)
+        self.assertTrue(self._comparefiles("pagebreaks_with_br.docx", files))
 
     def testPageBreaksWithPageBreakBefore(self):
-        textFiles = self._getOutput("pagebreaks_with_pagebreakbefore.docx")[0]
+        files = self._getOutput("pagebreaks_with_pagebreakbefore.docx")[0]
 
-        self.assertEqual(len(textFiles), 4)
-        self.assertTrue(self._compareTextFiles("pagebreaks_with_pagebreakbefore.docx", textFiles))
+        self.assertEqual(len(files), 4)
+        self.assertTrue(self._comparefiles("pagebreaks_with_pagebreakbefore.docx", files))
 
     def testPageBreaksWithMixed(self):
-        textFiles = self._getOutput("pagebreaks_with_mixed.docx")[0]
+        files = self._getOutput("pagebreaks_with_mixed.docx")[0]
 
-        self.assertEqual(len(textFiles), 6)
-        self.assertTrue(self._compareTextFiles("pagebreaks_with_mixed.docx", textFiles))
+        self.assertEqual(len(files), 6)
+        self.assertTrue(self._comparefiles("pagebreaks_with_mixed.docx", files))
 
     def testEnglishHeadings(self):
         # Testeo los títulos cuando el nombre de los estilos de los mismos tienen nombre en
         # inglés: "heading 1", "heading 2", etc.
-        textFiles = self._getOutput("english_headings.docx")[0]
+        files = self._getOutput("english_headings.docx")[0]
 
-        self.assertEqual(len(textFiles), 1)
-        self.assertTrue(self._compareTextFiles("english_headings.docx", textFiles))
+        self.assertEqual(len(files), 1)
+        self.assertTrue(self._comparefiles("english_headings.docx", files))
 
     def testSpanishHeadings(self):
         # Testeo los títulos cuando el nombre de los estilos de los mismos tienen nombre en
         # español: "encabezado 1", "encabezado 2", etc.
-        textFiles = self._getOutput("spanish_headings.docx")[0]
+        files = self._getOutput("spanish_headings.docx")[0]
 
-        self.assertEqual(len(textFiles), 1)
-        self.assertTrue(self._compareTextFiles("spanish_headings.docx", textFiles))
+        self.assertEqual(len(files), 1)
+        self.assertTrue(self._comparefiles("spanish_headings.docx", files))
 
     def testFormats(self):
-        textFiles = self._getOutput("formats.docx")[0]
+        files = self._getOutput("formats.docx")[0]
 
-        self.assertEqual(len(textFiles), 1)
-        self.assertTrue(self._compareTextFiles("formats.docx", textFiles))
+        self.assertEqual(len(files), 1)
+        self.assertTrue(self._comparefiles("formats.docx", files))
 
     def testHeadingsNested(self):
-        textFiles = self._getOutput("headings_nested.docx")[0]
+        files = self._getOutput("headings_nested.docx")[0]
 
-        self.assertEqual(len(textFiles), 22)
-        self.assertTrue(self._compareTextFiles("headings_nested.ocx", textFiles))
+        self.assertEqual(len(files), 22)
+        self.assertTrue(self._comparefiles("headings_nested.ocx", files))
 
     def testHeadingsWithFormat(self):
-        textFiles, titles = self._getOutput("headings_with_format.docx")
+        files, titles = self._getOutput("headings_with_format.docx")[:2]
 
-        self.assertEqual(len(textFiles), 4)
-        self.assertTrue(self._compareTextFiles("headings_with_format.docx", textFiles))
+        self.assertEqual(len(files), 4)
+        self.assertTrue(self._comparefiles("headings_with_format.docx", files))
 
         self.assertEqual(len(titles), 4)
         self.assertEqual(titles[0].text, "Capítulo 1 subrayado.")
@@ -92,39 +92,101 @@ class DocxTransformerTests(unittest.TestCase):
                                          "esta otra subrayada. Esta parte está en itálica y subrayada.")
 
     def testHeadingWithFootnote(self):
-        textFiles, titles = self._getOutput("heading_with_footnote.docx")
+        files, titles = self._getOutput("heading_with_footnote.docx")[:2]
 
-        self.assertEqual(len(textFiles), 2)
-        self.assertTrue(self._compareTextFiles("heading_with_footnote.docx", textFiles))
+        self.assertEqual(len(files), 2)
+        self.assertTrue(self._comparefiles("heading_with_footnote.docx", files))
 
         self.assertEqual(len(titles), 1)
         self.assertEqual(titles[0].text, "Título 1 que contiene una nota al pie.")
 
     def testCustomStyles(self):
-        textFiles = self._getOutput("custom_styles.docx")[0]
+        files = self._getOutput("custom_styles.docx")[0]
 
-        self.assertEqual(len(textFiles), 1)
-        self.assertTrue(self._compareTextFiles("custom_styles.docx", textFiles))
+        self.assertEqual(len(files), 1)
+        self.assertTrue(self._comparefiles("custom_styles.docx", files))
 
     def testFootnotes(self):
-        textFiles = self._getOutput("footnotes.docx")[0]
+        files = self._getOutput("footnotes.docx")[0]
 
-        self.assertEqual(len(textFiles), 2)
-        self.assertTrue(self._compareTextFiles("footnotes.docx", textFiles))
+        self.assertEqual(len(files), 2)
+        self.assertTrue(self._comparefiles("footnotes.docx", files))
 
     def testEmptyParagraphsConversion(self):
-        textFiles = self._getOutput("empty_paragraphs_conversion.docx", False)[0]
+        files = self._getOutput("empty_paragraphs_conversion.docx", False)[0]
 
-        self.assertEqual(len(textFiles), 1)
-        self.assertTrue(self._compareTextFiles("empty_paragraphs_conversion.docx", textFiles))
+        self.assertEqual(len(files), 1)
+        self.assertTrue(self._comparefiles("empty_paragraphs_conversion.docx", files))
 
     def testEmptyParagraphsIgnore(self):
-        textFiles = self._getOutput("empty_paragraphs_ignore.docx")[0]
+        files = self._getOutput("empty_paragraphs_ignore.docx")[0]
 
-        self.assertEqual(len(textFiles), 1)
-        self.assertTrue(self._compareTextFiles("empty_paragraphs_ignore.docx", textFiles))
+        self.assertEqual(len(files), 1)
+        self.assertTrue(self._comparefiles("empty_paragraphs_ignore.docx", files))
 
-    def _compareTextFiles(self, testFileName, files):
+    def testImages(self):
+        files = self._getOutput("images.docx")[0]
+
+        self._saveFileToDisk(files, "L:\\")
+
+        # La sección más las 7 imágenes
+        self.assertEqual(len(files), 7)
+
+        self.assertTrue(self._comparefiles("images.docx", files))
+
+    def testBrokenHeadings(self):
+        files, titles = self._getOutput("broken_headings.docx")[:2]
+
+        self.assertEqual(len(files), 1)
+        self.assertTrue(self._comparefiles("broken_headings.docx", files))
+
+    def testNestedParagraphs(self):
+        files, _, logMessages = self._getOutput("nested_paragraphs.docx")
+
+        self._saveFileToDisk(files, "L:\\")
+
+        self.assertEqual(len(files), 1)
+        self.assertTrue(self._comparefiles("nested_paragraphs.docx", files))
+
+        self.assertEqual(len(logMessages), 4)
+
+        self.assertTrue(logMessages[0].msgType == transformer_base.TransformerLogMessage.MSG_TYPE.WARNING)
+        self.assertTrue("Se encontró un párrafo anidado" in logMessages[0].message)
+
+        self.assertTrue(logMessages[1].msgType == transformer_base.TransformerLogMessage.MSG_TYPE.WARNING)
+        self.assertTrue("Se encontró un párrafo anidado" in logMessages[1].message)
+
+        self.assertTrue(logMessages[2].msgType == transformer_base.TransformerLogMessage.MSG_TYPE.WARNING)
+        self.assertTrue("Se encontró un párrafo anidado" in logMessages[2].message)
+
+        self.assertTrue(logMessages[3].msgType == transformer_base.TransformerLogMessage.MSG_TYPE.WARNING)
+        self.assertTrue("Se encontró un párrafo anidado" in logMessages[3].message)
+
+    def testShape(self):
+        files, _, logMessages = self._getOutput("shape.docx")
+
+        self.assertEqual(len(files), 1)
+        self.assertTrue(self._comparefiles("shape.docx", files))
+
+        self.assertEqual(len(logMessages), 2)
+
+        self.assertTrue(logMessages[0].msgType == transformer_base.TransformerLogMessage.MSG_TYPE.WARNING)
+        self.assertTrue("Se encontró una figura geométrica" in logMessages[0].message)
+
+        self.assertTrue(logMessages[1].msgType == transformer_base.TransformerLogMessage.MSG_TYPE.WARNING)
+        self.assertTrue("Se encontró un párrafo anidado" in logMessages[1].message)
+
+    def testInvalidImageFormat(self):
+        files, _, logMessages = self._getOutput("invalid_image_format.docx")
+
+        self.assertEqual(len(files), 1)
+        self.assertTrue(self._comparefiles("invalid_image_format.docx", files))
+
+        self.assertEqual(len(logMessages), 1)
+        self.assertTrue(logMessages[0].msgType == transformer_base.TransformerLogMessage.MSG_TYPE.WARNING)
+        self.assertTrue("Se encontró una imagen con un formato no válido" in logMessages[0].message)
+
+    def _comparefiles(self, testFileName, files):
         """
         Compara los archivos pertenecientes a un test, con la salida correspondiente
         esperada.
@@ -135,7 +197,7 @@ class DocxTransformerTests(unittest.TestCase):
         @return: True, si la  comparación fue exitosa. Caso contrario se va a disparar
                  una excepción.
         """
-        for textFile in files:
+        for textFile in [f for f in files if f.fileType == ebook_data.File.FILE_TYPE.TEXT]:
             expectedOutput = self._readExpectedOutput(testFileName, textFile.name)
             self.assertTrue(_XmlComparer.compare(textFile.content, expectedOutput))
         return True
@@ -156,21 +218,13 @@ class DocxTransformerTests(unittest.TestCase):
             return file.read()
 
     def _getOutput(self, docxTestFileName, ignoreEmptyParagraphs = True):
-        """
-        Transforma el docx pasado como parámetro.
-
-        @param docxTestFileName: el docx a transformar.
-
-        @return: una tupla cuyo primer elemento es una lista de File con todos los archivos de texto, y el
-                 segundo una lista de Title.
-        """
         transformer = docx_transformer.DocxTransformer(os.path.join("test_data", docxTestFileName),
                                                        ignoreEmptyParagraphs)
-        files, titles = transformer.transform()
-        return [textFile for textFile in files if textFile.fileType == ebook_data.File.FILE_TYPE.TEXT], titles
+        files, titles, logMessages = transformer.transform()
+        return files, titles, logMessages
 
     def _saveFileToDisk(self, files, folderPath):
-        for file in files:
+        for file in [f for f in files if f.fileType == ebook_data.File.FILE_TYPE.TEXT]:
             with open(os.path.join(folderPath, file.name), "w", encoding = "utf-8") as outputFile:
                 outputFile.write(file.content)
 
@@ -197,7 +251,7 @@ class _XmlComparer:
         @return: True/False, dependiendo de si los xmls son iguales o no. Además, imprime en consola las
                  diferencias, si las hay.
         """
-        return _XmlComparer._performCompare(etree.XML(x1), etree.XML(x2))
+        return _XmlComparer._performCompare(etree.XML(bytes(x1, "utf-8")), etree.XML(bytes(x2, "utf-8")))
 
     @staticmethod
     def _performCompare(x1, x2):

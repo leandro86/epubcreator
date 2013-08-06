@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\main_window.ui'
 #
-# Created: Wed Jul 31 11:23:25 2013
+# Created: Tue Aug  6 00:06:45 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -43,6 +43,8 @@ class Ui_MainWindow(object):
         self.menuArchivo.setObjectName(_fromUtf8("menuArchivo"))
         self.menuAyuda = QtGui.QMenu(self.menubar)
         self.menuAyuda.setObjectName(_fromUtf8("menuAyuda"))
+        self.menuVer = QtGui.QMenu(self.menubar)
+        self.menuVer.setObjectName(_fromUtf8("menuVer"))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
@@ -63,13 +65,24 @@ class Ui_MainWindow(object):
         self.aboutAction = QtGui.QAction(MainWindow)
         self.aboutAction.setMenuRole(QtGui.QAction.AboutRole)
         self.aboutAction.setObjectName(_fromUtf8("aboutAction"))
+        self.toggleToolBarAction = QtGui.QAction(MainWindow)
+        self.toggleToolBarAction.setCheckable(True)
+        self.toggleToolBarAction.setObjectName(_fromUtf8("toggleToolBarAction"))
+        self.toggleLogWindowAction = QtGui.QAction(MainWindow)
+        self.toggleLogWindowAction.setCheckable(True)
+        self.toggleLogWindowAction.setObjectName(_fromUtf8("toggleLogWindowAction"))
         self.menuArchivo.addAction(self.openFileAction)
+        self.menuArchivo.addAction(self.generateEpubAction)
         self.menuArchivo.addSeparator()
         self.menuArchivo.addAction(self.preferencesAction)
         self.menuArchivo.addSeparator()
         self.menuArchivo.addAction(self.quitAction)
         self.menuAyuda.addAction(self.aboutAction)
+        self.menuVer.addAction(self.toggleToolBarAction)
+        self.menuVer.addSeparator()
+        self.menuVer.addAction(self.toggleLogWindowAction)
         self.menubar.addAction(self.menuArchivo.menuAction())
+        self.menubar.addAction(self.menuVer.menuAction())
         self.menubar.addAction(self.menuAyuda.menuAction())
         self.toolBar.addAction(self.openFileAction)
         self.toolBar.addAction(self.generateEpubAction)
@@ -81,11 +94,14 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
         self.menuArchivo.setTitle(_translate("MainWindow", "Archivo", None))
         self.menuAyuda.setTitle(_translate("MainWindow", "Ayuda", None))
+        self.menuVer.setTitle(_translate("MainWindow", "Ver", None))
         self.toolBar.setWindowTitle(_translate("MainWindow", "Barra de Herramientas", None))
         self.openFileAction.setText(_translate("MainWindow", "Abrir", None))
         self.generateEpubAction.setText(_translate("MainWindow", "Generar ePub", None))
         self.preferencesAction.setText(_translate("MainWindow", "Preferencias", None))
         self.quitAction.setText(_translate("MainWindow", "Salir", None))
         self.aboutAction.setText(_translate("MainWindow", "Acerca de", None))
+        self.toggleToolBarAction.setText(_translate("MainWindow", "Barra de Herramientas", None))
+        self.toggleLogWindowAction.setText(_translate("MainWindow", "Log de Conversión", None))
 
 from gui.metadata_tab_manager import MetadataTabManager

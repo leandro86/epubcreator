@@ -62,8 +62,6 @@ class GeneralPreferences(PreferencesAbstract, preferences_general_widget.Ui_Gene
         elif platform.system() == "Darwin":
             dialogFilter = "Sigil (Sigil.app)"
 
-        print(platform.system())
-
         fileName = QtGui.QFileDialog.getOpenFileName(self, "", "", dialogFilter)
         if fileName:
             self.sigilPathInput.setText(fileName)

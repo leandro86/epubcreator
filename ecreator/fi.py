@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import sys
 
 from lxml import etree
 
@@ -24,7 +25,11 @@ from ecreator import ebook_data
 
 class Fi:
 
+    VALID_IMAGE_TYPES = ("png", "jpg", "jpeg", "gif")
+
     _XHTML_NS = "http://www.w3.org/1999/xhtml"
+    _DOCTYPE = ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"\n'
+                ' "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">\n')
     _SECTION_REGEX_SPLITTER = re.compile("<!--\[(\w+.xhtml)\]-->")
 
     def __init__(self, fi):
@@ -56,11 +61,35 @@ class Fi:
         return ebookSections, self._parseTitles(ebookSections)
 
     def _parseTitles(self, ebookSections):
-        # Contiene todos los títulos del primer nivel del libro (los h1). Es una lista de Title.
+        """
+        Corrige todos los tags "h" en los archivos de texto y genera además la lista de títulos.
+        En la conversión al FI no supongo que los títulos están correctamente anidados, es más, probablemente
+        estén mal (sobre todo si el archivo de origen fue un docx...). Por eso con este método debo procesar
+        los títulos y corregir los tags "h" de manera acorde.
+
+        @param ebookSections: una lista de File con los archivos de texto del ebook.
+
+        @return: una lista de Title con la toc.
+        """
+        # Contiene todos los títulos de primer nivel del libro (los h1). Es una lista de Title.
         ebookRootTitles = []
         
-        # Indica cuál fue el heading anterior procesado
+        # Indica cuál fue el nivel de heading anterior procesado
         previousHeadingNumber = 0
+
+        # Representa cuál es, en un momento dado, el nro de heading de primer nivel, es
+        # decir, el que vendría a ser una entrada de primer nivel en la toc.
+        # Puede darse una toc así:
+        #               t3
+        #               t3
+        #           t2
+        #           t2
+        #       t1
+        #       t1
+        # Como se ve, los dos primeros t3 vendrían a ser en realidad t1, pero están corridos. Lo mismo
+        # con los t2. No puedo suponer que los t1 van a ser siempre mi título de nivel 1. Incluso puede darse
+        # el caso de una toc que no tenga t1, sino que absolutamente todos los títulos estén corridos.
+        headingBase = sys.maxsize
         
         for ebookSection in ebookSections:
             sectionXml = etree.XML(ebookSection.content)
@@ -68,42 +97,68 @@ class Fi:
             headings = self._xpath(body, "x:h1 | x:h2 | x:h3 | x:h4 | x:h5 | x:h6")
 
             for heading in headings:
-                # Necesito obtener el número de heading
+                # Necesito obtener el nivel de heading
                 currentHeadingNumber = int(heading.tag[heading.tag.rindex("h") + 1:])
 
                 titleLocation = "{0}#{1}".format(ebookSection.name, heading.get("id"))
+                titleText = self._getAllText(heading, "{{{0}}}a".format(Fi._XHTML_NS)).strip()
 
-                # Si el heading es 1, entonces es un título de primer nivel y debo guardarlo.
-                if currentHeadingNumber == 1:
-                    titleText = self._getAllText(heading, "{{{0}}}a".format(Fi._XHTML_NS)).strip()
+                if currentHeadingNumber < headingBase:
+                    headingBase = currentHeadingNumber
+
+                # Si es un heading de primer nivel, entonces ésta es una entrada en la toc de primer nivel.
+                if currentHeadingNumber == headingBase:
                     title = ebook_data.Title(titleLocation, titleText)
-                    ebookRootTitles.append(title)   
-                                                         
-                    # Necesito un stack para manejar el anidamiento de títulos correctamente. Este stack va a
-                    # contener siempre, como primer elemento, algún h1. Es un stack de Title.
-                    titlesStack = [title]                            
+                    ebookRootTitles.append(title)
+
+                    # Esto es un stack que contiene una tupla con dos elementos: el primero representa un objeto
+                    # Title, y el segundo es un int con el nivel de título asociado al Title. El stack me sirve para
+                    # manejar el anidamiento de títulos correctamente, y siempre el primer elemento que voy a pushear
+                    # va a ser un título de primer nivel.
+                    titlesStack = [(title, currentHeadingNumber)]
                 else:
                     if currentHeadingNumber < previousHeadingNumber:                                            
-                        # Si el h actual es menor al anterior, debo sacar los títulos necesarios de mi pila para
-                        # poner el h actual en el nivel que corresponde. Ejemplo: si el h actual es 2, y el anterior
-                        # es 4, debo sacar de la pila: el h4, el h3 y el h2, para poder insertar el h2 actual como
-                        # hijo del h1.                        
-                        for i in range((previousHeadingNumber - currentHeadingNumber) + 1):                        
-                            titlesStack.pop()                            
+                        # Si el nivel de título actual es menor al anterior, debo sacar los títulos necesarios
+                        # de mi pila para poner el título actual en el nivel que corresponde. Ejemplo:
+                        #           1
+                        #               2
+                        #                   3
+                        #                       4
+                        # Dada una toc como la de arriba, si ahora tengo que insertar un título de nivel 2, debo ir
+                        # comparando el 2 con cada uno de los niveles de títulos que están en la pila. Mientras mi
+                        # título 2 sea menor o igual al que se encuentra en la pila, debo hacer un pop.
+                        # De esta manera me queda en la cima de la pila el título padre en el cual debo insertar mi
+                        # título 2 hijo.
+                        while currentHeadingNumber <= titlesStack[-1][1]:
+                            titlesStack.pop()
                     elif currentHeadingNumber == previousHeadingNumber:
-                        # Si el h actual es igual al anterior, debo sacar de mi pila de títulos el h que hay
-                        # en la cima (que tiene el mismo nivel que el h actual), y reemplazarlo por el nuevo h.
-                        # Ejemplo: si mi pila está así: [1, 2], no puedo permitir que quede: [1, 2, 2], ya que sino
-                        # luego no voy a poder colocar correctamente un h menor al h anterior.                        
-                        titlesStack.pop()      
+                        # Si el nivel de título actual es igual al anterior procesado, significa que los títulos son
+                        # hermanos, o sea, que tienen el mismo padre, por lo que me basta hacer un solo pop en la pila
+                        # para insertarlo en el lugar correcto. Ej:
+                        #                   4
+                        #                       5
+                        # Si tengo que insertar un nuevo título 5 en la toc de arriba, debo sacar el título 5 de la
+                        # cima de la pila para que quede el título 4 en la cima.
+                        titlesStack.pop()
                     
-                    # Inserto finalmente el nuevo título.         
-                    titlesStack.append(titlesStack[-1].addTitle(titleLocation, heading.text))
-                previousHeadingNumber = currentHeadingNumber    
-                                 
+                    # Inserto el título cuando no es un título de primer nivel.
+                    childTitle = titlesStack[-1][0].addTitle(titleLocation, titleText)
+                    titlesStack.append((childTitle, currentHeadingNumber))
+
+                # Una vez procesado el heading, corrijo el tag en la sección correspondiente.
+                heading.tag = "h{0}".format(len(titlesStack))
+                previousHeadingNumber = currentHeadingNumber
+
+            # Una vez procesados todoos los títulos de la sección, actualizo su contenido, con todos los headings ya
+            # corregidos.
+            ebookSection.content = etree.tostring(sectionXml,
+                                                  encoding="utf-8",
+                                                  xml_declaration=True,
+                                                  doctype=Fi._DOCTYPE).decode("utf-8")
+
         return ebookRootTitles
 
-    def _getAllText(self, node, ignorableNodes = ()):
+    def _getAllText(self, node, ignorableNodes=None):
         """
         Retorna todo el texto de un nodo, es decir, incluyendo el texto de todos los
         nodos descendientes.

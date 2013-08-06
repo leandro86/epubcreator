@@ -46,6 +46,7 @@
      <string>Archivo</string>
     </property>
     <addaction name="openFileAction"/>
+    <addaction name="generateEpubAction"/>
     <addaction name="separator"/>
     <addaction name="preferencesAction"/>
     <addaction name="separator"/>
@@ -57,7 +58,16 @@
     </property>
     <addaction name="aboutAction"/>
    </widget>
+   <widget class="QMenu" name="menuVer">
+    <property name="title">
+     <string>Ver</string>
+    </property>
+    <addaction name="toggleToolBarAction"/>
+    <addaction name="separator"/>
+    <addaction name="toggleLogWindowAction"/>
+   </widget>
    <addaction name="menuArchivo"/>
+   <addaction name="menuVer"/>
    <addaction name="menuAyuda"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -106,6 +116,22 @@
    </property>
    <property name="menuRole">
     <enum>QAction::AboutRole</enum>
+   </property>
+  </action>
+  <action name="toggleToolBarAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Barra de Herramientas</string>
+   </property>
+  </action>
+  <action name="toggleLogWindowAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Log de Conversión</string>
    </property>
   </action>
  </widget>

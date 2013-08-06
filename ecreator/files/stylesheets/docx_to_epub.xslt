@@ -2,8 +2,12 @@
 <xsl:stylesheet	xmlns="http://www.w3.org/1999/xhtml"
 				xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
 				xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" 
-				xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" 			
-				exclude-result-prefixes="w wp" 
+				xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+				xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"
+				xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
+				xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"				
+				xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+				exclude-result-prefixes="w a pic rels r mc" 
 				version="1.0">
 
 <xsl:output method="xml" 
@@ -15,11 +19,17 @@
 			indent="yes" 
 			version="1.0"/>
 
+<!--***********************************************************************************************	
+	Parámetros.
+	***********************************************************************************************-->
 <!--El path hacia el archivo footnotes.xml-->
 <xsl:param name="footNotesXmlPath">footnotes_path</xsl:param>
 
 <!--El path hacia el archivo styles.xml-->
 <xsl:param name="stylesXmlPath">styles_path</xsl:param>
+
+<!--El path hacia el archivo document.xml.rels-->
+<xsl:param name="relsXmlPath">rels_path</xsl:param>
 
 <!--Indica si deben ignorarse ("Y") o no ("N") los párrafos en blanco.
 	En caso de "N", los párrafos en blanco se convierten a las clases del
@@ -28,33 +38,55 @@
 		Dos o más párrafos en blanco:	"salto25"-->
 <xsl:param name="ignoreEmptyParagraphs">Y</xsl:param>
 
-<!--Necesito estas dos variables para poder comparar strings case-insensitive-->
-<xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz'"/>
-<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
-
+<!--***********************************************************************************************	
+	Variables globales.
+	**********************************************************************************************-->
 <xsl:variable name="footNotesDoc" select="document($footNotesXmlPath)"/>
 <xsl:variable name="stylesDoc" select="document($stylesXmlPath)"/>
-
-<xsl:variable name="headings" select="$stylesDoc/w:styles/w:style[starts-with(w:name/@w:val, 'heading') or 
-																  starts-with(w:name/@w:val, 'Encabezado')]/@w:styleId">
-</xsl:variable>
+<xsl:variable name="relsDoc" select="document($relsXmlPath)"/>
 
 <!--Una cosa es el id del estilo, y otra el nombre. En document.xml, se utiliza el id del estilo para referenciarlo.
 	Cada estilo está especificado en styles.xml: su id, nombre, formato, estilo padre, etc. Necesito hacer
 	un mapeo entre el id del estilo y su nombre.
-	Como se ve, en ningún momento hago referencia styles.xml, eso es porque <xslt:key> no me permite 
+	Como se ve, en ningún momento hago referencia styles.xml, eso es porque <key> no me permite 
 	usar la función "document" ni variables tampoco. Por eso es que al momento de buscar un valor con la 
 	función key(), necesito previamente	cambiar el contexto hacia styles.xml, utilizando un for-each.-->
 <xsl:key name="styles" match="w:styles/w:style/w:name/@w:val" use="parent::w:name/parent::w:style/@w:styleId"></xsl:key>
 
+<!--Me guardo el id de los estilos de todos los títulos, así me facilito el buscar párrafos con títulos más adelante.-->
+<xsl:variable name="headings" select="$stylesDoc/w:styles/w:style[starts-with(w:name/@w:val, 'heading') or 
+																  starts-with(w:name/@w:val, 'Encabezado')]/@w:styleId">
+</xsl:variable>
+
 <!--Necesito tener una referencia al documento principal para poder leer del mismo cuando
 	me encuentro en otro contexto, por ejemplo, analizando el contenido de las notas en footnotes.xml-->
 <xsl:variable name="mainDocument" select="/"></xsl:variable>
-			
+
+<!--***********************************************************************************************	
+	Warnings. (Ninguno por ahora...)
+	**********************************************************************************************-->
+<xsl:variable name="WARNING_PREFIX">**DOCX_WARNING**</xsl:variable>
+
+<xsl:variable name="NESTED_PARAGRAPH_WARNING">
+	<xsl:value-of select="$WARNING_PREFIX"/>
+	<xsl:text>Se encontró un párrafo anidado, que fue reemplazado por una etiqueta "span". Revise dicha etiqueta.</xsl:text>
+</xsl:variable>
+
+<xsl:variable name="SHAPE_WARNING">
+	<xsl:value-of select="$WARNING_PREFIX"/>
+	<xsl:text>Se encontró una figura geométrica. Este tipo de figuras no son imágenes, por lo que no pueden trasladarse al epub.</xsl:text>
+</xsl:variable>
+
+<xsl:variable name="INVALID_IMAGE_FORMAT_WARNING">
+	<xsl:value-of select="$WARNING_PREFIX"/>
+	<xsl:text>Se encontró una imagen con un formato no válido para un epub. </xsl:text>	
+	<xsl:text>Revise la etiqueta "img", cuyo atributo "alt" es "Formato inválido".</xsl:text>
+</xsl:variable>
+
 <!--***********************************************************************************************	
 	Procesa el documento principal.
 	***********************************************************************************************-->
-<xsl:template match="w:document">	
+<xsl:template match="w:document">
 	<html>
 		<head>
 			<title/>
@@ -69,7 +101,7 @@
 			<xsl:apply-templates/>
 			
 			<!--Luego de procesar todas las secciones, proceso las notas, si es que hay.-->
-			<xsl:if test="$footNotesDoc/w:footnotes">
+			<xsl:if test="$footNotesDoc/w:footnotes/w:footnote[not(@w:type)][1]">
 				<xsl:call-template name="startNotesSection"/>
 				<xsl:apply-templates select="w:body/w:p/w:r/w:footnoteReference" mode="content"/>
 			</xsl:if>
@@ -86,11 +118,8 @@
 	archivo 'foonotes.xml'.
 	***********************************************************************************************-->
 <xsl:template match="w:p[parent::w:footnote]">
-	<!--En el archivo footnotes.xml cada nota al pie tiene un atributo id que las identifica, comenzando
-		con el valor 1, e incrementándose secuencialmente. Esto me permite a mí insertar el número de nota
-		al pie de forma sencilla.
-		TODO: ¿esto es realmente así siempre? ¿Habrá algún caso donde en el docx los ids se 
-		numeren de otra forma? De ser así, debo modificar todoo esto.-->
+	<!--En el archivo footnotes.xml cada nota al pie tiene un atributo id que las identifica. 
+		Esto me permite a mí insertar el número de nota de forma sencilla.-->
 	<xsl:variable name="noteNumber" select="parent::w:footnote/@w:id"/>
 
 	<p>
@@ -98,9 +127,7 @@
 		<xsl:if test="not(preceding-sibling::w:p)">
 			<a id="nota{$noteNumber}"></a>
 			<sup>
-				<xsl:text>[</xsl:text>
-				<xsl:value-of select="$noteNumber"/>
-				<xsl:text>]</xsl:text>
+				<xsl:text>[</xsl:text><xsl:value-of select="$noteNumber"/><xsl:text>]</xsl:text>
 			</sup>
 		</xsl:if>
 
@@ -138,72 +165,131 @@
 </xsl:template>
 
 <!--***********************************************************************************************	
-	Procesa los párrafos.
+	Procesa los párrafos. Dependiendo de si se trata de un párrafo común o un título, se llama al
+	template correspondiente para que los procese.
+	Hubiera sido mejor hacer un template que matchee los títulos por un lado, y otro para los 
+	párrafos. Sin embargo, no puedo hacer esto: hasta no haber leído el archivo styles.xml, no sé
+	cuál va a ser el nombre de los estilos de los títulos, por eso debo guardarlos en una variable.
+	Pero resulta que en el "match" de un template no puedo utilizar variables... al menos en
+	xslt 1.0.
 	***********************************************************************************************-->
 <xsl:template match="w:p">
-	<xsl:choose>
-		<xsl:when test="descendant::w:t and normalize-space(.) != ''">
-			<xsl:variable name="style">
-				<xsl:variable name="currentStyleId" select="w:pPr/w:pStyle/@w:val"/>
-				<!--Obtengo el nombre del estilo a partir del id, haciendo un cambio de contexto hacia
-					styles.xml. (Ver arriba en la definición de "styles" por qué es necesario el
-					cambio de contexto.)-->
-				<xsl:for-each select="$stylesDoc">
-					<xsl:value-of select="key('styles', $currentStyleId)"/>
-				</xsl:for-each>
-			</xsl:variable>
-					
-			<!--Dependiendo de si el párrafo tiene un estilo de título aplicado o no, genero el
-				tag "h" o "p".-->
-			<xsl:variable name="tag">
-				<xsl:choose>
-					<xsl:when test="starts-with($style, 'Encabezado') or starts-with($style, 'heading')">
-						<xsl:value-of select="concat('h', substring($style, string-length($style), 1))"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:value-of select="'p'"/>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:variable>			
-			
-			<xsl:element name="{$tag}">
-				<xsl:choose>
-					<xsl:when test="$tag = 'p'">								
-						<xsl:variable name="classValue">
-							<xsl:if test="$ignoreEmptyParagraphs = 'N' and preceding-sibling::w:p[1][not(w:r/w:t[normalize-space(text()) != ''])]">
-								<xsl:text>salto</xsl:text>						
-								<xsl:choose>
-									<xsl:when test="preceding-sibling::w:p[2][not(w:r/w:t[normalize-space(text()) != ''])]">25 </xsl:when>
-									<xsl:otherwise>10 </xsl:otherwise>
-								</xsl:choose>
-							</xsl:if>						
-							<xsl:if test="starts-with($style, 'epub_')">
-								<xsl:value-of select="substring($style, 6)"/>
-							</xsl:if>
-						</xsl:variable>
-	
-						<xsl:if test="$classValue != ''">
-							<xsl:attribute name="class"><xsl:value-of select="$classValue"/></xsl:attribute>									
-						</xsl:if>								
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:variable name="headingsBeforeCount">
-							<xsl:call-template name="countHeadingsBefore">
-								<xsl:with-param name="paragraph" select="."/>
-							</xsl:call-template>
-						</xsl:variable>
-						<xsl:attribute name="id">heading_id_<xsl:value-of select="$headingsBeforeCount + 1"/></xsl:attribute>
-					</xsl:otherwise>
-				</xsl:choose>
-				<xsl:apply-templates/>
-			</xsl:element>	
+	<xsl:variable name="style">
+		<xsl:variable name="currentStyleId" select="w:pPr/w:pStyle/@w:val"/>
+		<!--Obtengo el nombre del estilo a partir del id, haciendo un cambio de contexto hacia
+			styles.xml. (Ver arriba en la definición de "styles" por qué es necesario el
+			cambio de contexto.)-->
+		<xsl:for-each select="$stylesDoc">
+			<xsl:value-of select="key('styles', $currentStyleId)"/>
+		</xsl:for-each>			
+	</xsl:variable>
+
+	<xsl:choose>		
+		<xsl:when test="starts-with($style, 'Encabezado') or starts-with($style, 'heading')">	
+			<xsl:call-template name="processHeading">
+				<xsl:with-param name="style" select="$style"/>
+			</xsl:call-template>
 		</xsl:when>
-		<xsl:when test="descendant::w:drawing">
-			<p class="ilustra"><xsl:apply-templates/></p>
-		</xsl:when>
+		<xsl:otherwise>
+			<xsl:call-template name="processParagraph">
+				<xsl:with-param name="style" select="$style"/>
+			</xsl:call-template>		
+		</xsl:otherwise>
 	</xsl:choose>
 	
-	<xsl:call-template name="checkForSectionBreak"/>
+	<xsl:call-template name="checkForSectionBreak">
+		<xsl:with-param name="paragraph" select="."/>
+	</xsl:call-template>
+</xsl:template>
+
+<!--***********************************************************************************************
+	Procesa los headings. Los títulos en docx no tienen ningún tag especial, sino que solamente
+	un estilo particular aplicado al párrafo me indica que se trata de un título.
+
+	style:	el estilo aplicado al párrafo actual.
+	***********************************************************************************************-->
+<xsl:template name="processHeading">
+	<xsl:param name="style"/>
+	
+	<xsl:variable name="headingNumber"><xsl:value-of select="substring($style, string-length($style), 1)"/></xsl:variable>
+	<xsl:choose>
+		<!--Si el número de heading es mayor a 6, no lo proceso como heading, sino como párrafo común.-->
+		<xsl:when test="$headingNumber > 6">
+			<xsl:call-template name="processParagraph">
+				<xsl:with-param name="style" select="$style"/>
+			</xsl:call-template>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:if test="w:r/w:t[normalize-space(text()) != '']">
+				<xsl:element name="h{$headingNumber}">
+					<xsl:variable name="headingsBeforeCount">
+						<xsl:call-template name="countHeadingsBefore">
+							<xsl:with-param name="paragraph" select="."/>
+						</xsl:call-template>
+					</xsl:variable>
+					
+					<!--Sumo 1, porque sino los id's me empiezan de 0 a contar...-->
+					<xsl:attribute name="id">heading_id_<xsl:value-of select="$headingsBeforeCount + 1"/></xsl:attribute>	
+					
+					<xsl:apply-templates/>
+				</xsl:element>		
+			</xsl:if>
+		</xsl:otherwise>
+	</xsl:choose>
+</xsl:template>
+
+<!--***********************************************************************************************	
+	Proceso los párrafos comunes.
+
+	style: el estilo aplicado al párrafo actual.
+	***********************************************************************************************-->
+<xsl:template name="processParagraph">
+	<xsl:param name="style"/>
+
+	<xsl:variable name="tag">
+		<xsl:choose>
+			<!--Si se trata de un párrafo anidado utilizo el tag "span".-->
+			<xsl:when test="ancestor::w:p[1]">
+				<xsl:value-of select="'span'"/>
+				<xsl:message><xsl:value-of select="$NESTED_PARAGRAPH_WARNING"/></xsl:message>
+			</xsl:when>
+			<xsl:otherwise>p</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>	
+	
+	<xsl:choose>
+		<xsl:when test="normalize-space(descendant::w:t) != ''">		
+			<xsl:variable name="classValue">
+				<!--Agrego la clase 'salto', dependiendo de si debo procesar los párrafos en blanco y de cuántos
+					párrafos en blanco hay antes del actual que estoy procesando.-->
+				<xsl:if test="$ignoreEmptyParagraphs = 'N' and preceding-sibling::w:p[1][not(w:r/w:t[normalize-space(text()) != ''])]">
+					<xsl:text>salto</xsl:text>						
+					<xsl:choose>
+						<xsl:when test="preceding-sibling::w:p[2][not(w:r/w:t[normalize-space(text()) != ''])]">25 </xsl:when>
+						<xsl:otherwise>10 </xsl:otherwise>
+					</xsl:choose>
+				</xsl:if>
+				<!--Compruebo si hay algún estilo propio-->
+				<xsl:if test="starts-with($style, 'epub_')">
+					<xsl:value-of select="substring($style, 6)"/>
+				</xsl:if>
+			</xsl:variable>
+			
+			<xsl:element name="{$tag}">
+				<xsl:if test="$classValue != ''">
+					<xsl:attribute name="class"><xsl:value-of select="$classValue"/></xsl:attribute>									
+				</xsl:if>
+				
+				<xsl:apply-templates/>	
+			</xsl:element>
+		</xsl:when>
+		<xsl:when test="descendant::pic:pic">
+			<xsl:element name="{$tag}">
+				<xsl:attribute name="class">ilustra</xsl:attribute>
+				<xsl:apply-templates/>
+			</xsl:element>
+		</xsl:when>
+</xsl:choose>
 </xsl:template>
 
 <!--***********************************************************************************************
@@ -269,18 +355,64 @@
 <!--***********************************************************************************************
 	Procesa las imágenes.
 	***********************************************************************************************-->
-<xsl:template match="w:drawing">
-	<!--Los archivos de imágenes parecen estar nombrados siempre "image1.png", "image2.png", etc., en
-		word y en libreoffice. Ahora, los ids usados en w:drawing difieren: en word empiezan a numerar
-		desde 1, y en libreoffice desde 0. Por ahora la única solución que encontré para poner
-		correctamente el id de la imagen es contar simplemente la cantidad de imágenes previas que
-		hay. De esta manera no tengo que alterar al menos los nombres de las imágenes, y puedo
-		guardarlas en el epub directamente tal cual están.
-		Necesito contar primero las imágenes que pueden encontrarse en el mismo párrafo, pero en 
-		runs anteriores. También debo contar las que se encuentran en párrafos anteriores.-->
-	<xsl:variable name="imgId" select="count(parent::w:r/preceding-sibling::w:r/w:drawing) +
-									   count(ancestor::w:p/preceding-sibling::w:p/w:r/w:drawing) + 1"/>
-	<img src="../Images/image{$imgId}.png" alt=""></img>
+<xsl:template match="pic:pic">
+	<!--Las imágenes en document.xml contienen un id, que hace referencia a document.xml.rels.
+		En dicho archivo se encuentra el path dentro del docx donde se encuentra físicamente la imagen.
+		Las imágenes parecen estar siempre dentro del dir "media", por lo que solamente extraigo el
+		nombre de la imagen.-->
+	<xsl:variable name="rId">
+		<xsl:value-of select="pic:blipFill/a:blip/@r:embed"/>	
+	</xsl:variable>
+	
+	<xsl:variable name="imageName">
+		<xsl:value-of select="substring-after($relsDoc/rels:Relationships/rels:Relationship[@Id = $rId]/@Target, 'media/')"/>
+	</xsl:variable>
+	
+	<xsl:variable name="imageType">
+		<xsl:value-of select="substring-after($imageName, '.')"/>
+	</xsl:variable>
+	
+	<img src="../Images/{$imageName}">
+		<xsl:variable name="altValue">
+			<xsl:choose>		
+				<xsl:when test="$imageType = 'png' or $imageName = 'jpg' or $imageName = 'jpeg' or $imageName = 'gif'">
+					<xsl:value-of select="$imageName"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>Formato inválido</xsl:text>
+					<xsl:message><xsl:value-of select="$INVALID_IMAGE_FORMAT_WARNING"/></xsl:message>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:attribute name="alt"><xsl:value-of select="$altValue"/></xsl:attribute>
+	</img>
+</xsl:template>
+
+
+<xsl:template match="mc:AlternateContent">
+	<xsl:message><xsl:value-of select="$SHAPE_WARNING"/></xsl:message>
+	
+	<!--Sigo aplicando templates, porque el shape probablemente tenga texto dentro, y debo procesarlo.-->
+	<xsl:apply-templates/>
+</xsl:template>
+
+<!--***********************************************************************************************
+	Los shapes y cuadros de texto tienen dos implementaciones: una actual, y otra por 
+	compatiblidad anterior. Ambas se usan en el docx. Debo ignorar la versión para compatiblidad, 
+	sino voy a obtener texto por duplicado (en el caso de un shape que contenga texto, por ej.).
+	***********************************************************************************************-->
+<xsl:template match="mc:Fallback">
+</xsl:template>
+
+<!--***********************************************************************************************
+	Sobreescribo el template por defecto que procesa texto. 
+	Solamente me interesa el texto de los elementos "t", no el resto. Por ej, un shape en el docx
+	viene representado por varios elementos, uno de ellos es la posición relativa al párrafo, que se
+	especifica así, por ej: "<wp:posOffset>608816</wp:posOffset>". Ese texto no debo procesarlo.
+	Quién sabe cuántas cosas parecidas así me tiene reservadas el formato docx, así que mejor 
+	cortar por lo sano.	
+	***********************************************************************************************-->
+<xsl:template match="text()">
 </xsl:template>
 
 
@@ -471,10 +603,13 @@
 
 <!--***********************************************************************************************
 	Comprueba si hay algún salto de página, y de ser así empieza una nueva sección.
-	NOTA: está función debe ser llamada desde dentro de un 'p' (el context node debe ser un 'p').
+	
+	paragraph:	el párrafo en el cual se debe comprobar si hay un salto de página.
 	***********************************************************************************************-->
 <xsl:template name="checkForSectionBreak">
-	<xsl:if test="w:r[w:br/@w:type = 'page'] or following-sibling::w:p[1]/w:pPr/w:pageBreakBefore">
+	<xsl:param name="paragraph"/>
+
+	<xsl:if test="$paragraph/w:r[w:br/@w:type = 'page'] or $paragraph/following-sibling::w:p[1]/w:pPr/w:pageBreakBefore">
 		<xsl:variable name="sectionsBeforeCount">	
 			<xsl:call-template name="countSectionsBefore">
 				<xsl:with-param name="paragraph" select="."/>
@@ -535,6 +670,11 @@
 </xsl:template>
 
 <!--***********************************************************************************************
+	Cuenta la cantidad de títulos que hay antes de cierto párrafo.
+
+	paragraph:	el elemento 'p' desde el cual empezar a contar hacia atrás los títulos.
+
+	Retorna el número de títulos antes del elemento 'paragraph' pasado como parámetro.
 	***********************************************************************************************-->
 <xsl:template name="countHeadingsBefore">
 	<xsl:param name="paragraph"/>
