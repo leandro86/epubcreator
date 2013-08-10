@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\preferences_dialog.ui'
 #
-# Created: Tue Aug  6 11:12:11 2013
+# Created: Sat Aug 10 01:26:20 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -74,7 +74,7 @@ class Ui_Preferences(object):
         Preferences.setTabOrder(self.listWidget, self.buttonBox)
 
     def retranslateUi(self, Preferences):
-        Preferences.setWindowTitle(_translate("Preferences", "Dialog", None))
+        Preferences.setWindowTitle(_translate("Preferences", "Preferencias", None))
         __sortingEnabled = self.listWidget.isSortingEnabled()
         self.listWidget.setSortingEnabled(False)
         item = self.listWidget.item(0)

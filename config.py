@@ -16,18 +16,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import sys
+
+
+isFrozen = getattr(sys, "frozen", False)
 
 ############################# Directorios #############################
-
-ROOT_DIR_PATH = os.path.abspath(os.path.dirname(__file__))
-ECREATOR_DIR_PATH = os.path.join(ROOT_DIR_PATH, "ecreator")
-GUI_DIR_PATH = os.path.join(ROOT_DIR_PATH, "gui")
-RESOURCES_DIR_PATH = os.path.join(GUI_DIR_PATH, "resources")
-FILES_DIR_PATH = os.path.join(ECREATOR_DIR_PATH, "files")
-EPUBBASE_FILES_DIR_PATH = os.path.join(FILES_DIR_PATH, "epubbase_files")
-STYLESHEETS_DIR_PATH = os.path.join(ROOT_DIR_PATH, FILES_DIR_PATH, "stylesheets")
-TRANSLATIONS_DIR_PATH = os.path.join(RESOURCES_DIR_PATH, "translations")
+ROOT_DIR_PATH = os.path.dirname(sys.executable if isFrozen else __file__)
+EPUBBASE_FILES_DIR_PATH = os.path.join(ROOT_DIR_PATH, "" if isFrozen else "ecreator", "files", "epubbase_files")
 
 ############################# Archivos #############################
-
-DOCX_TO_EPUB_STYLESHEET_PATH = os.path.join(STYLESHEETS_DIR_PATH, "docx_to_epub.xslt")
+DOCX_TO_EPUB_STYLESHEET_PATH = os.path.join(ROOT_DIR_PATH, "" if isFrozen else "ecreator", "files", "stylesheets",
+                                            "docx_to_epub.xslt")
+QT_SP_TRANSLATION_PATH = (os.path.join("translations", "qt_es.qm") if isFrozen else
+                          os.path.join("gui", "resources", "translations", "qt_es.qm"))

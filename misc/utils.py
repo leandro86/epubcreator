@@ -55,8 +55,10 @@ class Utilities:
     def enum(**enums):
         """
         Implementa una enumeración.
-        http://stackoverflow.com/questions/36932/whats-the-best-way-to-implement-an-enum-in-python
+
+        Ejemplo de uso: enum(RED=1, BLUE=2, GREEN=3)
         """
+        #http://stackoverflow.com/questions/36932/whats-the-best-way-to-implement-an-enum-in-python
         return type("Enum", (), enums)
 
     @staticmethod

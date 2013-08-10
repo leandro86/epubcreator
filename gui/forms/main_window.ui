@@ -32,6 +32,20 @@
     </item>
    </layout>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>Barra de Herramientas</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="openFileAction"/>
+   <addaction name="generateEpubAction"/>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -52,12 +66,6 @@
     <addaction name="separator"/>
     <addaction name="quitAction"/>
    </widget>
-   <widget class="QMenu" name="menuAyuda">
-    <property name="title">
-     <string>Ayuda</string>
-    </property>
-    <addaction name="aboutAction"/>
-   </widget>
    <widget class="QMenu" name="menuVer">
     <property name="title">
      <string>Ver</string>
@@ -68,21 +76,6 @@
    </widget>
    <addaction name="menuArchivo"/>
    <addaction name="menuVer"/>
-   <addaction name="menuAyuda"/>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>Barra de Herramientas</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="openFileAction"/>
-   <addaction name="generateEpubAction"/>
   </widget>
   <action name="openFileAction">
    <property name="icon">

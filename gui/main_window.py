@@ -25,6 +25,7 @@ from ecreator import ebook
 from misc import settings_store, utils
 from gui.forms.compiled import main_window
 from gui import preferences, log_window
+import version
 
 class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
 
@@ -49,6 +50,8 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
         # El path de la última ubicación desde la cual se abrió un archivo.
         self._lastFolderOpen = ""
 
+        self.setWindowTitle(version.APP_NAME)
+
         # Agrego la ventana de log, por defecto oculta.
         self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self._logWindow)
         self._logWindow.hide()
@@ -64,7 +67,7 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
 
         if fileName:
             self._workingFilePath = fileName
-            self.setWindowTitle(os.path.split(fileName)[-1])
+            self.setWindowTitle("{0} - {1}".format(os.path.split(fileName)[-1], version.APP_NAME))
             self._lastFolderOpen = os.path.dirname(fileName)
             self._showMessageOnStatusBar("Trabajando con: {0}.".format(fileName), 5000)
 
@@ -159,6 +162,10 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
 
         return files, titles, logMessages
 
+    def _close(self):
+        QtGui.qApp.closeAllWindows()
+        QtGui.qApp.quit()
+
     def _connectSignals(self):
         self.openFileAction.triggered.connect(self._openFile)
         self.generateEpubAction.triggered.connect(self._generateEpub)
@@ -167,4 +174,4 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
         self._logWindow.visibilityChanged.connect(self.toggleLogWindowAction.setChecked)
         self.toggleToolBarAction.triggered.connect(self.toolBar.setVisible)
         self.toolBar.visibilityChanged.connect(self.toggleToolBarAction.setChecked)
-        self.quitAction.triggered.connect(QtGui.qApp.quit)
+        self.quitAction.triggered.connect(self._close)

@@ -50,7 +50,7 @@ if __name__ == "__main__":
     # Intento cargar las traducciones a español para todos los diálogos, botones, etc., estándares de Qt
     locale = QtCore.QLocale.system().name()
     qtTranslator = QtCore.QTranslator()
-    if qtTranslator.load(os.path.join(config.TRANSLATIONS_DIR_PATH, "qt_es")):
+    if qtTranslator.load(config.QT_SP_TRANSLATION_PATH):
         app.installTranslator(qtTranslator)
 
     QtCore.QCoreApplication.setApplicationName(version.APP_NAME)

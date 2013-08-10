@@ -19,7 +19,7 @@ import os
 import datetime
 
 from lxml import etree
-from pyepubwriter import epub
+from pyepub.pyepubwriter import epub
 
 from ecreator import ebook_data
 import config

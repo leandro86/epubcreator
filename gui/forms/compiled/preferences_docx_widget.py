@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\preferences_docx_widget.ui'
 #
-# Created: Tue Aug  6 11:12:12 2013
+# Created: Sat Aug 10 01:26:20 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!

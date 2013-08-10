@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="main_window">
+    <file>../resources/images/epub.png</file>
+    <file>../resources/images/open_24x24.png</file>
+  </qresource>
+</RCC>
