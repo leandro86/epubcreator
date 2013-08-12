@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\basic_metadata_widget.ui'
 #
-# Created: Sat Aug 10 01:26:19 2013
+# Created: Sat Aug 10 23:37:57 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -27,6 +27,11 @@ class Ui_BasicMetadata(object):
     def setupUi(self, BasicMetadata):
         BasicMetadata.setObjectName(_fromUtf8("BasicMetadata"))
         BasicMetadata.resize(817, 656)
+        BasicMetadata.setStyleSheet(_fromUtf8("QGroupBox\n"
+"{ \n"
+"    border: 1px solid #A6A6A6; \n"
+"    border-radius: 5px; \n"
+"}"))
         self.gridLayout_2 = QtGui.QGridLayout(BasicMetadata)
         self.gridLayout_2.setSpacing(6)
         self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
@@ -91,6 +96,7 @@ class Ui_BasicMetadata(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupBox.sizePolicy().hasHeightForWidth())
         self.groupBox.setSizePolicy(sizePolicy)
+        self.groupBox.setStyleSheet(_fromUtf8(""))
         self.groupBox.setTitle(_fromUtf8(""))
         self.groupBox.setFlat(False)
         self.groupBox.setObjectName(_fromUtf8("groupBox"))
@@ -219,5 +225,5 @@ class Ui_BasicMetadata(object):
         self.label_13.setText(_translate("BasicMetadata", "Diseñador", None))
         self.label_6.setText(_translate("BasicMetadata", "Sinopsis", None))
 
-from gui.custom_widgets import ExtendedQListWidget, ExtendedQLabel
+from gui.custom_widgets import ExtendedQLabel, ExtendedQListWidget
 from . import basic_metadata_widget_rc

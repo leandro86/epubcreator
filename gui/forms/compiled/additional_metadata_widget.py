@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\additional_metadata_widget.ui'
 #
-# Created: Sat Aug 10 01:26:19 2013
+# Created: Sat Aug 10 23:37:57 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -27,6 +27,11 @@ class Ui_AdditionalMetadata(object):
     def setupUi(self, AdditionalMetadata):
         AdditionalMetadata.setObjectName(_fromUtf8("AdditionalMetadata"))
         AdditionalMetadata.resize(837, 594)
+        AdditionalMetadata.setStyleSheet(_fromUtf8("QGroupBox\n"
+"{ \n"
+"    border: 1px solid #A6A6A6; \n"
+"    border-radius: 5px; \n"
+"}"))
         self.gridLayout = QtGui.QGridLayout(AdditionalMetadata)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.label_17 = QtGui.QLabel(AdditionalMetadata)
@@ -129,6 +134,7 @@ class Ui_AdditionalMetadata(object):
         spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem, 6, 0, 1, 1)
         self.groupBox = QtGui.QGroupBox(AdditionalMetadata)
+        self.groupBox.setStyleSheet(_fromUtf8(""))
         self.groupBox.setTitle(_fromUtf8(""))
         self.groupBox.setObjectName(_fromUtf8("groupBox"))
         self.gridLayout_2 = QtGui.QGridLayout(self.groupBox)

@@ -16,7 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-import os
 import traceback
 
 from PyQt4 import QtGui, QtCore
@@ -24,7 +23,8 @@ import sip
 
 from misc import utils
 from gui import main_window
-import config, version
+import config
+import version
 
 
 def _handleUnknownException(exc_type, exc_value, exc_traceback):
@@ -46,6 +46,7 @@ if __name__ == "__main__":
     sip.setdestroyonexit(False)
 
     app = QtGui.QApplication(sys.argv)
+    app.setWindowIcon(config.getAppIcon())
 
     # Intento cargar las traducciones a español para todos los diálogos, botones, etc., estándares de Qt
     locale = QtCore.QLocale.system().name()

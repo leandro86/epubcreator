@@ -25,7 +25,7 @@ from ecreator import ebook
 from misc import settings_store, utils
 from gui.forms.compiled import main_window
 from gui import preferences, log_window
-import version
+import version, config
 
 class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
 

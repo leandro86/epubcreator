@@ -17,34 +17,62 @@
 
 import sys
 import os
-import distutils.sysconfig
 
+from PyQt4 import QtCore
 from cx_Freeze import setup, Executable
 
 import version
 
 
-_SITE_PACKAGES_PATH = distutils.sysconfig.get_python_lib()
-_PYQT_PATH = os.path.join(_SITE_PACKAGES_PATH, "PyQt4")
+def getImageFormatsPath():
+    app = QtCore.QCoreApplication(sys.argv)
+    libraryPaths = QtCore.QCoreApplication.libraryPaths()
 
-_packages = ["lxml"]
-_includes = []
-#_excludes = ["PyQt4.QtNetwork"]
-_include_files = [(os.path.join(_PYQT_PATH, "plugins", "imageformats", "qjpeg4.dll"), "imageformats\qjpeg4.dll"),
-                  ("ecreator/files", "files"),
-                  ("gui/resources/translations/qt_es.qm", "translations/qt_es.qm")]
+    imageFormatsPath = ""
+    i = 0
+    while i < len(libraryPaths) and not imageFormatsPath:
+        if "plugins" in libraryPaths[i]:
+            imageFormatsPath = os.path.join(libraryPaths[i], "imageformats")
+        i += 1
 
-_base = None
+    if imageFormatsPath:
+        return imageFormatsPath
+    else:
+        raise "Missing qt imageformats directory!"
 
-if sys.platform == "win32":
-    _base = "Win32GUI"
 
-setup(name = version.APP_NAME,
-      version = version.VERSION,
-      description = version.DESCRIPTION,
-      options = {"build_exe": {"packages" : _packages,
-                               "includes" : _includes,
-                               "excludes" : _excludes,
-                               "include_files" : _include_files,
-                               "include_msvcr" : True}},
-      executables = [Executable("main.py", base=_base)])
+def freezeApp():
+    imageFormatsPath = getImageFormatsPath()
+
+    packages = ["lxml"]
+    excludes = ["PyQt4.QtSvg", "PyQt4.QtNetwork", "PyQt4.QtOpenGL", "PyQt4.QtScript", "PyQt4.QtSql", "PyQt4.Qsci",
+                "PyQt4.QtXml", "PyQt4.QtTest"]
+    include_files = [(imageFormatsPath, "imageformats"),
+                     ("ecreator/files", "files"),
+                     ("gui/resources/translations/qt_es.qm", "translations/qt_es.qm")]
+    icon = "gui/resources/images/icons/app_icon.ico"
+
+    executableName = "epubcreator.exe"
+    base = "Win32GUI"
+
+    if sys.platform != "win32":
+        base = None
+        executableName = "epubcreator"
+
+    setup(name=version.APP_NAME,
+          version=version.VERSION,
+          description=version.DESCRIPTION,
+          options={"build_exe": {"build_exe": "build/epubcreator",
+                                 "packages": packages,
+                                 "excludes": excludes,
+                                 "include_files": include_files,
+                                 "include_msvcr": True,
+                                 "icon": icon}},
+          executables=[Executable("main.py",
+                                  base=base,
+                                  targetName=executableName)])
+
+
+if __name__ == "__main__":
+    freezeApp()
+
