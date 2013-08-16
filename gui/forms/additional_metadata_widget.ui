@@ -496,7 +496,7 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
-      <item row="0" column="0">
+      <item row="0" column="2">
        <widget class="QLabel" name="label_13">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -505,12 +505,12 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Nombre</string>
+         <string>Serie</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="collectionNameInput">
+      <item row="0" column="3">
+       <widget class="QLineEdit" name="subCollectionNameInput">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -525,7 +525,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
+      <item row="0" column="4">
        <widget class="QLabel" name="label_16">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -538,7 +538,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
+      <item row="0" column="5">
        <widget class="QLineEdit" name="collectionVolumeInput">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -548,11 +548,21 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>16777215</width>
+          <width>50</width>
           <height>16777215</height>
          </size>
         </property>
        </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_18">
+        <property name="text">
+         <string>Saga</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="collectionNameInput"/>
       </item>
      </layout>
     </widget>
@@ -585,6 +595,7 @@
   <tabstop>addGenreButton</tabstop>
   <tabstop>genresList</tabstop>
   <tabstop>collectionNameInput</tabstop>
+  <tabstop>subCollectionNameInput</tabstop>
   <tabstop>collectionVolumeInput</tabstop>
  </tabstops>
  <resources>

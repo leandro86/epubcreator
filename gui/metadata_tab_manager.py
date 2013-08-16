@@ -75,7 +75,8 @@ class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget.Ui_MetadataT
         try:
             collection = self.additionalMetadata.getCollection()
             metadata.collectionName = collection[0]
-            metadata.collectionVolume = collection[1]
+            metadata.subCollectionName = collection[1]
+            metadata.collectionVolume = collection[2]
         except metadata_tabs.ValidationException as e:
             self._showError(e.error, e.description, e.tab, e.widget)
             isValid = False

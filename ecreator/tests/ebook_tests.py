@@ -20,7 +20,7 @@ import tempfile
 import datetime
 
 from lxml import etree
-from pyepubreader import epub
+from pyepub.pyepubreader import epub
 
 from ecreator import ebook, ebook_data
 
@@ -280,14 +280,24 @@ class TestEbook(unittest.TestCase):
         self.assertEqual(ilustrators[2], ("William Shakespeare", "Shakespeare, William"))
         self.assertEqual(ilustrators[3], ("G. K. Chesterton", "Chesterton, G. K."))
 
-    def testCollectionsMetadadata(self):
-        self._metadata.collectionName = "Este es el nombre de la colección"
+    def testSimpleCollection(self):
+        self._metadata.subCollectionName = "Este es el nombre de la colección"
         self._metadata.collectionVolume = "9"
 
         self._generateEbook()
 
         calibreSerie = self._outputEpub.getCalibreSerie()
         self.assertEqual(calibreSerie, ("Este es el nombre de la colección", "9"))
+
+    def testBigCollection(self):
+        self._metadata.collectionName = "Esta es la colección principal"
+        self._metadata.subCollectionName = "Esta es la subcolección"
+        self._metadata.collectionVolume = "9"
+
+        self._generateEbook()
+
+        calibreSerie = self._outputEpub.getCalibreSerie()
+        self.assertEqual(calibreSerie, ("Esta es la colección principal: Esta es la subcolección", "9"))
 
     def _generateEbook(self, files = None):
         eebook = ebook.Ebook(files=files, metadata=self._metadata)

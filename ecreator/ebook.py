@@ -62,7 +62,7 @@ class Ebook:
         self._setupToc(outputEpub)
         self._addMetadata(outputEpub)
 
-        # Compruebo si estoy ante un string o un objeto file-like
+        # Compruebo si estoy ante un string (o sea, un directorio) o un objeto file-like
         if isinstance(file, str):
             fileName = os.path.join(file, self._getOutputFileName())
             outputEpub.generate(fileName)
@@ -133,7 +133,7 @@ class Ebook:
         outputEpub.addImageData(Ebook.COVER_IMAGE_EP_NAME, coverImageData)
         outputEpub.addImageData(Ebook.AUTHOR_IMAGE_EP_NAME, authorImageData)
 
-        with open(logoPath, "rb") as logo, open(exLibrisPath, "rb") as exLibris, open(styleCssPath) as styleCss:
+        with open(logoPath, "rb") as logo, open(exLibrisPath, "rb") as exLibris, open(styleCssPath, encoding="utf-8") as styleCss:
             outputEpub.addImageData("EPL_logo.png", logo.read())
             outputEpub.addImageData("ex_libris.png", exLibris.read())
             outputEpub.addStyleData("style.css", styleCss.read())
@@ -208,8 +208,14 @@ class Ebook:
         if self._metadata.publicationDate is not None:
             outputEpub.addPublicationDate(self._metadata.publicationDate)
 
-        if self._metadata.collectionName:
-            outputEpub.addCustomMetadata("calibre:series", self._metadata.collectionName)
+        if self._metadata.subCollectionName:
+            calibreSeries = ""
+
+            if self._metadata.collectionName:
+                calibreSeries += "{0}: ".format(self._metadata.collectionName)
+            calibreSeries += self._metadata.subCollectionName
+
+            outputEpub.addCustomMetadata("calibre:series", calibreSeries)
             outputEpub.addCustomMetadata("calibre:series_index", self._metadata.collectionVolume)
 
     def _setupToc(self, outputEpub):

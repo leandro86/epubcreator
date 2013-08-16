@@ -70,7 +70,12 @@ class Metadata:
         self.synopsis = ""
         self.editor = ""
         self.originalTitle = ""
+
+        # Saga
         self.collectionName = ""
+        # Serie
+        self.subCollectionName = ""
+        # Volumen
         self.collectionVolume = ""
 
         # Una lista de Person con los autores

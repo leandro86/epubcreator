@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\additional_metadata_widget.ui'
 #
-# Created: Sat Aug 10 23:37:57 2013
+# Created: Thu Aug 15 22:19:08 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -302,16 +302,16 @@ class Ui_AdditionalMetadata(object):
         sizePolicy.setHeightForWidth(self.label_13.sizePolicy().hasHeightForWidth())
         self.label_13.setSizePolicy(sizePolicy)
         self.label_13.setObjectName(_fromUtf8("label_13"))
-        self.gridLayout_5.addWidget(self.label_13, 0, 0, 1, 1)
-        self.collectionNameInput = QtGui.QLineEdit(self.groupBox_4)
+        self.gridLayout_5.addWidget(self.label_13, 0, 2, 1, 1)
+        self.subCollectionNameInput = QtGui.QLineEdit(self.groupBox_4)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.collectionNameInput.sizePolicy().hasHeightForWidth())
-        self.collectionNameInput.setSizePolicy(sizePolicy)
-        self.collectionNameInput.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        self.collectionNameInput.setObjectName(_fromUtf8("collectionNameInput"))
-        self.gridLayout_5.addWidget(self.collectionNameInput, 0, 1, 1, 1)
+        sizePolicy.setHeightForWidth(self.subCollectionNameInput.sizePolicy().hasHeightForWidth())
+        self.subCollectionNameInput.setSizePolicy(sizePolicy)
+        self.subCollectionNameInput.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.subCollectionNameInput.setObjectName(_fromUtf8("subCollectionNameInput"))
+        self.gridLayout_5.addWidget(self.subCollectionNameInput, 0, 3, 1, 1)
         self.label_16 = QtGui.QLabel(self.groupBox_4)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -319,16 +319,22 @@ class Ui_AdditionalMetadata(object):
         sizePolicy.setHeightForWidth(self.label_16.sizePolicy().hasHeightForWidth())
         self.label_16.setSizePolicy(sizePolicy)
         self.label_16.setObjectName(_fromUtf8("label_16"))
-        self.gridLayout_5.addWidget(self.label_16, 0, 2, 1, 1)
+        self.gridLayout_5.addWidget(self.label_16, 0, 4, 1, 1)
         self.collectionVolumeInput = QtGui.QLineEdit(self.groupBox_4)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.collectionVolumeInput.sizePolicy().hasHeightForWidth())
         self.collectionVolumeInput.setSizePolicy(sizePolicy)
-        self.collectionVolumeInput.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.collectionVolumeInput.setMaximumSize(QtCore.QSize(50, 16777215))
         self.collectionVolumeInput.setObjectName(_fromUtf8("collectionVolumeInput"))
-        self.gridLayout_5.addWidget(self.collectionVolumeInput, 0, 3, 1, 1)
+        self.gridLayout_5.addWidget(self.collectionVolumeInput, 0, 5, 1, 1)
+        self.label_18 = QtGui.QLabel(self.groupBox_4)
+        self.label_18.setObjectName(_fromUtf8("label_18"))
+        self.gridLayout_5.addWidget(self.label_18, 0, 0, 1, 1)
+        self.collectionNameInput = QtGui.QLineEdit(self.groupBox_4)
+        self.collectionNameInput.setObjectName(_fromUtf8("collectionNameInput"))
+        self.gridLayout_5.addWidget(self.collectionNameInput, 0, 1, 1, 1)
         self.gridLayout.addWidget(self.groupBox_4, 5, 1, 1, 3)
 
         self.retranslateUi(AdditionalMetadata)
@@ -350,7 +356,8 @@ class Ui_AdditionalMetadata(object):
         AdditionalMetadata.setTabOrder(self.genreSubGenreInput, self.addGenreButton)
         AdditionalMetadata.setTabOrder(self.addGenreButton, self.genresList)
         AdditionalMetadata.setTabOrder(self.genresList, self.collectionNameInput)
-        AdditionalMetadata.setTabOrder(self.collectionNameInput, self.collectionVolumeInput)
+        AdditionalMetadata.setTabOrder(self.collectionNameInput, self.subCollectionNameInput)
+        AdditionalMetadata.setTabOrder(self.subCollectionNameInput, self.collectionVolumeInput)
 
     def retranslateUi(self, AdditionalMetadata):
         AdditionalMetadata.setWindowTitle(_translate("AdditionalMetadata", "Form", None))
@@ -373,8 +380,9 @@ class Ui_AdditionalMetadata(object):
         self.label_14.setText(_translate("AdditionalMetadata", "Género", None))
         self.label_15.setText(_translate("AdditionalMetadata", "Subgénero", None))
         self.addGenreButton.setText(_translate("AdditionalMetadata", "Agregar Género", None))
-        self.label_13.setText(_translate("AdditionalMetadata", "Nombre", None))
+        self.label_13.setText(_translate("AdditionalMetadata", "Serie", None))
         self.label_16.setText(_translate("AdditionalMetadata", "Volumen", None))
+        self.label_18.setText(_translate("AdditionalMetadata", "Saga", None))
 
 from gui.custom_widgets import ExtendedQListWidget
 from . import additional_metadata_widget_rc

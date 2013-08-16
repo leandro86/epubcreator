@@ -17,12 +17,15 @@
 
 import sys
 import os
+import shutil
 
 from PyQt4 import QtCore
 from cx_Freeze import setup, Executable
 
 import version
 
+# En windows y linux ejecutar así: python3 setup.py build
+# En Mac: python3 setup.py bdist_mac --bundle-icon=app_icon.icns
 
 def getImageFormatsPath():
     app = QtCore.QCoreApplication(sys.argv)
@@ -45,32 +48,41 @@ def freezeApp():
     imageFormatsPath = getImageFormatsPath()
 
     packages = ["lxml"]
-    excludes = ["PyQt4.QtSvg", "PyQt4.QtNetwork", "PyQt4.QtOpenGL", "PyQt4.QtScript", "PyQt4.QtSql", "PyQt4.Qsci",
-                "PyQt4.QtXml", "PyQt4.QtTest"]
-    include_files = [(imageFormatsPath, "imageformats"),
+    excludes = ["PyQt4.QtSvg", "PyQt4.QtNetwork", "PyQt4.QtOpenGL", "PyQt4.QtScript", "PyQt4.QtSql", "PyQt4.Qsci", "PyQt4.QtXml", "PyQt4.QtTest"]
+    include_files = [(imageFormatsPath, "imageformats" if sys.platform != "darwin" else "plugins/imageformats"),
                      ("ecreator/files", "files"),
                      ("gui/resources/translations/qt_es.qm", "translations/qt_es.qm")]
-    icon = "gui/resources/images/icons/app_icon.ico"
 
-    executableName = "epubcreator.exe"
+    executableName = "{0}.exe".format(version.APP_NAME)
     base = "Win32GUI"
+
+    options = {"packages": packages,
+               "excludes": excludes,
+               "include_files": include_files,
+               "include_msvcr": True}
 
     if sys.platform != "win32":
         base = None
-        executableName = "epubcreator"
+        executableName = version.APP_NAME
+
+    if sys.platform != "darwin":
+        # Ícono para windows y linux... En mac el ícono debe tener extensión icns.
+        options["icon"] = "gui/resources/images/icons/app_icon.ico"
+
+        # En mac, al utilizar bdist_mac para crear el bundle, intenta leer los archivos desde el
+        # directorio: "exe.macos-i386..." (algo así), independientemente de que yo especifique otro
+        # directorio de destino... por eso no puedo decirle que el directorio de destino sea "build/epubcreator", solamente
+        # puedo hacerlo si estoy en windows o linux.
+        options["build_exe"] = "build/epubcreator"
 
     setup(name=version.APP_NAME,
           version=version.VERSION,
           description=version.DESCRIPTION,
-          options={"build_exe": {"build_exe": "build/epubcreator",
-                                 "packages": packages,
-                                 "excludes": excludes,
-                                 "include_files": include_files,
-                                 "include_msvcr": True,
-                                 "icon": icon}},
-          executables=[Executable("main.py",
-                                  base=base,
-                                  targetName=executableName)])
+          options={"build_exe": options},
+          executables=[Executable("main.py", base=base, targetName=executableName)])
+
+    if sys.platform == "darwin":
+        shutil.copyfile("gui/resources/images/icons/app_icon.icns", "{0}-{1}/Contents/Resources".format(version.APP_NAME, version.VERSION))
 
 
 if __name__ == "__main__":

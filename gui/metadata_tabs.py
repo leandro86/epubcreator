@@ -149,9 +149,7 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
         self._populateGenreTypes()
         self._populateGenresAndSubGenres()
 
-        # Cuando se crea el tab, por defecto el input del volumen de la serie debe estar deshabilitado, ya que no hay
-        # ningún nombre de serie especificado
-        self._toggleCollectionVolumeInput("")
+        self.collectionVolumeInput.setEnabled(False)
 
         # Editorial por defecto.
         self.publisherInput.setText("ePubLibre")
@@ -231,22 +229,29 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
 
     def getCollection(self):
         """
-        Retorna la colección y el número de la misma.
+        Retorna la saga, serie y volumen.
 
-        @return: una tupla de strings: el primer elemento es el nombre de la colección, y el segundo el número.
+        @return: una tupla de strings con: saga, serie, volumen.
 
-        @raise: ValidationException, si se especificó un nombre de colección pero no un volumen.
+        @raise: ValidationException, si se especificó una saga pero no una serie, o si se especificó
+                una serie pero no el número de volumen.
         """
         collectionName = self.collectionNameInput.text().strip()
+        subCollectionName = self.subCollectionNameInput.text().strip()
         collectionVolume = self.collectionVolumeInput.text().strip()
 
-        if collectionName and not collectionVolume:
-            raise ValidationException("No se especificó volumen de la colección",
-                                      "Se especificó un nombre para la colección, pero no el número de volumen.",
+        if collectionName and not subCollectionName:
+            raise ValidationException("No se especificó serie",
+                                      "Se especificó el nombre de la saga, pero no la serie.",
+                                      self,
+                                      self.subCollectionNameInput)
+        elif subCollectionName and not collectionVolume:
+            raise ValidationException("No se especificó volumen de la serie",
+                                      "Se especificó un nombre para la serie, pero no el número de volumen.",
                                       self,
                                       self.collectionVolumeInput)
         else:
-            return self.collectionNameInput.text().strip(), self.collectionVolumeInput.text().strip()
+            return collectionName, subCollectionName, collectionVolume
 
     def _populateLanguages(self):
         for languageName in language.Language.getSortedLanguagesNames():
@@ -349,15 +354,12 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
         item.setData(QtCore.Qt.UserRole, ebook_data.Person(name, fileAs))
         listWidget.addItem(item)
 
-    def _toggleCollectionVolumeInput(self, collectionName):
-        self.collectionVolumeInput.setEnabled(len(collectionName.strip()) != 0)
-
     def _connectSignals(self):
         self.addGenreButton.clicked.connect(self._addGenreToList)
         self.genreTypeInput.currentIndexChanged.connect(self._populateGenresAndSubGenres)
         self.genresList.deleteKeyPressed.connect(self._removeCurrentItemFromList)
 
-        self.collectionNameInput.textChanged.connect(self._toggleCollectionVolumeInput)
+        self.subCollectionNameInput.textChanged.connect(lambda s: self.collectionVolumeInput.setEnabled(len(s.strip()) != 0))
 
         self.addTranslatorButton.clicked.connect(self._addTranslatorToList)
         self.translatorsList.deleteKeyPressed.connect(self._removeCurrentItemFromList)

@@ -19,7 +19,7 @@ import zipfile
 
 from lxml import etree
 
-from pyepubreader import opf_reader
+from pyepub.pyepubreader import opf_reader
 
 class Epub:
 

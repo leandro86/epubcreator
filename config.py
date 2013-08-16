@@ -27,12 +27,12 @@ from gui.forms.compiled import epubcreator_rc
 isFrozen = getattr(sys, "frozen", False)
 
 ############################# Directorios #############################
-#ROOT_DIR_PATH = os.path.dirname(sys.executable if isFrozen else __file__)
-EPUBBASE_FILES_DIR_PATH = "files/epubbase_files" if isFrozen else "ecreator/files/epubbase_files"
+ROOT_DIR_PATH = os.path.dirname(sys.executable if isFrozen else __file__)
+EPUBBASE_FILES_DIR_PATH = os.path.join(ROOT_DIR_PATH, "" if isFrozen else "ecreator", "files", "epubbase_files")
 
 ############################# Archivos #############################
-DOCX_TO_EPUB_STYLESHEET_PATH = "files/stylesheets/docx_to_epub.xslt" if isFrozen else "ecreator/files/stylesheets/docx_to_epub.xslt"
-QT_SP_TRANSLATION_PATH = "translations/qt_es.qm" if isFrozen else "gui/resources/translations/qt_es.qm"
+DOCX_TO_EPUB_STYLESHEET_PATH = os.path.join(ROOT_DIR_PATH, "" if isFrozen else "ecreator", "files", "stylesheets", "docx_to_epub.xslt")
+QT_SP_TRANSLATION_PATH = os.path.join(ROOT_DIR_PATH, "" if isFrozen else os.path.join("gui", "resources"), "translations", "qt_es.qm")
 
 def getAppIcon():
     return QtGui.QIcon(":/epubcreator/resources/images/icons/app_icon_512x512.png")
