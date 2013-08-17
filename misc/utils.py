@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import math
+import unicodedata
 
 from PyQt4 import QtCore, QtGui
 
@@ -91,6 +92,18 @@ class Utilities:
         msgBox.setStandardButtons(QtGui.QMessageBox.Close)
         msgBox.setDetailedText(exceptionMessage)
         msgBox.exec()
+
+    @staticmethod
+    def purgeString(s):
+        """
+        Elimina acentos y caracteres no latinos de un string.
+
+        @param s: el string del cual eliminar los caracteres.
+
+        @return: un string con los caracteres eliminados.
+        """
+        return unicodedata.normalize("NFKD", s).encode('ASCII', 'ignore').decode()
+
 
 
 

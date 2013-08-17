@@ -22,6 +22,7 @@ from lxml import etree
 from pyepub.pyepubwriter import epub
 
 from ecreator import ebook_data
+from misc import utils
 import config
 
 
@@ -51,8 +52,8 @@ class Ebook:
 
         @raise: IOError, si el ebook no pudo guardarse.
 
-        @return: el path del archivo generado, si "file" es un string. Sino, se retorna el mismo objeto "file"
-                 si file es un objeto de tipo file-like.
+        @return: el path del archivo generado, si "file" es un string. Si "file" es un objeto de tipo
+                 file-like, se retorna el nombre de archivo del epub.
         """
         outputEpub = epub.Epub()
 
@@ -62,14 +63,16 @@ class Ebook:
         self._setupToc(outputEpub)
         self._addMetadata(outputEpub)
 
+        epubName = self._getOutputFileName()
+
         # Compruebo si estoy ante un string (o sea, un directorio) o un objeto file-like
         if isinstance(file, str):
-            fileName = os.path.join(file, self._getOutputFileName())
+            fileName = os.path.join(file, epubName)
             outputEpub.generate(fileName)
             return fileName
         else:
             outputEpub.generate(file)
-            return file
+            return epubName
 
     def _addEpubBaseFiles(self, outputEpub):
         templates = _EpubBaseTemplate(config.EPUBBASE_FILES_DIR_PATH)
@@ -243,7 +246,31 @@ class Ebook:
             self._addTitlesToToc(childNavPoint, childTitle.childTitles)
 
     def _getOutputFileName(self):
-        return "output.epub"
+        fileName = []
+        authorsFileAs = [author.fileAs for author in self._metadata.authors]
+        if len(authorsFileAs) < 3:
+            fileName.append(" & ".join(authorsFileAs))
+        else:
+            fileName.append("AA. VV.")
+
+        fileName.append(" - ")
+
+        if self._metadata.subCollectionName:
+            collection = ""
+
+            if self._metadata.collectionName:
+                collection += "[{0}] ".format(self._metadata.collectionName)
+            collection += "[{0} {1}] ".format(self._metadata.subCollectionName, self._metadata.collectionVolume)
+
+            if self._metadata.collectionName:
+                fileName.insert(0, collection)
+            else:
+                fileName.append(collection)
+
+        fileName.append(self._metadata.title)
+        fileName.append(" (r1.0 {0})".format(self._metadata.editor if self._metadata.editor else "El Editor"))
+
+        return utils.Utilities.purgeString("{0}.epub".format("".join(fileName)))
 
     def _formatPersons(self, personsList):
         """
