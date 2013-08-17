@@ -306,7 +306,7 @@ class TestEbook(unittest.TestCase):
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "Pérez, Juan - Título del libro (r1.0 Editor del libro).epub")
+        self.assertEqual(fileName, "Perez, Juan - Titulo del libro (r1.0 Editor del libro).epub")
 
     def testEpubFileNameTwoAuthorsNoCollection(self):
         self._metadata.title = "Título del libro"
@@ -316,7 +316,7 @@ class TestEbook(unittest.TestCase):
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "Pérez, Juan & Gómez, Roberto - Título del libro (r1.0 Editor del libro).epub")
+        self.assertEqual(fileName, "Perez, Juan & Gomez, Roberto - Titulo del libro (r1.0 Editor del libro).epub")
 
     def testEpubFileNameThreeAuthorsNoCollection(self):
         self._metadata.title = "Título del libro"
@@ -327,7 +327,7 @@ class TestEbook(unittest.TestCase):
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "AA. VV. - Título del libro (r1.0 Editor del libro).epub")
+        self.assertEqual(fileName, "AA. VV. - Titulo del libro (r1.0 Editor del libro).epub")
 
     def testEpubFileNameOneAuthorSimpleCollection(self):
         self._metadata.title = "Título del libro"
@@ -338,7 +338,7 @@ class TestEbook(unittest.TestCase):
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "Pérez, Juan - [Esta es la serie 10] Título del libro (r1.0 Editor del libro).epub")
+        self.assertEqual(fileName, "Perez, Juan - [Esta es la serie 10] Titulo del libro (r1.0 Editor del libro).epub")
 
     def testEpubFileNameOneAuthorSubCollection(self):
         self._metadata.title = "Título del libro"
@@ -350,7 +350,7 @@ class TestEbook(unittest.TestCase):
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] Pérez, Juan - Título del libro (r1.0 Editor del libro).epub")
+        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] Perez, Juan - Titulo del libro (r1.0 Editor del libro).epub")
 
     def testEpubFileNameTwoAuthorsubCollection(self):
         self._metadata.title = "Título del libro"
@@ -364,7 +364,7 @@ class TestEbook(unittest.TestCase):
         fileName = self._generateEbook()
 
         self.assertEqual(fileName,
-                         "[Esta es la saga] [Esta es la serie 10] Pérez, Juan & Gómez, Roberto - Título del libro (r1.0 Editor del libro).epub")
+                         "[Esta es la saga] [Esta es la serie 10] Perez, Juan & Gomez, Roberto - Titulo del libro (r1.0 Editor del libro).epub")
 
     def _generateEbook(self, files = None):
         eebook = ebook.Ebook(files=files, metadata=self._metadata)
