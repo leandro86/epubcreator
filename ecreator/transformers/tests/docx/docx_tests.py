@@ -127,8 +127,6 @@ class DocxTransformerTests(unittest.TestCase):
     def testImages(self):
         files = self._getOutput("images.docx")[0]
 
-        self._saveFileToDisk(files, "L:\\")
-
         # La sección más las 7 imágenes
         self.assertEqual(len(files), 7)
 

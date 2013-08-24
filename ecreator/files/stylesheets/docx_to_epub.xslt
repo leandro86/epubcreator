@@ -62,6 +62,23 @@
 	me encuentro en otro contexto, por ejemplo, analizando el contenido de las notas en footnotes.xml-->
 <xsl:variable name="mainDocument" select="/"></xsl:variable>
 
+<!--Llevar un contador de notas implicaría otro overhead más, además de que no es necesario porque en el propio footnotes.xml
+	se indica con un atributo "id" el número de nota. El problema es que este "id" no siempre empieza a contar desde 1, a veces
+	lo hace desde 2 (y podría hacerlo desde cualquier otro número, aunque esto no lo he visto por ahora). Esto no es
+	un problema grave, porque al fin y al cabo los ids no interesan, pero no es muy estético que digamos. Para solucionar esto
+	hago un pequeño cálculo sobre el id de la primer nota, de manera de obtener una especie de delfa u offset, que me va a 
+	indicar el valor que tengo que restarle a los subsecuentes id's de notas que me encuentre para corregirlo, y así siempre
+	en el epub resultante los ids de notas empiezan a contar desde 1.
+	Ojo que supongo que los ids en footnotes.xml son consecutivos, si llegara a darse el caso de un docx que no es así, no me queda
+	otra que llevar un contador de notas propio.-->
+<xsl:variable name="noteIdDelta">
+	<xsl:variable name="firstId" select="$footNotesDoc/w:footnotes/w:footnote[not(@w:type)][1]/@w:id"/>
+	<xsl:choose>
+		<xsl:when test="$firstId != 1">	<xsl:value-of select="$firstId - ($firstId - 1)"/></xsl:when>
+		<xsl:otherwise>0</xsl:otherwise>
+	</xsl:choose>
+</xsl:variable>
+
 <!--***********************************************************************************************	
 	Warnings. (Ninguno por ahora...)
 	**********************************************************************************************-->
@@ -120,7 +137,7 @@
 <xsl:template match="w:p[parent::w:footnote]">
 	<!--En el archivo footnotes.xml cada nota al pie tiene un atributo id que las identifica. 
 		Esto me permite a mí insertar el número de nota de forma sencilla.-->
-	<xsl:variable name="noteNumber" select="parent::w:footnote/@w:id"/>
+	<xsl:variable name="noteNumber" select="parent::w:footnote/@w:id - $noteIdDelta"/>
 
 	<p>
 		<!--Si es el primer párrafo, debo insertar el id de la nota-->
@@ -331,7 +348,7 @@
 	Procesa una referencia a una nota al pie.
 	***********************************************************************************************-->
 <xsl:template match="w:footnoteReference">
-	<xsl:variable name="noteNumber" select="./@w:id"/>
+	<xsl:variable name="noteNumber" select="./@w:id - $noteIdDelta"/>
 	<a id="nota{$noteNumber}-ref" href="../Text/notas.xhtml#nota{$noteNumber}"><sup>[<xsl:value-of select="$noteNumber"/>]</sup></a>
 </xsl:template>
 
