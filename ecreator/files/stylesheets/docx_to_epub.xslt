@@ -603,6 +603,7 @@
 	<xsl:call-template name="insertSeparator">
 		<xsl:with-param name="text" select="'notas.xhtml'"/>
 	</xsl:call-template>
+	<h1>Notas</h1>
 </xsl:template>
 
 <!--***********************************************************************************************
