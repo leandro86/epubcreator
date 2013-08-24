@@ -289,7 +289,7 @@ class TestEbook(unittest.TestCase):
         calibreSerie = self._outputEpub.getCalibreSerie()
         self.assertEqual(calibreSerie, ("Este es el nombre de la colección", "9"))
 
-    def testBigCollection(self):
+    def testSubCollections(self):
         self._metadata.collectionName = "Esta es la colección principal"
         self._metadata.subCollectionName = "Esta es la subcolección"
         self._metadata.collectionVolume = "9"

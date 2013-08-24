@@ -60,8 +60,8 @@ class Ebook:
         self._addEpubBaseFiles(outputEpub)
         self._addTextSections(outputEpub)
         self._addImages(outputEpub)
-        self._setupToc(outputEpub)
         self._addMetadata(outputEpub)
+        self._setupToc(outputEpub)
 
         epubName = self._getOutputFileName()
 
@@ -226,9 +226,12 @@ class Ebook:
         Crea la tabla de contenidos del epub.
         
         @param outputEpub: el epub donde está la toc.
-        """        
-        # La cubierta debe ser el primer título en la toc
+        """
+        # La cubierta debe ser la primera entrada en la toc
         outputEpub.addNavPoint(Ebook.COVER_EP_NAME, "Cubierta")
+
+        # El título del libro debe ser la segunda entrada en la toc
+        outputEpub.addNavPoint(Ebook.TITLE_EP_NAME, self._metadata.title)
         
         for title in self._titles:
             rootNavPoint = outputEpub.addNavPoint(title.titleLocation, title.text)

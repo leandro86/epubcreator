@@ -20,10 +20,8 @@ from lxml import etree
 
 class OpfReader:
 
-
     OPF_NS = "http://www.idpf.org/2007/opf"
     DC_NS = "http://purl.org/dc/elements/1.1/"
-
 
     def __init__(self, opfContent):
         """
@@ -31,10 +29,8 @@ class OpfReader:
         """
         self._opf = etree.XML(opfContent)
 
-
     def getSpineItems(self):
         return self._xpath(self._opf, "/opf:package/opf:spine/opf:itemref/@idref")
-
 
     def getAuthors(self):
         authorsList = []
@@ -47,7 +43,6 @@ class OpfReader:
 
         return authorsList
 
-
     def getTranslators(self):
         translatorsList = []
 
@@ -59,7 +54,6 @@ class OpfReader:
 
         return translatorsList
 
-
     def getIlustrators(self):
         ilustratorsList = []
 
@@ -70,7 +64,6 @@ class OpfReader:
             ilustratorsList.append((ilustratorName, ilustratorFileAs))
 
         return ilustratorsList
-
 
     def getCalibreSerie(self):
         serieName = ""
@@ -85,7 +78,6 @@ class OpfReader:
             serieIndex = self._xpath(calibreSerieIndex[0], "@content")[0]
 
         return serieName, serieIndex
-
 
     def _xpath(self, element, xpath):
         return element.xpath(xpath, namespaces={"opf" : OpfReader.OPF_NS, "dc" : OpfReader.DC_NS})
