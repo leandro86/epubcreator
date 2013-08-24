@@ -281,23 +281,32 @@ class TestEbook(unittest.TestCase):
         self.assertEqual(ilustrators[3], ("G. K. Chesterton", "Chesterton, G. K."))
 
     def testSimpleCollection(self):
-        self._metadata.subCollectionName = "Este es el nombre de la colección"
+        self._metadata.subCollectionName = "Esta es la saga"
         self._metadata.collectionVolume = "9"
 
         self._generateEbook()
 
         calibreSerie = self._outputEpub.getCalibreSerie()
-        self.assertEqual(calibreSerie, ("Este es el nombre de la colección", "9"))
+        self.assertEqual(calibreSerie, ("Esta es la saga", "9"))
 
     def testSubCollections(self):
-        self._metadata.collectionName = "Esta es la colección principal"
-        self._metadata.subCollectionName = "Esta es la subcolección"
+        self._metadata.collectionName = "Esta es la serie"
+        self._metadata.subCollectionName = "Esta es la saga"
         self._metadata.collectionVolume = "9"
 
         self._generateEbook()
 
         calibreSerie = self._outputEpub.getCalibreSerie()
-        self.assertEqual(calibreSerie, ("Esta es la colección principal: Esta es la subcolección", "9"))
+        self.assertEqual(calibreSerie, ("Esta es la serie: Esta es la saga", "9"))
+
+    def testStripZerosFromCollectionVolumeForCalibreMetadata(self):
+        self._metadata.subCollectionName = "Esta es la saga"
+        self._metadata.collectionVolume = "007"
+
+        self._generateEbook()
+
+        calibreSerie = self._outputEpub.getCalibreSerie()
+        self.assertEqual(calibreSerie, ("Esta es la saga", "7"))
 
     def testEpubFileNameOneAuthorNoCollection(self):
         self._metadata.title = "Título del libro"
@@ -369,7 +378,7 @@ class TestEbook(unittest.TestCase):
     def _generateEbook(self, files = None):
         eebook = ebook.Ebook(files=files, metadata=self._metadata)
         fileName = eebook.save(self._outputFile)
-        self._outputEpub = epub.Epub(self._outputFile)
+        self._outputEpub = epub.EpubReader(self._outputFile)
         return fileName
 
     def _getInfoFile(self):

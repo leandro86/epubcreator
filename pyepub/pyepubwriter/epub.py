@@ -24,7 +24,7 @@ from lxml import etree
 from pyepub.pyepubwriter import opf, toc
 
 
-class Epub:
+class EpubWriter:
     
     def __init__(self):
         self._opf = opf.Opf()

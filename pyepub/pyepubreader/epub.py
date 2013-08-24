@@ -22,7 +22,7 @@ from lxml import etree
 from pyepub.pyepubreader import opf_reader
 
 
-class Epub:
+class EpubReader:
 
     def __init__(self, fileInput):
         """

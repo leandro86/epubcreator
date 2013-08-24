@@ -55,7 +55,7 @@ class Ebook:
         @return: el path del archivo generado, si "file" es un string. Si "file" es un objeto de tipo
                  file-like, se retorna el nombre de archivo del epub.
         """
-        outputEpub = epub.Epub()
+        outputEpub = epub.EpubWriter()
 
         self._addEpubBaseFiles(outputEpub)
         self._addTextSections(outputEpub)
@@ -218,8 +218,14 @@ class Ebook:
                 calibreSeries += "{0}: ".format(self._metadata.collectionName)
             calibreSeries += self._metadata.subCollectionName
 
+            try:
+                # Elimino los ceros a la izquierda si se trata de un número
+                series_index = str(int(self._metadata.collectionVolume))
+            except ValueError:
+                series_index = self._metadata.collectionVolume
+
             outputEpub.addCustomMetadata("calibre:series", calibreSeries)
-            outputEpub.addCustomMetadata("calibre:series_index", self._metadata.collectionVolume)
+            outputEpub.addCustomMetadata("calibre:series_index", series_index)
 
     def _setupToc(self, outputEpub):
         """
