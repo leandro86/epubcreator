@@ -238,6 +238,13 @@ class Ebook:
 
         # El título del libro debe ser la segunda entrada en la toc
         outputEpub.addNavPoint(Ebook.TITLE_EP_NAME, self._metadata.title)
+
+        # Agrego el título "Autor" a la lista de títulos que van a ser procesados.
+        # El título "Autor" va siempre antes que el de "Notas".
+        pos = len(self._titles)
+        if self._files and self._files[-1].name == Ebook.NOTES_EP_NAME:
+            pos = len(self._titles) - 1
+        self._titles.insert(pos, ebook_data.Title(Ebook.AUTHOR_EP_NAME, "Autor"))
         
         for title in self._titles:
             rootNavPoint = outputEpub.addNavPoint(title.titleLocation, title.text)
