@@ -17,6 +17,7 @@
 
 import sys
 import traceback
+import os
 
 from PyQt4 import QtGui, QtCore
 import sip
@@ -44,6 +45,8 @@ if __name__ == "__main__":
     # can be disabled by calling the sip.setdestroyonexit() function.
     # PyQt5 always calls sip.setdestroyonexit() automatically.
     sip.setdestroyonexit(False)
+
+    QtGui.QApplication.setDesktopSettingsAware(True)
 
     app = QtGui.QApplication(sys.argv)
     app.setWindowIcon(config.getAppIcon())

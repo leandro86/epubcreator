@@ -27,6 +27,7 @@ from gui.forms.compiled import main_window
 from gui import preferences, log_window
 import version
 
+
 class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
 
     _SETTINGS_GROUP = "mainWindow"
@@ -115,9 +116,11 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
 
     def _showMessageOnStatusBar(self, message, duration=0):
         if not message:
-            self.statusBar().clearMessage()
+            #self.statusBar().clearMessage()
+            self.statusbar.clearMessage()
         else:
-            self.statusBar().showMessage(message, duration)
+            #self.statusBar().showMessage(message, duration)
+            self.statusbar.showMessage(message, duration)
 
     def _readSettings(self):
         settings = settings_store.SettingsStore()
