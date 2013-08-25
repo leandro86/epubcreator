@@ -26,6 +26,7 @@ from misc import settings_store, utils
 from gui.forms.compiled import main_window
 from gui import preferences, log_window
 import version
+import config
 
 
 class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
@@ -110,7 +111,12 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
 
     def _openInSigil(self, sigilPath, fileName):
         try:
-            subprocess.Popen([sigilPath, fileName])
+            if config.IS_RUNNING_ON_MAC:
+                # Un bundle (archivo .app) no puedo abrirlo directamente como si fuera
+                # un ejecutable, sino que debo utilizar el comando "open".
+                subprocess.Popen(["open", "-a", sigilPath, fileName])
+            else:
+                subprocess.Popen([sigilPath, fileName])
         except Exception as e:
             utils.Utilities.displayStdErrorDialog("Sigil no pudo abrirse. Compruebe que la ruta sea correcta.", str(e))
 
