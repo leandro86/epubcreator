@@ -65,10 +65,13 @@ def freezeApp():
     options["build_exe"] = "build/epubcreator"          
 
     if config.IS_RUNNING_ON_LINUX:
-        include_files.append(("/usr/lib/i386-gnu-linux/libxslt.so", "libxslt.so"))
-        include_files.append(("/usr/lib/i386-gnu-linux/libexslt.so", "libexslt.so"))
-        include_files.append(("/usr/lib/i386-gnu-linux/libxml2.so", "libxml2.so"))
-        include_files.append(("/usr/lib/i386-gnu-linux/libz.so", "libz.so"))
+        libsPath = "/usr/lib/i386-gnu-linux"
+        if sys.maxsize > 2**32:
+            libsPath = "/usr/lib/x86_64-linux-gnu"
+        include_files.append((os.path.join(libsPath, "libxslt.so.1"), "libxslt.so.1"))
+        include_files.append((os.path.join(libsPath, "libexslt.so.0"), "libexslt.so.0"))
+        include_files.append((os.path.join(libsPath, "libxml2.so.2"), "libxml2.so.2"))
+        include_files.append((os.path.join(libsPath, "libz.so"), "libz.so"))
     else:
         imgPluginsPath = getImgFormatsPluginsPath()
 
