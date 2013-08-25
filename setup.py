@@ -32,6 +32,7 @@ from PyQt4 import QtCore
 from cx_Freeze import setup, Executable
 
 import version
+import config
 
 
 def getImgFormatsPluginsPath():
@@ -52,11 +53,6 @@ def getImgFormatsPluginsPath():
 
         
 def freezeApp():
-    platform = sys.platform
-    isWin = platform == "win32"
-    isLinux = sys.platform == "linux"
-    isMac = sys.platform == "darwin"
-
     options = {}
     
     includes = ["PyQt4", "PyQt4.QtCore", "PyQt4.QtGui"]
@@ -68,7 +64,7 @@ def freezeApp():
     options["icon"] = "gui/resources/images/icons/app_icon.ico"    
     options["build_exe"] = "build/epubcreator"          
 
-    if isLinux:
+    if config.IS_RUNNING_ON_LINUX:
         include_files.append(("/usr/lib/i386-gnu-linux/libxslt.so", "libxslt.so"))
         include_files.append(("/usr/lib/i386-gnu-linux/libexslt.so", "libexslt.so"))
         include_files.append(("/usr/lib/i386-gnu-linux/libxml2.so", "libxml2.so"))
@@ -76,9 +72,9 @@ def freezeApp():
     else:
         imgPluginsPath = getImgFormatsPluginsPath()
 
-        if isWin:
+        if config.IS_RUNNING_ON_WIN:
             include_files.append((os.path.join(imgPluginsPath, "qjpeg4.dll"), "plugins/imageformats/qjpeg4.dll"))
-        elif isMac:
+        elif config.IS_RUNNING_ON_MAC:
             include_files.append((os.path.join(imgPluginsPath, "libqjpeg.dylib"), "plugins/imageformats/libqjpeg.dylib"))
             include_files.append(("/opt/local/lib/libjpeg.9.dylib", "libjpeg.9.dylib"))
 
@@ -105,15 +101,16 @@ def freezeApp():
           description=version.DESCRIPTION,
           options={"build_exe": options},
           executables=[Executable("main.py",
-                                  base="Win32GUI" if isWin else None,
-                                  targetName="{0}{1}".format(version.APP_NAME, ".exe" if isWin else ""))])
+                                  base="Win32GUI" if config.IS_RUNNING_ON_WIN else None,
+                                  targetName="{0}{1}".format(version.APP_NAME, ".exe" if config.IS_RUNNING_ON_WIN else ""))])
 
-    if isWin:
+    if config.IS_RUNNING_ON_WIN:
         # Necesito el archivo qt.conf vacío. Si está vacío, Qt carga todos los paths por defecto, que
         # en el caso de los plugins es el directorio "plugins".
         with open(os.path.join("build", "epubcreator", "qt.conf"), "w", encoding="utf-8") as file:
             pass
-    if isMac:
+
+    if config.IS_RUNNING_ON_MAC:
         # El bundle ".app" creado, por defecto tiene el nombre de esta forma: name-version.app
         bundlePath = "build/{0}-{1}.app".format(version.APP_NAME, version.VERSION)
         bundleMacOsDir = os.path.join(bundlePath, "Contents", "MacOS")
