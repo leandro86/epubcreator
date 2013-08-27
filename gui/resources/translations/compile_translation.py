@@ -20,10 +20,11 @@ import distutils.sysconfig
 import subprocess
 
 
-_SITE_PACKAGES_PATH = distutils.sysconfig.get_python_lib()
-_LRELEASE = os.path.join(_SITE_PACKAGES_PATH, "PyQt4", "lrelease.exe")
+SITE_PACKAGES_PATH = distutils.sysconfig.get_python_lib()
+LRELEASE = os.path.join(SITE_PACKAGES_PATH, "PyQt4", "lrelease.exe")
 
-def _compileQtTranslation():
+
+def compileQtTranslation():
     currentDir = os.path.dirname(__file__)
     files = os.listdir(currentDir)
     fileList = ""
@@ -32,8 +33,9 @@ def _compileQtTranslation():
         if file.endswith(".ts"):
             fileList += os.path.join(currentDir, file)
 
-    subprocess.call([_LRELEASE, fileList, "-qm", "qt_es.qm"])
-    
+    subprocess.call([LRELEASE, fileList, "-qm", "qt_es.qm"])
+
+
 if __name__ == '__main__':
-    _compileQtTranslation()
-    print("Archivos compilados.")
+    compileQtTranslation()
+    print("Listo!")

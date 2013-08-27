@@ -15,28 +15,39 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# Es necesario correr este script cada vez que se realice algún cambio
+# en la interface gráfica.
+
 import os
 import distutils.sysconfig
 import subprocess
+import shutil
 
 
-_SITE_PACKAGES_PATH = distutils.sysconfig.get_python_lib()
-_PYUIC = os.path.join(_SITE_PACKAGES_PATH, "PyQt4", "pyuic4.bat")
-_PYRCC = os.path.join(_SITE_PACKAGES_PATH, "PyQt4", "pyrcc4.exe")
-_FORMS_PATH = os.path.join(os.path.dirname(__file__), "forms")
+SITE_PACKAGES_PATH = distutils.sysconfig.get_python_lib()
+PYUIC = os.path.join(SITE_PACKAGES_PATH, "PyQt4", "pyuic4.bat")
+PYRCC = os.path.join(SITE_PACKAGES_PATH, "PyQt4", "pyrcc4.exe")
+FORMS_PATH = os.path.join(os.path.dirname(__file__), "forms")
+OUTPUT_DIR = os.path.join(FORMS_PATH, "compiled")
 
-def _compileUi():
-    files = os.listdir(_FORMS_PATH)
+def compileUi():
+    # Limpio primero la carpeta
+    for file in [os.path.join(OUTPUT_DIR, f) for f in os.listdir(OUTPUT_DIR)]:
+        if os.path.isdir(file):
+            shutil.rmtree(file)
+        else:
+            os.remove(file)
+
+    files = os.listdir(FORMS_PATH)
     for file in files:
         fileName, fileExtension = os.path.splitext(file)
 
         if fileExtension == ".ui":
-            subprocess.call([_PYUIC, "--from-imports", "-o", os.path.join(_FORMS_PATH, "compiled", fileName + ".py"),
-                             os.path.join(_FORMS_PATH, file)])
+            subprocess.call([PYUIC, "--from-imports", "-o", os.path.join(OUTPUT_DIR, fileName + ".py"), os.path.join(FORMS_PATH, file)])
         elif fileExtension == ".qrc":
-            subprocess.call([_PYRCC, "-py3", "-o", os.path.join(_FORMS_PATH, "compiled", fileName + "_rc.py"),
-                             os.path.join(_FORMS_PATH, file)])
+            subprocess.call([PYRCC, "-py3", "-o", os.path.join(OUTPUT_DIR, fileName + "_rc.py"), os.path.join(FORMS_PATH, file)])
+
 
 if __name__ == "__main__":
-    _compileUi()
-    print("Archivos compilados.")
+    compileUi()
+    print("Listo!")
