@@ -122,11 +122,16 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
 
     def _showMessageOnStatusBar(self, message, duration=0):
         if not message:
-            #self.statusBar().clearMessage()
-            self.statusbar.clearMessage()
+            self.statusBar().clearMessage()
         else:
-            #self.statusBar().showMessage(message, duration)
-            self.statusbar.showMessage(message, duration)
+            self.statusBar().showMessage(message, duration)
+
+        # Obligo a mostrar el mensaje en la barra de estado, ya que si
+        # previamente empezó a correr un proceso que lleva algo de
+        # tiempo, el mensaje se muestra después de que el proceso finalice.
+        # Aunque esto solamente pasa en linux y mac, no en windows. Es decir, que
+        # en windows esta línea no sería necesaria.
+        QtGui.QApplication.processEvents()
 
     def _readSettings(self):
         settings = settings_store.SettingsStore()
