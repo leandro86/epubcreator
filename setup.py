@@ -65,7 +65,7 @@ def freezeApp():
     options["build_exe"] = "build/epubcreator"          
 
     if config.IS_RUNNING_ON_LINUX:
-        libsPath = "/usr/lib/i386-gnu-linux"
+        libsPath = "/usr/lib/i386-linux-gnu"
         if sys.maxsize > 2**32:
             libsPath = "/usr/lib/x86_64-linux-gnu"
         include_files.append((os.path.join(libsPath, "libxslt.so.1"), "libxslt.so.1"))
@@ -153,10 +153,12 @@ def freezeApp():
                     newfilename = "@executable_path/{0}".format(name)
                     subprocess.call(("install_name_tool", "-change", filename, newfilename, lib))
 
-        # Por último, copio el ícono
+        # Copio el ícono
         shutil.copy("gui/resources/images/icons/app_icon.icns", "build/{0}-{1}.app/Contents/Resources".format(version.APP_NAME, version.VERSION))
 
-
+        # Renombro el bundle, porque no quiero que el nombre incluya la versión
+        os.rename(bundlePath, "build/EpubCreator.app")
+        
 if __name__ == "__main__":
     freezeApp()
 
