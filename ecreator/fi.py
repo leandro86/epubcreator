@@ -100,7 +100,11 @@ class Fi:
                 # Necesito obtener el nivel de heading
                 currentHeadingNumber = int(heading.tag[heading.tag.rindex("h") + 1:])
 
-                titleLocation = "{0}#{1}".format(ebookSection.name, heading.get("id"))
+                headingId = heading.get("id")
+                titleLocation = ebookSection.name
+                if headingId:
+                    titleLocation += "#{0}".format(headingId)
+
                 titleText = self._getAllText(heading, "{{{0}}}a".format(Fi._XHTML_NS)).strip()
 
                 if currentHeadingNumber < headingBase:
