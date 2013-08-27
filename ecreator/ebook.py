@@ -177,7 +177,7 @@ class Ebook:
             self._metadata.publisher = "ePubLibre"
 
         # Ordeno los géneros alfabéticamente...
-        self._metadata.genres.sort(key = lambda x: (x.genreType, x.genre, x.subGenre))
+        self._metadata.genres.sort(key=lambda x: (x.genreType, x.genre, x.subGenre))
 
         genres = []
         previousGenre = ""
@@ -188,6 +188,8 @@ class Ebook:
             genres.append(genre.subGenre)
 
         authors = self._formatPersons(self._metadata.authors)
+        translators = self._formatPersons(self._metadata.translators)
+        ilustrators = self._formatPersons(self._metadata.ilustrators)
 
         # Agrego semántica a cubierta.xhtml
         outputEpub.addReference("cubierta.xhtml", "Cover", "cover")
@@ -202,11 +204,11 @@ class Ebook:
         outputEpub.addPublisher(self._metadata.publisher)
         outputEpub.addSubject(", ".join(genres))
 
-        for translator in self._metadata.translators:
-            outputEpub.addTranslator(translator.name, translator.fileAs)
+        if translators:
+            outputEpub.addTranslator(translators[0], translators[1])
 
-        for ilustrator in self._metadata.ilustrators:
-            outputEpub.addIlustrator(ilustrator.name, ilustrator.fileAs)
+        if ilustrators:
+            outputEpub.addIlustrator(ilustrators[0], ilustrators[1])
 
         if self._metadata.publicationDate is not None:
             outputEpub.addPublicationDate(self._metadata.publicationDate)

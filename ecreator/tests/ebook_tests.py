@@ -253,11 +253,9 @@ class TestEbook(unittest.TestCase):
 
         # Compruebo que en los metadatos se hayan agregado los traductores correctamente
         translators = self._outputEpub.getTranslators()
-        self.assertEqual(len(translators), 4)
-        self.assertEqual(translators[0], ("Jorge Luis Borges", "Borges, Jorge Luis"))
-        self.assertEqual(translators[1], ("Edgar Allan Poe", "Poe, Edgar Allan"))
-        self.assertEqual(translators[2], ("William Shakespeare", "Shakespeare, William"))
-        self.assertEqual(translators[3], ("G. K. Chesterton", "Chesterton, G. K."))
+        self.assertEqual(len(translators), 1)
+        self.assertEqual(translators[0], ("Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & G. K. Chesterton",
+                                          "Borges, Jorge Luis & Poe, Edgar Allan & Shakespeare, William & Chesterton, G. K."))
 
     def testMultipleIlustrators(self):
         self._metadata.ilustrators.append(ebook_data.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
@@ -274,11 +272,9 @@ class TestEbook(unittest.TestCase):
 
         # Compruebo que en los metadatos se hayan agregado los ilustradores correctamente
         ilustrators = self._outputEpub.getIlustrators()
-        self.assertEqual(len(ilustrators), 4)
-        self.assertEqual(ilustrators[0], ("Jorge Luis Borges", "Borges, Jorge Luis"))
-        self.assertEqual(ilustrators[1], ("Edgar Allan Poe", "Poe, Edgar Allan"))
-        self.assertEqual(ilustrators[2], ("William Shakespeare", "Shakespeare, William"))
-        self.assertEqual(ilustrators[3], ("G. K. Chesterton", "Chesterton, G. K."))
+        self.assertEqual(len(ilustrators), 1)
+        self.assertEqual(ilustrators[0], ("Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & G. K. Chesterton",
+                                          "Borges, Jorge Luis & Poe, Edgar Allan & Shakespeare, William & Chesterton, G. K."))
 
     def testSimpleCollection(self):
         self._metadata.subCollectionName = "Esta es la saga"
