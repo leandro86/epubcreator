@@ -175,7 +175,7 @@
 			
 			<xsl:call-template name="insertNoteReturn">
 				<xsl:with-param name="sectionName" select="$sectionName"/>
-				<xsl:with-param name="noteId" select="concat('nota', $noteNumber, '-ref')"/>
+				<xsl:with-param name="noteId" select="concat('nota', $noteNumber, 'ref')"/>
 			</xsl:call-template>
 		</xsl:if>
 	</p>
@@ -349,7 +349,7 @@
 	***********************************************************************************************-->
 <xsl:template match="w:footnoteReference">
 	<xsl:variable name="noteNumber" select="./@w:id - $noteIdDelta"/>
-	<a id="nota{$noteNumber}-ref" href="../Text/notas.xhtml#nota{$noteNumber}"><sup>[<xsl:value-of select="$noteNumber"/>]</sup></a>
+	<a id="nota{$noteNumber}ref" href="../Text/notas.xhtml#nota{$noteNumber}"><sup>[<xsl:value-of select="$noteNumber"/>]</sup></a>
 </xsl:template>
 
 <!--***********************************************************************************************
