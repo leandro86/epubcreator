@@ -101,15 +101,26 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
                     if logMessages:
                         self._logWindow.show()
 
+                    statusBarMsg = "ePub generado. "
+
                     if settings.sigilPath:
-                        self._showMessageOnStatusBar("Abriendo ePub en Sigil...")
-                        self._openInSigil(settings.sigilPath, fileName)
+                        if self._openInSigil(settings.sigilPath, fileName):
+                            statusBarMsg += "Abriendo Sigil..."
+
+                    self._showMessageOnStatusBar(statusBarMsg, 5000)
                 except IOError as e:
                     utils.Utilities.displayStdErrorDialog("Ocurrió un error al intentar guardar el epub.", str(e))
-
-        self._showMessageOnStatusBar("")
+                    self._showMessageOnStatusBar("No se pudo generar el ePub.")
 
     def _openInSigil(self, sigilPath, fileName):
+        """
+        Abre un epub en sigil.
+
+        @param sigilPath: el path de sigil.
+        @param fileName: la ruta del epub a abrir.
+
+        @return: True o False, dependiendo de si sigil pudo abrirse o no.
+        """
         try:
             if config.IS_RUNNING_ON_MAC:
                 # Un bundle (archivo .app) no puedo abrirlo directamente como si fuera
@@ -117,8 +128,10 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
                 subprocess.Popen(["open", "-a", sigilPath, fileName])
             else:
                 subprocess.Popen([sigilPath, fileName])
+            return True
         except Exception as e:
             utils.Utilities.displayStdErrorDialog("Sigil no pudo abrirse. Compruebe que la ruta sea correcta.", str(e))
+            return False
 
     def _showMessageOnStatusBar(self, message, duration=0):
         if not message:
