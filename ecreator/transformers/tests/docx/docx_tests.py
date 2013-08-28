@@ -141,8 +141,6 @@ class DocxTransformerTests(unittest.TestCase):
     def testNestedParagraphs(self):
         files, _, logMessages = self._getOutput("nested_paragraphs.docx")
 
-        self._saveFileToDisk(files, "L:\\")
-
         self.assertEqual(len(files), 1)
         self.assertTrue(self._comparefiles("nested_paragraphs.docx", files))
 
@@ -183,6 +181,12 @@ class DocxTransformerTests(unittest.TestCase):
         self.assertEqual(len(logMessages), 1)
         self.assertTrue(logMessages[0].msgType == transformer_base.TransformerLogMessage.MSG_TYPE.WARNING)
         self.assertTrue("Se encontró una imagen con un formato no válido" in logMessages[0].message)
+
+    def testStylesWithFormats(self):
+        files = self._getOutput("styles_with_formats.docx")[0]
+
+        self.assertEqual(len(files), 1)
+        self.assertTrue(self._comparefiles("styles_with_formats.docx", files))
 
     def _comparefiles(self, testFileName, files):
         """

@@ -80,7 +80,7 @@
 </xsl:variable>
 
 <!--***********************************************************************************************	
-	Warnings. (Ninguno por ahora...)
+	Warnings.
 	**********************************************************************************************-->
 <xsl:variable name="WARNING_PREFIX">**DOCX_WARNING**</xsl:variable>
 
@@ -194,11 +194,10 @@
 	<xsl:variable name="style">
 		<xsl:variable name="currentStyleId" select="w:pPr/w:pStyle/@w:val"/>
 		<!--Obtengo el nombre del estilo a partir del id, haciendo un cambio de contexto hacia
-			styles.xml. (Ver arriba en la definición de "styles" por qué es necesario el
-			cambio de contexto.)-->
+			styles.xml (necesario, porque es una limitación de xslt 1.0)-->
 		<xsl:for-each select="$stylesDoc">
 			<xsl:value-of select="key('styles', $currentStyleId)"/>
-		</xsl:for-each>			
+		</xsl:for-each>
 	</xsl:variable>
 
 	<xsl:choose>		
@@ -313,6 +312,12 @@
 	Procesa los 'runs'.
 	***********************************************************************************************-->
 <xsl:template match="w:r">
+	<!--TODO: por ahora, esto lo dejo así. No encontré la forma todavía de poder abrir y cerrar los tags
+		de formato de manera elegante. Es muy difícil hacerlo sin poder mantener algún tipo de estado, algo
+		que me indique qué formatos siguen abierto de runs anteriores, así puedo cerrar todos los anidamientos
+		de manera acorde. Me limité a copiar la solución que usó tarloth en su planilla, que reconstruye de
+		manera elegante los tags en la mayoría de los casos (cuando el formato de los runs que se comparan es
+		EXACTAMENTE el mismo)-->
 	<xsl:variable name="previousFormats">
 		<xsl:call-template name="transformRunFormats">
 			<xsl:with-param name="run" select="preceding-sibling::w:r[1]"/>
@@ -495,55 +500,59 @@
 
 	run:	el nodo "r" (run) del cual buscar los formatos.
 
-	Retorna un string de 5 caracteres, donde un "-" significa ausencia de estilo, y "*" significa
-	que ese estilo está aplicado al run. Los 5 caracteres representan, en orden:
+	Retorna un string de 5 caracteres, donde un "-" significa ausencia de formato, y "*" significa
+	que ese formato está aplicado al run. Los 5 caracteres representan, en orden:
 		1-	Negrita
 		2-	Itálica
 		3-	Superíndice
 		4-	Subíndice
 		5-	Subrayado
-	Ejemplo: "*-*-*", significa que el run tiene aplicado los estilos: negrita, superíndice y
+	Ejemplo: "*-*-*", significa que el run tiene aplicado los formatos: negrita, superíndice y
 					  subrayado.
 	***********************************************************************************************-->	
 <xsl:template name="transformRunFormats">
 	<xsl:param name="run"/>	
-
-	<!--TODO: por ahora, esto lo dejo así. No encontré la forma todavía de poder abrir y cerrar los tags
-		de formato de manera elegante. Es muy difícil hacerlo sin poder mantener algún tipo de estado, algo
-		que me indique qué formatos siguen abierto de runs anteriores, así puedo cerrar todos los anidamientos
-		de manera acorde. Me limité a copiar la solución que usó tarloth en su planilla, que reconstruye de
-		manera elegante los tags en la mayoría de los casos (cuando el formato de los runs que se comparan es
-		EXACTAMENTE el mismo)-->
 
 	<xsl:choose>
 		<xsl:when test="not($run[w:rPr])">
 			<xsl:text>-----</xsl:text>
 		</xsl:when>				
 		<xsl:otherwise>
-			<xsl:variable name="style" select="$run/w:rPr"/>			
+			<!--Obtengo los formatos aplicados al run-->
+			<xsl:variable name="formats" select="$run/w:rPr"/>
+			
+			<!--Además de los formatos, un run puede tener aplicado un estilo. Dicho estilo también tiene
+				varias propiedades, entre ellas, posiblemente un formato. Debo obtener también estos formatos
+				que son propios al estilo, porque puede suceder que algún texto esté en negrita, pero no porque
+				se le aplicó el formato negrita, sino porque tiene aplicado un estilo particular que entre sus
+				propiedades tiene definido el formato negrita. Esto sucede a menudo cuando se realiza la conversión
+				desde un pdf a docx utilizando abby finereader: no le aplica "formatos" al texto, sino que le aplica
+				"estilos" propios.-->
+			<xsl:variable name="style" select="$stylesDoc/w:styles/w:style[@w:styleId = $run/w:rPr/w:rStyle/@w:val]/w:rPr"/>
+			
 			<!--Negrita-->
 			<xsl:choose>
-				<xsl:when test="$style/w:b">*</xsl:when>
+				<xsl:when test="$formats/w:b or $style/w:b">*</xsl:when>
 				<xsl:otherwise>-</xsl:otherwise>
 			</xsl:choose>
 			<!--Itálica-->
 			<xsl:choose>
-				<xsl:when test="$style/w:i">*</xsl:when>
+				<xsl:when test="$formats/w:i or $style/w:i">*</xsl:when>
 				<xsl:otherwise>-</xsl:otherwise>
 			</xsl:choose>
 			<!--Superíndice-->
 			<xsl:choose>
-				<xsl:when test="$style/w:vertAlign/@w:val='superscript'">*</xsl:when>
+				<xsl:when test="$formats/w:vertAlign/@w:val='superscript'">*</xsl:when>
 				<xsl:otherwise>-</xsl:otherwise>
 			</xsl:choose>
 			<!--Subíndice-->
 			<xsl:choose>
-				<xsl:when test="$style/w:vertAlign/@w:val='subscript'">*</xsl:when>
+				<xsl:when test="$formats/w:vertAlign/@w:val='subscript'">*</xsl:when>
 				<xsl:otherwise>-</xsl:otherwise>
 			</xsl:choose>
 			<!--Subrayado-->
 			<xsl:choose>
-				<xsl:when test="$style/w:u">*</xsl:when>
+				<xsl:when test="$formats/w:u or $style/w:u">*</xsl:when>
 				<xsl:otherwise>-</xsl:otherwise>
 			</xsl:choose>
 		</xsl:otherwise>
