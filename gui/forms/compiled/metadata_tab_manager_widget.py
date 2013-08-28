@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\metadata_tab_manager_widget.ui'
 #
-# Created: Tue Aug 27 14:44:04 2013
+# Created: Wed Aug 28 16:18:48 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -54,4 +54,4 @@ class Ui_MetadataTabManager(object):
         self.metadataTabManager.setTabText(self.metadataTabManager.indexOf(self.additionalMetadata), _translate("MetadataTabManager", "Datos Adicionales", None))
         self.metadataTabManager.setTabText(self.metadataTabManager.indexOf(self.authorMetadata), _translate("MetadataTabManager", "Datos del Autor", None))
 
-from gui.metadata_tabs import BasicMetadata, AuthorMetadata, AdditionalMetadata
+from gui.metadata_tabs import AdditionalMetadata, AuthorMetadata, BasicMetadata

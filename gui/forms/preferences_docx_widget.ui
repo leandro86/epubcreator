@@ -29,6 +29,13 @@
    </item>
    <item row="0" column="0">
     <widget class="QCheckBox" name="ignoreEmptyParagraphsInput">
+     <property name="toolTip">
+      <string>Indica si los párrafos en blanco deben ignorarse, o reemplazarse por la 
+clase &quot;salto&quot; de acuerdo al siguiente criterio:
+
+Un párrafo en blanco, se reemplaza por la clase &quot;salto10&quot;.
+Dos o más, por la clase &quot;salto25&quot;.</string>
+     </property>
      <property name="text">
       <string>Ignorar Párrafos en Blanco</string>
      </property>

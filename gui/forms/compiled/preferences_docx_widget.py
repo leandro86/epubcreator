@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\preferences_docx_widget.ui'
 #
-# Created: Tue Aug 27 14:44:04 2013
+# Created: Wed Aug 28 16:18:48 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -40,5 +40,10 @@ class Ui_DocxPreferences(object):
 
     def retranslateUi(self, DocxPreferences):
         DocxPreferences.setWindowTitle(_translate("DocxPreferences", "Form", None))
+        self.ignoreEmptyParagraphsInput.setToolTip(_translate("DocxPreferences", "Indica si los párrafos en blanco deben ignorarse, o reemplazarse por la \n"
+"clase \"salto\" de acuerdo al siguiente criterio:\n"
+"\n"
+"Un párrafo en blanco, se reemplaza por la clase \"salto10\".\n"
+"Dos o más, por la clase \"salto25\".", None))
         self.ignoreEmptyParagraphsInput.setText(_translate("DocxPreferences", "Ignorar Párrafos en Blanco", None))
 

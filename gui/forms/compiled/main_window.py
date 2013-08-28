@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\main_window.ui'
 #
-# Created: Tue Aug 27 14:44:04 2013
+# Created: Wed Aug 28 16:18:47 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -100,7 +100,7 @@ class Ui_MainWindow(object):
         self.menuArchivo.setTitle(_translate("MainWindow", "Archivo", None))
         self.menuVer.setTitle(_translate("MainWindow", "Ver", None))
         self.openFileAction.setText(_translate("MainWindow", "Abrir", None))
-        self.openFileAction.setToolTip(_translate("MainWindow", "Abrir", None))
+        self.openFileAction.setToolTip(_translate("MainWindow", "Abrir Archivo", None))
         self.generateEpubAction.setText(_translate("MainWindow", "Generar ePub", None))
         self.preferencesAction.setText(_translate("MainWindow", "Preferencias", None))
         self.quitAction.setText(_translate("MainWindow", "Salir", None))

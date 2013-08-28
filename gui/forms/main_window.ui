@@ -86,7 +86,7 @@
     <string>Abrir</string>
    </property>
    <property name="toolTip">
-    <string>Abrir</string>
+    <string>Abrir Archivo</string>
    </property>
   </action>
   <action name="generateEpubAction">
