@@ -7,7 +7,8 @@
 				xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
 				xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"				
 				xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-				exclude-result-prefixes="w a pic rels r mc" 
+				xmlns:v="urn:schemas-microsoft-com:vml"
+				exclude-result-prefixes="w a pic rels r mc v" 
 				version="1.0">
 
 <xsl:output method="xml" 
@@ -299,7 +300,7 @@
 				<xsl:apply-templates/>	
 			</xsl:element>
 		</xsl:when>
-		<xsl:when test="descendant::pic:pic">
+		<xsl:when test="not(descendant::w:t) and (descendant::pic:pic[1] or descendant::w:pict[1])">
 			<xsl:element name="{$tag}">
 				<xsl:attribute name="class">ilustra</xsl:attribute>
 				<xsl:apply-templates/>
@@ -390,27 +391,37 @@
 		<xsl:value-of select="substring-after($relsDoc/rels:Relationships/rels:Relationship[@Id = $rId]/@Target, 'media/')"/>
 	</xsl:variable>
 	
-	<xsl:variable name="imageType">
-		<xsl:value-of select="substring-after($imageName, '.')"/>
-	</xsl:variable>
-	
-	<img src="../Images/{$imageName}">
-		<xsl:variable name="altValue">
-			<xsl:choose>		
-				<xsl:when test="$imageType = 'png' or $imageName = 'jpg' or $imageName = 'jpeg' or $imageName = 'gif'">
-					<xsl:value-of select="$imageName"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:text>Formato inválido</xsl:text>
-					<xsl:message><xsl:value-of select="$INVALID_IMAGE_FORMAT_WARNING"/></xsl:message>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		<xsl:attribute name="alt"><xsl:value-of select="$altValue"/></xsl:attribute>
-	</img>
+	<xsl:call-template name="insertImage">
+		<xsl:with-param name="name" select="$imageName"/>
+	</xsl:call-template>
 </xsl:template>
 
+<!--***********************************************************************************************
+	Procesa las imágenes, matcheando un tag para las imágenes ya en desuso, que se usaba en
+	word 2007, pero que abby finereader parece utilizar al convertir a docx.
+	***********************************************************************************************-->
+<xsl:template match="w:pict">
+	<xsl:variable name="rId">
+		<xsl:value-of select="descendant::v:imagedata[1]/@r:id"/>	
+	</xsl:variable>
+	
+	<xsl:if test="$rId != ''">
+		<xsl:variable name="imageName">
+			<xsl:value-of select="substring-after($relsDoc/rels:Relationships/rels:Relationship[@Id = $rId]/@Target, 'media/')"/>
+		</xsl:variable>
+			
+		<xsl:call-template name="insertImage">
+			<xsl:with-param name="name" select="$imageName"/>
+		</xsl:call-template>
+	</xsl:if>
+	
+	<!--Puede contener un textbox o un shape dentro, por lo que debo procesar texto si lo hay-->
+	<xsl:apply-templates/>
+</xsl:template>
 
+<!--***********************************************************************************************
+	Procesa los textboxes y shapes.
+	***********************************************************************************************-->
 <xsl:template match="mc:AlternateContent">
 	<xsl:message><xsl:value-of select="$SHAPE_WARNING"/></xsl:message>
 	
@@ -707,6 +718,35 @@
 	<xsl:param name="paragraph"/>
 
 	<xsl:value-of select="count(preceding-sibling::w:p/w:pPr/w:pStyle[@w:val = $headings])"/>
+</xsl:template>
+
+
+<!--***********************************************************************************************
+	Inserta una imagen.
+
+	name: el nombre de la imagen a insertar.
+	***********************************************************************************************-->
+<xsl:template name="insertImage">
+	<xsl:param name="name"/>
+
+	<xsl:variable name="type">
+		<xsl:value-of select="substring-after($name, '.')"/>
+	</xsl:variable>
+
+	<img src="../Images/{$name}">
+		<xsl:variable name="altValue">
+			<xsl:choose>		
+				<xsl:when test="$type = 'png' or $type = 'jpg' or $type = 'jpeg' or $type = 'gif'">
+					<xsl:value-of select="$name"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>Formato inválido</xsl:text>
+					<xsl:message><xsl:value-of select="$INVALID_IMAGE_FORMAT_WARNING"/></xsl:message>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:attribute name="alt"><xsl:value-of select="$altValue"/></xsl:attribute>
+	</img>
 </xsl:template>
 
 </xsl:stylesheet>
