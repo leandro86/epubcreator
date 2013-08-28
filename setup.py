@@ -158,7 +158,8 @@ def freezeApp():
 
         # Renombro el bundle, porque no quiero que el nombre incluya la versión
         os.rename(bundlePath, "build/EpubCreator.app")
-        
+
+
 if __name__ == "__main__":
     freezeApp()
 

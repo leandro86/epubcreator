@@ -88,7 +88,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
 
     def _changeCoverImage(self):
         imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen",
-                                                      "L:\\libros\\epubcreator_tests", "Imágenes (*.png *.jpg)")
+                                                      "L:\\libros\\epubcreator_tests", "Imágenes (*.jpg)")
         if imageName:
             with open(imageName, "rb") as file:
                 self._coverImageBytes = file.read()
@@ -402,7 +402,7 @@ class AuthorMetadata(QtGui.QWidget, author_metadata_widget.Ui_AuthorMetadata):
 
     def _changeAuthorImage(self):
         imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen",
-                                                      "L:\\libros\\epubcreator_tests", "Imágenes (*.png *.jpg)")
+                                                      "L:\\libros\\epubcreator_tests", "Imágenes (*.jpg)")
         if imageName:
             with open(imageName, "rb") as file:
                 self._authorImageBytes = file.read()
