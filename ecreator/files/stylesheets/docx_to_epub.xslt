@@ -138,7 +138,8 @@
 <xsl:template match="w:p[parent::w:footnote]">
 	<!--En el archivo footnotes.xml cada nota al pie tiene un atributo id que las identifica. 
 		Esto me permite a mí insertar el número de nota de forma sencilla.-->
-	<xsl:variable name="noteNumber" select="parent::w:footnote/@w:id - $noteIdDelta"/>
+	<xsl:variable name="nodeId" select="parent::w:footnote/@w:id"/>
+	<xsl:variable name="noteNumber" select="$nodeId - $noteIdDelta"/>
 
 	<p>
 		<!--Si es el primer párrafo, debo insertar el id de la nota-->
@@ -161,7 +162,7 @@
 				una función para contar la cantidad de saltos de páginas que hay antes de dicha referencia.-->
 			<xsl:variable name="sectionNumber">
 				<xsl:call-template name="countSectionsBefore">
-					<xsl:with-param name="paragraph" select="$mainDocument/w:document/w:body/w:p[w:r/w:footnoteReference[@w:id = $noteNumber]]"/>
+					<xsl:with-param name="node" select="$mainDocument/w:document/w:body/*[descendant::w:r/w:footnoteReference[@w:id = $nodeId]]"/>
 				</xsl:call-template>
 			</xsl:variable>	
 								
@@ -650,7 +651,7 @@
 	<xsl:if test="$paragraph/w:r[w:br/@w:type = 'page'] or $paragraph/following-sibling::w:p[1]/w:pPr/w:pageBreakBefore">
 		<xsl:variable name="sectionsBeforeCount">	
 			<xsl:call-template name="countSectionsBefore">
-				<xsl:with-param name="paragraph" select="."/>
+				<xsl:with-param name="node" select="."/>
 			</xsl:call-template>
 		</xsl:variable>
 		
@@ -662,14 +663,17 @@
 </xsl:template>
 
 <!--***********************************************************************************************
-	Cuenta la cantidad de saltos de páginas anteriores a algún element 'p'.
+	Cuenta la cantidad de saltos de páginas anteriores a algún elemento. Ojo que solamente busco
+	saltos de páginas en los siblings anteriores al "node" dado, no en sus ancestros y demás, por
+	lo que es responsabilidad del caller llamar a esta función con el nodo adecuado.
 
-	paragraph:	el elemento 'p' hasta donde contar los saltos de páginas.
+	node:	el elemento del cual se van a examinar los siblings anteriores en busca de saltos de 
+			página.
 
-	Retorna el número de saltos de páginas antes del elemento 'p' pasado como parámetro.
+	Retorna el número de saltos de páginas que se encontraron.
 	***********************************************************************************************-->
 <xsl:template name="countSectionsBefore">
-	<xsl:param name="paragraph"/>
+	<xsl:param name="node"/>
 	
 	<!--Debo tener cuidado acá, porque según parece, word y libreoffice utilizan dos formas distintas
 		de representar los saltos de página: word usa el br, y libreoffice el pageBreakBefore. El 
@@ -691,10 +695,10 @@
 				</p>
 		Como se ve en el ejemplo, no puedo contabilizar lo anterior como dos saltos de página, sino que
 		en realidad es uno solo.-->
-	<xsl:variable name="pWithBr" select="$paragraph/preceding-sibling::w:p[w:r/w:br[@w:type = 'page']]"/>
-	<xsl:variable name="pWithBreakBefore" select="$paragraph/preceding-sibling::w:p[w:pPr/w:pageBreakBefore]"/>
+	<xsl:variable name="pWithBr" select="$node/preceding-sibling::w:p[w:r/w:br[@w:type = 'page']]"/>
+	<xsl:variable name="pWithBreakBefore" select="$node/preceding-sibling::w:p[w:pPr/w:pageBreakBefore]"/>
 	
-	<!--Tengo que tener en cuenta 3 cosas para saber cuantos saltos de páginas hay antes del párrafo actual
+	<!--Tengo que tener en cuenta 3 cosas para saber cuantos saltos de páginas hay antes del node actual
 		pasado como parámetro:
 			1-	Los tags br. Estos directamente los cuento a todos.
 			2-	Los tags pageBreakBefore. Estos debo contarlo solamente si en el párrafo anterior no hay un
@@ -704,7 +708,7 @@
 				en el párrafo anterior no hay un br.-->
 	<xsl:value-of select="count($pWithBr) +
 						  count($pWithBreakBefore[not(preceding-sibling::w:p[1]/w:r/w:br[@w:type = 'page'])]) +
-						  count($paragraph[w:pPr/w:pageBreakBefore and not(preceding-sibling::w:p[1]/w:r/w:br[@w:type = 'page'])])"/>
+						  count($node[w:pPr/w:pageBreakBefore and not(preceding-sibling::w:p[1]/w:r/w:br[@w:type = 'page'])])"/>
 </xsl:template>
 
 <!--***********************************************************************************************

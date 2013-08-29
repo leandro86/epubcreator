@@ -109,8 +109,20 @@ class DocxTransformerTests(unittest.TestCase):
     def testFootnotes(self):
         files = self._getOutput("footnotes.docx")[0]
 
-        self.assertEqual(len(files), 2)
+        self.assertEqual(len(files), 3)
         self.assertTrue(self._comparefiles("footnotes.docx", files))
+
+    def testFootnotesLibreoffice(self):
+        # En libreoffice (y creo que algún word viejo también) el id de las notas
+        # no necesariamente empieza a contar desde 1, sino que puede hacerlo desde
+        # cualquier otro número. En este docx que uso como test, los ids empiezan desde
+        # 2, pero obviamente en el epub resultante debo asegurarme que SIEMPRE las notas
+        # empiecen a numerarse desde 1.
+
+        files = self._getOutput("footnotes_libreoffice.docx")[0]
+
+        self.assertEqual(len(files), 3)
+        self.assertTrue(self._comparefiles("footnotes_libreoffice.docx", files))
 
     def testEmptyParagraphsConversion(self):
         files = self._getOutput("empty_paragraphs_conversion.docx", False)[0]
