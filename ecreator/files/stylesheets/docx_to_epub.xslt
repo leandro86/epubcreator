@@ -121,7 +121,7 @@
 			<!--Luego de procesar todas las secciones, proceso las notas, si es que hay.-->
 			<xsl:if test="$footNotesDoc/w:footnotes/w:footnote[not(@w:type)][1]">
 				<xsl:call-template name="startNotesSection"/>
-				<xsl:apply-templates select="w:body/w:p/w:r/w:footnoteReference" mode="content"/>
+				<xsl:apply-templates select="w:body//w:footnoteReference" mode="content"/>
 			</xsl:if>
 		
 		<xsl:call-template name="insertSeparator">
