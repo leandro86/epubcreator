@@ -101,7 +101,7 @@ class DocxTransformerTests(unittest.TestCase):
         self.assertEqual(titles[0].text, "Título 1 que contiene una nota al pie.")
 
     def testCustomStyles(self):
-        files = self._getOutput("custom_styles.docx")[0]
+        files = self._getOutput("custom_styles.docx", False)[0]
 
         self.assertEqual(len(files), 1)
         self.assertTrue(self._comparefiles("custom_styles.docx", files))
