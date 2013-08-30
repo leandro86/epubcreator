@@ -74,8 +74,15 @@
     <addaction name="separator"/>
     <addaction name="toggleLogWindowAction"/>
    </widget>
+   <widget class="QMenu" name="menuAyuda">
+    <property name="title">
+     <string>Ayuda</string>
+    </property>
+    <addaction name="aboutAction"/>
+   </widget>
    <addaction name="menuArchivo"/>
    <addaction name="menuVer"/>
+   <addaction name="menuAyuda"/>
   </widget>
   <action name="openFileAction">
    <property name="icon">
@@ -114,14 +121,6 @@
     <enum>QAction::QuitRole</enum>
    </property>
   </action>
-  <action name="aboutAction">
-   <property name="text">
-    <string>Acerca de</string>
-   </property>
-   <property name="menuRole">
-    <enum>QAction::AboutRole</enum>
-   </property>
-  </action>
   <action name="toggleToolBarAction">
    <property name="checkable">
     <bool>true</bool>
@@ -138,9 +137,12 @@
     <string>Log de Conversión</string>
    </property>
   </action>
-  <action name="showHelpAction">
+  <action name="aboutAction">
    <property name="text">
-    <string>Ver la Ayuda</string>
+    <string>Acerca de...</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutRole</enum>
    </property>
   </action>
  </widget>

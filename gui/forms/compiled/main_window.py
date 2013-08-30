@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\main_window.ui'
 #
-# Created: Wed Aug 28 16:18:47 2013
+# Created: Fri Aug 30 00:44:29 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -49,6 +49,8 @@ class Ui_MainWindow(object):
         self.menuArchivo.setObjectName(_fromUtf8("menuArchivo"))
         self.menuVer = QtGui.QMenu(self.menubar)
         self.menuVer.setObjectName(_fromUtf8("menuVer"))
+        self.menuAyuda = QtGui.QMenu(self.menubar)
+        self.menuAyuda.setObjectName(_fromUtf8("menuAyuda"))
         MainWindow.setMenuBar(self.menubar)
         self.openFileAction = QtGui.QAction(MainWindow)
         icon = QtGui.QIcon()
@@ -66,17 +68,15 @@ class Ui_MainWindow(object):
         self.quitAction = QtGui.QAction(MainWindow)
         self.quitAction.setMenuRole(QtGui.QAction.QuitRole)
         self.quitAction.setObjectName(_fromUtf8("quitAction"))
-        self.aboutAction = QtGui.QAction(MainWindow)
-        self.aboutAction.setMenuRole(QtGui.QAction.AboutRole)
-        self.aboutAction.setObjectName(_fromUtf8("aboutAction"))
         self.toggleToolBarAction = QtGui.QAction(MainWindow)
         self.toggleToolBarAction.setCheckable(True)
         self.toggleToolBarAction.setObjectName(_fromUtf8("toggleToolBarAction"))
         self.toggleLogWindowAction = QtGui.QAction(MainWindow)
         self.toggleLogWindowAction.setCheckable(True)
         self.toggleLogWindowAction.setObjectName(_fromUtf8("toggleLogWindowAction"))
-        self.showHelpAction = QtGui.QAction(MainWindow)
-        self.showHelpAction.setObjectName(_fromUtf8("showHelpAction"))
+        self.aboutAction = QtGui.QAction(MainWindow)
+        self.aboutAction.setMenuRole(QtGui.QAction.AboutRole)
+        self.aboutAction.setObjectName(_fromUtf8("aboutAction"))
         self.toolBar.addAction(self.openFileAction)
         self.toolBar.addAction(self.generateEpubAction)
         self.menuArchivo.addAction(self.openFileAction)
@@ -88,8 +88,10 @@ class Ui_MainWindow(object):
         self.menuVer.addAction(self.toggleToolBarAction)
         self.menuVer.addSeparator()
         self.menuVer.addAction(self.toggleLogWindowAction)
+        self.menuAyuda.addAction(self.aboutAction)
         self.menubar.addAction(self.menuArchivo.menuAction())
         self.menubar.addAction(self.menuVer.menuAction())
+        self.menubar.addAction(self.menuAyuda.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -99,15 +101,15 @@ class Ui_MainWindow(object):
         self.toolBar.setWindowTitle(_translate("MainWindow", "Barra de Herramientas", None))
         self.menuArchivo.setTitle(_translate("MainWindow", "Archivo", None))
         self.menuVer.setTitle(_translate("MainWindow", "Ver", None))
+        self.menuAyuda.setTitle(_translate("MainWindow", "Ayuda", None))
         self.openFileAction.setText(_translate("MainWindow", "Abrir", None))
         self.openFileAction.setToolTip(_translate("MainWindow", "Abrir Archivo", None))
         self.generateEpubAction.setText(_translate("MainWindow", "Generar ePub", None))
         self.preferencesAction.setText(_translate("MainWindow", "Preferencias", None))
         self.quitAction.setText(_translate("MainWindow", "Salir", None))
-        self.aboutAction.setText(_translate("MainWindow", "Acerca de", None))
         self.toggleToolBarAction.setText(_translate("MainWindow", "Barra de Herramientas", None))
         self.toggleLogWindowAction.setText(_translate("MainWindow", "Log de Conversión", None))
-        self.showHelpAction.setText(_translate("MainWindow", "Ver la Ayuda", None))
+        self.aboutAction.setText(_translate("MainWindow", "Acerca de...", None))
 
 from gui.metadata_tab_manager import MetadataTabManager
 from . import main_window_rc

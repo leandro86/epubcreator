@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\metadata_tab_manager_widget.ui'
 #
-# Created: Wed Aug 28 16:18:48 2013
+# Created: Fri Aug 30 00:44:29 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!

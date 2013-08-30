@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="about_dialog">
+    <file>../resources/images/icons/app_icon_512x512.png</file>
+  </qresource>
+</RCC>

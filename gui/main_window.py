@@ -24,7 +24,7 @@ from ecreator.transformers import docx_transformer
 from ecreator import ebook
 from misc import settings_store, utils
 from gui.forms.compiled import main_window
-from gui import preferences, log_window
+from gui import preferences, log_window, about
 import version
 import config
 
@@ -172,10 +172,6 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
 
         settings.endGroup()
 
-    def _showPreferences(self):
-        prefs = preferences.Preferences(self)
-        prefs.exec()
-
     def _prepareEbook(self):
         settings = settings_store.SettingsStore()
 
@@ -196,9 +192,10 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
     def _connectSignals(self):
         self.openFileAction.triggered.connect(self._openFile)
         self.generateEpubAction.triggered.connect(self._generateEpub)
-        self.preferencesAction.triggered.connect(self._showPreferences)
+        self.preferencesAction.triggered.connect(lambda: preferences.Preferences(self).exec())
         self.toggleLogWindowAction.triggered.connect(self._logWindow.setVisible)
         self._logWindow.visibilityChanged.connect(self.toggleLogWindowAction.setChecked)
         self.toggleToolBarAction.triggered.connect(self.toolBar.setVisible)
         self.toolBar.visibilityChanged.connect(self.toggleToolBarAction.setChecked)
         self.quitAction.triggered.connect(self._close)
+        self.aboutAction.triggered.connect(lambda: about.About(self).exec())
