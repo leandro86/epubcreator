@@ -193,24 +193,23 @@
 	xslt 1.0.
 	***********************************************************************************************-->
 <xsl:template match="w:p">
-	<xsl:variable name="style">
-		<xsl:variable name="currentStyleId" select="w:pPr/w:pStyle/@w:val"/>
-		<!--Obtengo el nombre del estilo a partir del id, haciendo un cambio de contexto hacia
-			styles.xml (necesario, porque es una limitación de xslt 1.0)-->
-		<xsl:for-each select="$stylesDoc">
-			<xsl:value-of select="key('styles', $currentStyleId)"/>
-		</xsl:for-each>
+	<xsl:variable name="styleId" select="w:pPr/w:pStyle/@w:val"/>
+	<xsl:variable name="styleName">
+		<xsl:call-template name="getStyleName">
+			<xsl:with-param name="styleId" select="$styleId"/>
+		</xsl:call-template>
 	</xsl:variable>
 
 	<xsl:choose>		
-		<xsl:when test="starts-with($style, 'Encabezado') or starts-with($style, 'heading')">	
+		<xsl:when test="starts-with($styleName, 'Encabezado') or starts-with($styleName, 'heading')">	
 			<xsl:call-template name="processHeading">
-				<xsl:with-param name="style" select="$style"/>
+				<xsl:with-param name="styleName" select="$styleName"/>
 			</xsl:call-template>
 		</xsl:when>
 		<xsl:otherwise>
 			<xsl:call-template name="processParagraph">
-				<xsl:with-param name="style" select="$style"/>
+				<xsl:with-param name="styleId" select="$styleId"/>
+				<xsl:with-param name="styleName" select="$styleName"/>
 			</xsl:call-template>		
 		</xsl:otherwise>
 	</xsl:choose>
@@ -224,17 +223,17 @@
 	Procesa los headings. Los títulos en docx no tienen ningún tag especial, sino que solamente
 	un estilo particular aplicado al párrafo me indica que se trata de un título.
 
-	style:	el estilo aplicado al párrafo actual.
+	styleName: el nombre del estilo aplicado al párrafo actual.
 	***********************************************************************************************-->
 <xsl:template name="processHeading">
-	<xsl:param name="style"/>
+	<xsl:param name="styleName"/>
 	
-	<xsl:variable name="headingNumber"><xsl:value-of select="substring($style, string-length($style), 1)"/></xsl:variable>
+	<xsl:variable name="headingNumber"><xsl:value-of select="substring($styleName, string-length($styleName), 1)"/></xsl:variable>
 	<xsl:choose>
 		<!--Si el número de heading es mayor a 6, no lo proceso como heading, sino como párrafo común.-->
 		<xsl:when test="$headingNumber > 6">
 			<xsl:call-template name="processParagraph">
-				<xsl:with-param name="style" select="$style"/>
+				<xsl:with-param name="style" select="$styleName"/>
 			</xsl:call-template>
 		</xsl:when>
 		<xsl:otherwise>
@@ -259,10 +258,12 @@
 <!--***********************************************************************************************	
 	Proceso los párrafos comunes.
 
-	style: el estilo aplicado al párrafo actual.
+	styleId: el id del estilo aplicado al párrafo actual.
+	styleName: el nombre del estilo aplicado al párrafo actual.
 	***********************************************************************************************-->
 <xsl:template name="processParagraph">
-	<xsl:param name="style"/>
+	<xsl:param name="styleId"/>
+	<xsl:param name="styleName"/>
 
 	<xsl:variable name="tag">
 		<xsl:choose>
@@ -276,10 +277,10 @@
 	</xsl:variable>	
 	
 	<xsl:choose>
-		<xsl:when test="normalize-space(descendant::w:t) != ''">		
-			<xsl:variable name="classValue">
-				<!--Agrego la clase 'salto', dependiendo de si debo procesar los párrafos en blanco y de cuántos
-					párrafos en blanco hay antes del actual que estoy procesando.-->
+		<xsl:when test="normalize-space(descendant::w:t) != ''">			
+			<!--Me fijo si es necesario agregar la clase "salto", dependiendo de si debo procesar los párrafos en blanco y de cuántos
+				párrafos en blanco hay antes del actual que estoy procesando.-->	
+			<xsl:variable name="marginClass">		
 				<xsl:if test="$ignoreEmptyParagraphs = 'N' and preceding-sibling::w:p[1][not(w:r/w:t[normalize-space(text()) != ''])]">
 					<xsl:text>salto</xsl:text>						
 					<xsl:choose>
@@ -287,19 +288,64 @@
 						<xsl:otherwise>10 </xsl:otherwise>
 					</xsl:choose>
 				</xsl:if>
-				<!--Compruebo si hay algún estilo propio-->
-				<xsl:if test="starts-with($style, 'epub_')">
-					<xsl:value-of select="substring($style, 6)"/>
+			</xsl:variable>
+			<!--Compruebo si se trata de un estilo estándar que debo procesar, o de algún estilo customizado-->
+			<xsl:variable name="classValue">
+				<!--Es un estilo propio?-->
+				<xsl:if test="starts-with($styleName, 'epub_')">
+					<xsl:value-of select="substring($styleName, 6)"/>
 				</xsl:if>
 			</xsl:variable>
 			
-			<xsl:element name="{$tag}">
-				<xsl:if test="$classValue != ''">
-					<xsl:attribute name="class"><xsl:value-of select="$classValue"/></xsl:attribute>									
+			<!--Si dos o más parrafos consecutivos comparten el mismo estilo, entonces los agrupo en un div-->
+			<xsl:variable name="divContainer">
+				<!--Me fijo si el párrafo tiene aplicado un estilo que me interesa, es decir, alguno que proceso-->
+				<xsl:if test="$styleId != '' and $classValue != ''">
+					<xsl:variable name="previousParagraphStyleId"><xsl:value-of select="preceding-sibling::w:p[1]/w:pPr/w:pStyle/@w:val"/></xsl:variable>
+					<xsl:variable name="nextParagraphStyleId"><xsl:value-of select="following-sibling::w:p[1]/w:pPr/w:pStyle/@w:val"/></xsl:variable>
+					
+					<xsl:choose>
+						<!--Debo abrir el div?-->
+						<xsl:when test="$styleId != $previousParagraphStyleId and $styleId = $nextParagraphStyleId">1</xsl:when>
+						<xsl:when test="$styleId = $previousParagraphStyleId">
+							<xsl:choose>
+								<!--Está el párrafo actual dentro de un div que ya fue abierto anteriormente?-->
+								<xsl:when test="$styleId = $nextParagraphStyleId">2</xsl:when>
+								<!--Debo cerrar el div?-->
+								<xsl:otherwise>3</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+					</xsl:choose>							
 				</xsl:if>
-				
+			</xsl:variable>
+			
+			<!--Abro el div de ser necesario, agregando la clase correspondiente-->
+			<xsl:if test="$divContainer = 1">
+				<xsl:text disable-output-escaping="yes">&lt;div class="</xsl:text>
+				<xsl:value-of select="$classValue"/>
+				<xsl:text disable-output-escaping="yes">"&gt;</xsl:text>
+			</xsl:if>
+						
+			<xsl:element name="{$tag}">
+				<!--Le asigno una clase al párrafo solo si se trata de la clase "salto", o si bien tiene asignado algún
+					otro estilo, pero dicho párrafo no se encuentra dentro de un div-->
+				<xsl:if test="$marginClass != '' or ($classValue != '' and $divContainer = '')">
+					<xsl:attribute name="class">
+						<xsl:if test="$marginClass != ''">
+							<xsl:value-of select="$marginClass"/>
+						</xsl:if>
+						<xsl:if test="$classValue != '' and $divContainer = ''">
+							<xsl:value-of select="$classValue"/>
+						</xsl:if>
+					</xsl:attribute>									
+				</xsl:if>
 				<xsl:apply-templates/>	
 			</xsl:element>
+			
+			<!--Cierro el div, si es necesario-->
+			<xsl:if test="$divContainer = 3">
+				<xsl:text disable-output-escaping="yes">&lt;/div&gt;</xsl:text>						
+			</xsl:if>
 		</xsl:when>
 		<xsl:when test="not(descendant::w:t) and (descendant::pic:pic[1] or descendant::w:pict[1])">
 			<xsl:element name="{$tag}">
@@ -724,7 +770,6 @@
 	<xsl:value-of select="count(preceding-sibling::w:p/w:pPr/w:pStyle[@w:val = $headings])"/>
 </xsl:template>
 
-
 <!--***********************************************************************************************
 	Inserta una imagen.
 
@@ -751,6 +796,21 @@
 		</xsl:variable>
 		<xsl:attribute name="alt"><xsl:value-of select="$altValue"/></xsl:attribute>
 	</img>
+</xsl:template>
+
+<!--***********************************************************************************************
+	Retorna el nombre de un estilo asociado a un id.
+
+	styleId: el id del estilo.
+	***********************************************************************************************-->
+<xsl:template name="getStyleName">
+	<xsl:param name="styleId"/>
+
+	<!--Obtengo el nombre del estilo a partir del id, haciendo un cambio de contexto hacia
+		styles.xml (el cambio de contexto es necesario dada una limitación de xslt 1.0)-->
+	<xsl:for-each select="$stylesDoc">
+		<xsl:value-of select="key('styles', $styleId)"/>
+	</xsl:for-each>
 </xsl:template>
 
 </xsl:stylesheet>

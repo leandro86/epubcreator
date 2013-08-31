@@ -100,11 +100,21 @@ class DocxTransformerTests(unittest.TestCase):
         self.assertEqual(len(titles), 2)
         self.assertEqual(titles[0].text, "Título 1 que contiene una nota al pie.")
 
-    def testCustomStyles(self):
-        files = self._getOutput("custom_styles.docx", False)[0]
+    def testParagraphStyles(self):
+        # Testea estilos que se aplican a todoo el párrafo, lo que en word se
+        # denomina "estilos vinculados a párrafo".
+        files = self._getOutput("paragraph_styles.docx", False)[0]
 
         self.assertEqual(len(files), 1)
-        self.assertTrue(self._comparefiles("custom_styles.docx", files))
+        self.assertTrue(self._comparefiles("paragraph_styles.docx", files))
+
+    def testParagraphStylesInsideDiv(self):
+        # Si dos o más párrafo consecutivos comparten el mismo estilo vinculado a
+        # párrafo, entonces deben ir dentro de un div.
+        files = self._getOutput("paragraph_styles_inside_div.docx", False)[0]
+
+        self.assertEqual(len(files), 1)
+        self.assertTrue(self._comparefiles("paragraph_styles_inside_div.docx", files))
 
     def testFootnotes(self):
         files = self._getOutput("footnotes.docx")[0]
@@ -118,7 +128,6 @@ class DocxTransformerTests(unittest.TestCase):
         # cualquier otro número. En este docx que uso como test, los ids empiezan desde
         # 2, pero obviamente en el epub resultante debo asegurarme que SIEMPRE las notas
         # empiecen a numerarse desde 1.
-
         files = self._getOutput("footnotes_libreoffice.docx")[0]
 
         self.assertEqual(len(files), 3)
@@ -227,13 +236,11 @@ class DocxTransformerTests(unittest.TestCase):
         @return: un string con el contenido del archivo.
         """
         testName = os.path.splitext(testFileName)[0]
-        with open(os.path.join("test_data", "{0}_output".format(testName), fileName),
-                  encoding = "utf-8") as file:
+        with open(os.path.join("test_data", "{0}_output".format(testName), fileName), encoding = "utf-8") as file:
             return file.read()
 
     def _getOutput(self, docxTestFileName, ignoreEmptyParagraphs = True):
-        transformer = docx_transformer.DocxTransformer(os.path.join("test_data", docxTestFileName),
-                                                       ignoreEmptyParagraphs)
+        transformer = docx_transformer.DocxTransformer(os.path.join("test_data", docxTestFileName), ignoreEmptyParagraphs)
         files, titles, logMessages = transformer.transform()
         return files, titles, logMessages
 
