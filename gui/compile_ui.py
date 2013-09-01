@@ -36,7 +36,8 @@ def compileUi():
         if os.path.isdir(file):
             shutil.rmtree(file)
         else:
-            os.remove(file)
+            if not(file.endswith("__init__.py")):
+                os.remove(file)
 
     files = os.listdir(FORMS_PATH)
     for file in files:
