@@ -108,6 +108,15 @@ class DocxTransformerTests(unittest.TestCase):
         self.assertEqual(len(files), 1)
         self.assertTrue(self._comparefiles("paragraph_styles.docx", files))
 
+    def testCharacterStyles(self):
+        # Testea estilos que son aplicados a nivel carácter, es decir, que pueden
+        # aplicarse a partes dentro del párrafo. Para ello necesito utilizar la
+        # etiqueta span.
+        files = self._getOutput("character_styles.docx", False)[0]
+
+        self.assertEqual(len(files), 1)
+        self.assertTrue(self._comparefiles("character_styles.docx", files))
+
     def testParagraphStylesInsideDiv(self):
         # Si dos o más párrafo consecutivos comparten el mismo estilo vinculado a
         # párrafo, entonces deben ir dentro de un div.

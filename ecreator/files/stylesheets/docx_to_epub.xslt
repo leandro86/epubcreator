@@ -292,9 +292,9 @@
 			<!--Compruebo si se trata de un estilo estándar que debo procesar, o de algún estilo customizado-->
 			<xsl:variable name="classValue">
 				<!--Es un estilo propio?-->
-				<xsl:if test="starts-with($styleName, 'epub_')">
-					<xsl:value-of select="substring($styleName, 6)"/>
-				</xsl:if>
+				<xsl:call-template name="parseCustomStyle">
+					<xsl:with-param name="styleName" select="$styleName"/>
+				</xsl:call-template>
 			</xsl:variable>
 			
 			<!--Si dos o más parrafos consecutivos comparten el mismo estilo, entonces los agrupo en un div-->
@@ -306,13 +306,14 @@
 					
 					<xsl:choose>
 						<!--Debo abrir el div?-->
-						<xsl:when test="$styleId != $previousParagraphStyleId and $styleId = $nextParagraphStyleId">1</xsl:when>
+						<xsl:when test="$styleId != $previousParagraphStyleId and $styleId = $nextParagraphStyleId">O</xsl:when>
 						<xsl:when test="$styleId = $previousParagraphStyleId">
 							<xsl:choose>
-								<!--Está el párrafo actual dentro de un div que ya fue abierto anteriormente?-->
-								<xsl:when test="$styleId = $nextParagraphStyleId">2</xsl:when>
+								<!--Está el párrafo actual dentro de un div que ya fue abierto anteriormente, y que
+									todavía no debe ser cerrado, porque hay al menos otro párrafo más con el mismo estilo?-->
+								<xsl:when test="$styleId = $nextParagraphStyleId">N</xsl:when>
 								<!--Debo cerrar el div?-->
-								<xsl:otherwise>3</xsl:otherwise>
+								<xsl:otherwise>C</xsl:otherwise>
 							</xsl:choose>
 						</xsl:when>
 					</xsl:choose>							
@@ -320,7 +321,7 @@
 			</xsl:variable>
 			
 			<!--Abro el div de ser necesario, agregando la clase correspondiente-->
-			<xsl:if test="$divContainer = 1">
+			<xsl:if test="$divContainer = 'O'">
 				<xsl:text disable-output-escaping="yes">&lt;div class="</xsl:text>
 				<xsl:value-of select="$classValue"/>
 				<xsl:text disable-output-escaping="yes">"&gt;</xsl:text>
@@ -343,7 +344,7 @@
 			</xsl:element>
 			
 			<!--Cierro el div, si es necesario-->
-			<xsl:if test="$divContainer = 3">
+			<xsl:if test="$divContainer = 'C'">
 				<xsl:text disable-output-escaping="yes">&lt;/div&gt;</xsl:text>						
 			</xsl:if>
 		</xsl:when>
@@ -353,13 +354,54 @@
 				<xsl:apply-templates/>
 			</xsl:element>
 		</xsl:when>
-</xsl:choose>
+	</xsl:choose>
 </xsl:template>
 
 <!--***********************************************************************************************
 	Procesa los 'runs'.
 	***********************************************************************************************-->
 <xsl:template match="w:r">
+	<xsl:variable name="styleId" select="w:rPr/w:rStyle/@w:val"/>
+	<xsl:variable name="styleName">
+		<xsl:call-template name="getStyleName">
+			<xsl:with-param name="styleId" select="$styleId"/>
+		</xsl:call-template>
+	</xsl:variable>
+	
+	<xsl:variable name="classValue">
+		<xsl:if test="$styleName">
+			<xsl:call-template name="parseCustomStyle">
+				<xsl:with-param name="styleName" select="$styleName"/>
+			</xsl:call-template>
+		</xsl:if>
+	</xsl:variable>
+	
+	<!--Es necesario utilizar un span si el run tiene algún estilo que me interesa procesar-->
+	<xsl:variable name="spanContainer">
+		<xsl:if test="$classValue != ''">
+			<xsl:variable name="previousRunStyleId"><xsl:value-of select="preceding-sibling::w:r[1]/w:rPr/w:rStyle/@w:val"/></xsl:variable>
+			<xsl:variable name="nextRunStyleId"><xsl:value-of select="following-sibling::w:r[1]/w:rPr/w:rStyle/@w:val"/></xsl:variable>	
+			
+			<!--Debo abrir el span?-->
+			<xsl:if test="$styleId != $previousRunStyleId">
+				<xsl:value-of select="'O'"/>
+			</xsl:if>
+			<!--Debo cerrar el span?-->
+			<!--Notar que totalmente posible que sea necesario abrir un span en un run, y luego tener que
+				cerrarlo en el mismo run.-->
+			<xsl:if test="$styleId != $nextRunStyleId">
+				<xsl:value-of select="'C'"/>
+			</xsl:if>
+		</xsl:if>
+	</xsl:variable>
+		
+	<!--Abro el span de ser necesario, agregando la clase correspondiente-->
+	<xsl:if test="contains($spanContainer, 'O')">
+		<xsl:text disable-output-escaping="yes">&lt;span class="</xsl:text>
+		<xsl:value-of select="$classValue"/>
+		<xsl:text disable-output-escaping="yes">"&gt;</xsl:text>
+	</xsl:if>
+
 	<!--TODO: por ahora, esto lo dejo así. No encontré la forma todavía de poder abrir y cerrar los tags
 		de formato de manera elegante. Es muy difícil hacerlo sin poder mantener algún tipo de estado, algo
 		que me indique qué formatos siguen abierto de runs anteriores, así puedo cerrar todos los anidamientos
@@ -395,6 +437,11 @@
 			<xsl:with-param name="formats" select="$currentFormats"/>
 		</xsl:call-template>
 	</xsl:if>
+	
+	<!--Cierro el span, si es necesario-->
+	<xsl:if test="contains($spanContainer, 'C')">
+		<xsl:text disable-output-escaping="yes">&lt;/span&gt;</xsl:text>						
+	</xsl:if>	
 </xsl:template>
 
 <!--***********************************************************************************************
@@ -811,6 +858,21 @@
 	<xsl:for-each select="$stylesDoc">
 		<xsl:value-of select="key('styles', $styleId)"/>
 	</xsl:for-each>
+</xsl:template>
+
+<!--***********************************************************************************************
+	Comprueba si un estilo dado es un estilo creado por el usuario.
+
+	styleName: el nombre del estilo a comprobar.
+
+	Retorna el nombre del estilo, si es un estilo custom; sino vacío.
+	***********************************************************************************************-->
+<xsl:template name="parseCustomStyle">
+	<xsl:param name="styleName"/>
+
+	<xsl:if test="starts-with($styleName, 'epub_')">
+		<xsl:value-of select="substring($styleName, 6)"/>
+	</xsl:if>
 </xsl:template>
 
 </xsl:stylesheet>
