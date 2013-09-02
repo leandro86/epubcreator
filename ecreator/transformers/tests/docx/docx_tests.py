@@ -202,16 +202,6 @@ class DocxTransformerTests(unittest.TestCase):
         self.assertTrue(logMessages[1].msgType == transformer_base.TransformerLogMessage.MSG_TYPE.WARNING)
         self.assertTrue("Se encontró un párrafo anidado" in logMessages[1].message)
 
-    def testInvalidImageFormat(self):
-        files, _, logMessages = self._getOutput("invalid_image_format.docx")
-
-        self.assertEqual(len(files), 1)
-        self.assertTrue(self._comparefiles("invalid_image_format.docx", files))
-
-        self.assertEqual(len(logMessages), 1)
-        self.assertTrue(logMessages[0].msgType == transformer_base.TransformerLogMessage.MSG_TYPE.WARNING)
-        self.assertTrue("Se encontró una imagen con un formato no válido" in logMessages[0].message)
-
     def testStylesWithFormats(self):
         files = self._getOutput("styles_with_formats.docx")[0]
 

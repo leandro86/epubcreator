@@ -11,6 +11,8 @@
 				exclude-result-prefixes="w a pic rels r mc v" 
 				version="1.0">
 
+<xsl:import href="common.xslt"/>
+
 <xsl:output method="xml" 
 			doctype-public="-//W3C//DTD XHTML 1.1//EN"
 			doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd" 
@@ -93,12 +95,6 @@
 <xsl:variable name="SHAPE_WARNING">
 	<xsl:value-of select="$WARNING_PREFIX"/>
 	<xsl:text>Se encontró una figura geométrica. Este tipo de figuras no son imágenes, por lo que no pueden trasladarse al epub.</xsl:text>
-</xsl:variable>
-
-<xsl:variable name="INVALID_IMAGE_FORMAT_WARNING">
-	<xsl:value-of select="$WARNING_PREFIX"/>
-	<xsl:text>Se encontró una imagen con un formato no válido para un epub. </xsl:text>	
-	<xsl:text>Revise la etiqueta "img", cuyo atributo "alt" es "Formato inválido".</xsl:text>
 </xsl:variable>
 
 <!--***********************************************************************************************	
@@ -665,75 +661,6 @@
 </xsl:template>
 
 <!--***********************************************************************************************
-	Genera el nombre de una sección de texto para el epub.
-
-	number:		el número de sección para el cual generar el nombre.
-
-	Retorna el nombre generado para la sección.
-	***********************************************************************************************-->
-<xsl:template name="generateSectionName">
-	<xsl:param name="number"/>
-	
-	<!--Me aseguro de que el número de sección sea de 4 caracteres, y que esté 
-		paddeado con ceros a la izquierda-->	
-	<xsl:variable name="sectionNumber" select="concat('000', $number)"/>
-	<xsl:value-of select="concat('Section', substring($sectionNumber, string-length($number), 4), '.xhtml')"/>
-</xsl:template>
-
-<!--***********************************************************************************************
-	Inserta un separador, que sirve para indicar las partes importantes del doc.
-
-	text:	el texto del separador.
-	***********************************************************************************************-->
-<xsl:template name="insertSeparator">	
-	<xsl:param name="text"/>
-	
-	<xsl:comment>[<xsl:value-of select="$text"/>]</xsl:comment>
-</xsl:template>
-
-<!--***********************************************************************************************
-	Inserta un separador para distingur cuándo comienza una nueva sección de texto.
-
-	number:		el número de la sección a insertar.
-	***********************************************************************************************-->
-<xsl:template name="startNewSection">
-	<xsl:param name="number"/>
-	
-	<xsl:variable name="sectionName">
-		<xsl:call-template name="generateSectionName">
-			<xsl:with-param name="number" select="$number"/>
-		</xsl:call-template>
-	</xsl:variable>
-	
-	<xsl:call-template name="insertSeparator">
-		<xsl:with-param name="text" select="$sectionName"/>
-	</xsl:call-template>
-</xsl:template>
-
-<!--***********************************************************************************************
-	Inserta el separador de la sección notas.
-	***********************************************************************************************-->
-<xsl:template name="startNotesSection">	
-	<xsl:call-template name="insertSeparator">
-		<xsl:with-param name="text" select="'notas.xhtml'"/>
-	</xsl:call-template>
-	<h1>Notas</h1>
-</xsl:template>
-
-<!--***********************************************************************************************
-	Inserta el retorno de nota.
-
-	sectionName:	el nombre de la sección a la cual se debe retornar.
-	noteId:			el id de la nota a la cual se debe retornar.
-	***********************************************************************************************-->
-<xsl:template name="insertNoteReturn">
-	<xsl:param name="sectionName"/>
-	<xsl:param name="noteId"/>
-	
-	<a href="../Text/{$sectionName}#{$noteId}">&lt;&lt;</a>
-</xsl:template>
-
-<!--***********************************************************************************************
 	Comprueba si hay algún salto de página, y de ser así empieza una nueva sección.
 	
 	paragraph:	el párrafo en el cual se debe comprobar si hay un salto de página.
@@ -815,34 +742,6 @@
 	<xsl:param name="paragraph"/>
 
 	<xsl:value-of select="count(preceding-sibling::w:p/w:pPr/w:pStyle[@w:val = $headings])"/>
-</xsl:template>
-
-<!--***********************************************************************************************
-	Inserta una imagen.
-
-	name: el nombre de la imagen a insertar.
-	***********************************************************************************************-->
-<xsl:template name="insertImage">
-	<xsl:param name="name"/>
-
-	<xsl:variable name="type">
-		<xsl:value-of select="substring-after($name, '.')"/>
-	</xsl:variable>
-
-	<img src="../Images/{$name}">
-		<xsl:variable name="altValue">
-			<xsl:choose>		
-				<xsl:when test="$type = 'png' or $type = 'jpg' or $type = 'jpeg' or $type = 'gif'">
-					<xsl:value-of select="$name"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:text>Formato inválido</xsl:text>
-					<xsl:message><xsl:value-of select="$INVALID_IMAGE_FORMAT_WARNING"/></xsl:message>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		<xsl:attribute name="alt"><xsl:value-of select="$altValue"/></xsl:attribute>
-	</img>
 </xsl:template>
 
 <!--***********************************************************************************************
