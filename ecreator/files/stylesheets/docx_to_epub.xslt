@@ -138,12 +138,11 @@
 	<xsl:variable name="noteNumber" select="$nodeId - $noteIdDelta"/>
 
 	<p>
-		<!--Si es el primer párrafo, debo insertar el id de la nota-->
+		<!--Si es el primer párrafo, debo insertar el id y número de la nota-->
 		<xsl:if test="not(preceding-sibling::w:p)">
-			<a id="nota{$noteNumber}"></a>
-			<sup>
-				<xsl:text>[</xsl:text><xsl:value-of select="$noteNumber"/><xsl:text>]</xsl:text>
-			</sup>
+			<xsl:call-template name="insertNoteNumber">
+				<xsl:with-param name="noteNumber" select="$noteNumber"/>
+			</xsl:call-template>
 		</xsl:if>
 
 		<xsl:apply-templates/>
@@ -167,10 +166,7 @@
 					<xsl:with-param name="number" select="$sectionNumber"/>
 				</xsl:call-template>
 			</xsl:variable>
-			
-			<!--El retorno de notas tiene un pequeño espacio que lo separa del final de párrafo...-->
-			<xsl:text> </xsl:text>
-			
+						
 			<xsl:call-template name="insertNoteReturn">
 				<xsl:with-param name="sectionName" select="$sectionName"/>
 				<xsl:with-param name="noteId" select="concat('nota', $noteNumber, 'ref')"/>
@@ -444,17 +440,19 @@
 	Procesa una referencia a una nota al pie.
 	***********************************************************************************************-->
 <xsl:template match="w:footnoteReference">
-	<xsl:variable name="noteNumber" select="./@w:id - $noteIdDelta"/>
-	<a id="nota{$noteNumber}ref" href="../Text/notas.xhtml#nota{$noteNumber}"><sup>[<xsl:value-of select="$noteNumber"/>]</sup></a>
+	<xsl:call-template name="insertNoteReference">
+		<xsl:with-param name="noteNumber" select="./@w:id - $noteIdDelta"/>
+	</xsl:call-template>
 </xsl:template>
 
 <!--***********************************************************************************************
 	Procesa el contenido de una nota al pie.
 	***********************************************************************************************-->
 <xsl:template match="w:footnoteReference" mode="content">
+	<!--El epubbase especifica que cada nota debe ir dentro un div con clase=nota-->
 	<xsl:element name="div">
 		<xsl:attribute name="class">nota</xsl:attribute>
-			<xsl:apply-templates select="$footNotesDoc/w:footnotes/w:footnote[@w:id = current()/@w:id]"/>		
+		<xsl:apply-templates select="$footNotesDoc/w:footnotes/w:footnote[@w:id = current()/@w:id]"/>		
 	</xsl:element>	
 </xsl:template>
 

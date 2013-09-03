@@ -60,19 +60,6 @@
 </xsl:template>
 
 <!--***********************************************************************************************
-	Inserta el retorno de nota.
-
-	sectionName:	el nombre de la sección a la cual se debe retornar.
-	noteId:			el id de la nota a la cual se debe retornar.
-	***********************************************************************************************-->
-<xsl:template name="insertNoteReturn">
-	<xsl:param name="sectionName"/>
-	<xsl:param name="noteId"/>
-	
-	<a href="../Text/{$sectionName}#{$noteId}">&lt;&lt;</a>
-</xsl:template>
-
-<!--***********************************************************************************************
 	Inserta una imagen.
 
 	name: el nombre de la imagen a insertar.
@@ -87,6 +74,52 @@
 	<img src="../Images/{$name}">
 		<xsl:attribute name="alt"><xsl:value-of select="$name"/></xsl:attribute>
 	</img>
+</xsl:template>
+
+<!--***********************************************************************************************
+	Inserta una referencia a una nota.
+
+	noteNumber: el número de la nota.
+	***********************************************************************************************-->
+<xsl:template name="insertNoteReference">
+	<xsl:param name="noteNumber"/>
+
+	<a id="nota{$noteNumber}ref" href="../Text/notas.xhtml#nota{$noteNumber}"><sup>[<xsl:value-of select="$noteNumber"/>]</sup></a>
+</xsl:template>
+
+<!--***********************************************************************************************
+	Inserta el retorno de nota.
+	Debe llamarse al template luego de procesar el último párrafo del contenido de una nota al
+	pie. Es decir, el retorno de nota debe ir dentro del último párrafo de la nota (y debe
+	colocarse al final).
+
+	sectionName:	el nombre de la sección a la cual se debe retornar.
+	noteId:			el id de la nota a la cual se debe retornar.
+	***********************************************************************************************-->
+<xsl:template name="insertNoteReturn">
+	<xsl:param name="sectionName"/>
+	<xsl:param name="noteId"/>
+	
+	<!--El retorno de notas tiene un pequeño espacio que lo separa del final del texto-->
+	<xsl:text> </xsl:text>
+	
+	<a href="../Text/{$sectionName}#{$noteId}">&lt;&lt;</a>
+</xsl:template>
+
+<!--***********************************************************************************************
+	Inserta el número de nota.
+	El template debe llamarse al momento de procesar el primer párrafo del contenido de una nota
+	al pie. Es decir, el número de nota debe ir solamente dentro del primer párrafo de la nota.
+
+	noteNumber: el número de la nota.
+	***********************************************************************************************-->
+<xsl:template name="insertNoteNumber">
+	<xsl:param name="noteNumber"/>
+
+	<a id="nota{$noteNumber}"></a>
+	<sup>
+		<xsl:text>[</xsl:text><xsl:value-of select="$noteNumber"/><xsl:text>]</xsl:text>
+	</sup>
 </xsl:template>
 
 </xsl:stylesheet>
