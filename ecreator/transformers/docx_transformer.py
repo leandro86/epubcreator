@@ -28,14 +28,14 @@ import config
 class DocxTransformer(transformer_base.AbstractTransformer):
 
     def __init__(self, inputFile, ignoreEmptyParagraphs = True):
-        super().__init__(inputFile)
+        self._inputFile = inputFile
 
         self._params = locals()
 
-        # Nombré los parámetros del método de igual manera a como están en la planilla de transformación.
+        # Nombré los parámetros del método de igual manera a como están en la planilla de transformación, de
+        # esta manera puedo pasar los parámetros directamente.
         # Solo me interesan los argumentos para la planilla. Borro todoo el resto de variables locales.
         del(self._params["self"])
-        del(self._params["__class__"])
         del(self._params["inputFile"])
         self._prepareParams(self._params)
 

@@ -26,11 +26,6 @@ class AbstractTransformer:
     sobreescribir obligatoriamente el método "transform", y opcionalmente el método "getMetadata".
     """
 
-    def __init__(self, inputFile):
-        """
-        """
-        self._inputFile = inputFile
-
     def transform(self):
         """
         Obtiene los archivos y títulos de algún documento de origen.
