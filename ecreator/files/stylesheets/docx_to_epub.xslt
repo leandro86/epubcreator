@@ -269,7 +269,7 @@
 	</xsl:variable>	
 	
 	<xsl:choose>
-		<xsl:when test="normalize-space(descendant::w:t) != ''">			
+		<xsl:when test="descendant::w:t and normalize-space(string(.)) != ''">
 			<!--Me fijo si es necesario agregar la clase "salto", dependiendo de si debo procesar los párrafos en blanco y de cuántos
 				párrafos en blanco hay antes del actual que estoy procesando.-->	
 			<xsl:variable name="marginClass">		
