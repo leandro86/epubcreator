@@ -208,6 +208,12 @@ class DocxTransformerTests(unittest.TestCase):
         self.assertEqual(len(files), 1)
         self.assertTrue(self._comparefiles("styles_with_formats.docx", files))
 
+    def testEmptyParagraphInsideDiv(self):
+        files = self._getOutput("empty_paragraph_inside_div.docx")[0]
+
+        self.assertEqual(len(files), 1)
+        self.assertTrue(self._comparefiles("empty_paragraph_inside_div.docx", files))
+
     def _comparefiles(self, testFileName, files):
         """
         Compara los archivos pertenecientes a un test, con la salida correspondiente
