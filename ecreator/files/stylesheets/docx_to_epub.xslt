@@ -205,10 +205,11 @@
 			</xsl:call-template>		
 		</xsl:otherwise>
 	</xsl:choose>
-	
-	<xsl:call-template name="checkForSectionBreak">
+
+    <xsl:call-template name="checkForSectionBreak">
 		<xsl:with-param name="paragraph" select="."/>
 	</xsl:call-template>
+
 </xsl:template>
 
 <!--***********************************************************************************************
@@ -268,6 +269,37 @@
 		</xsl:choose>
 	</xsl:variable>	
 	
+	<!--Compruebo si se trata de un estilo estándar que debo procesar, o de algún estilo customizado-->
+	<xsl:variable name="classValue">
+		<!--Es un estilo propio?-->
+		<xsl:call-template name="parseCustomStyle">
+			<xsl:with-param name="styleName" select="$styleName"/>
+		</xsl:call-template>
+	</xsl:variable>	
+	
+	<!--Si dos o más parrafos consecutivos comparten el mismo estilo, entonces los agrupo en un div-->
+	<xsl:variable name="divContainer">
+		<!--Me fijo si el párrafo tiene aplicado un estilo que me interesa, es decir, alguno que proceso-->
+		<xsl:if test="$styleId != '' and $classValue != ''">				
+			<xsl:variable name="previousParagraphStyleId"><xsl:value-of select="preceding-sibling::w:p[1]/w:pPr/w:pStyle/@w:val"/></xsl:variable>
+			<xsl:variable name="nextParagraphStyleId"><xsl:value-of select="following-sibling::w:p[1]/w:pPr/w:pStyle/@w:val"/></xsl:variable>
+			
+			<xsl:choose>
+				<!--Debo abrir el div?-->
+				<xsl:when test="$styleId != $previousParagraphStyleId and $styleId = $nextParagraphStyleId">O</xsl:when>
+				<xsl:when test="$styleId = $previousParagraphStyleId">
+					<xsl:choose>
+						<!--Está el párrafo actual dentro de un div que ya fue abierto anteriormente, y que
+							todavía no debe ser cerrado, porque hay al menos otro párrafo más con el mismo estilo?-->
+						<xsl:when test="$styleId = $nextParagraphStyleId">N</xsl:when>
+						<!--Debo cerrar el div?-->
+						<xsl:otherwise>C</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
+			</xsl:choose>							
+		</xsl:if>
+	</xsl:variable>	
+	
 	<xsl:choose>
 		<xsl:when test="descendant::w:t and normalize-space(string(.)) != ''">
 			<!--Me fijo si es necesario agregar la clase "salto", dependiendo de si debo procesar los párrafos en blanco y de cuántos
@@ -279,36 +311,6 @@
 						<xsl:when test="preceding-sibling::w:p[2][not(w:r/w:t[normalize-space(text()) != ''])]">25 </xsl:when>
 						<xsl:otherwise>10 </xsl:otherwise>
 					</xsl:choose>
-				</xsl:if>
-			</xsl:variable>
-			<!--Compruebo si se trata de un estilo estándar que debo procesar, o de algún estilo customizado-->
-			<xsl:variable name="classValue">
-				<!--Es un estilo propio?-->
-				<xsl:call-template name="parseCustomStyle">
-					<xsl:with-param name="styleName" select="$styleName"/>
-				</xsl:call-template>
-			</xsl:variable>
-			
-			<!--Si dos o más parrafos consecutivos comparten el mismo estilo, entonces los agrupo en un div-->
-			<xsl:variable name="divContainer">
-				<!--Me fijo si el párrafo tiene aplicado un estilo que me interesa, es decir, alguno que proceso-->
-				<xsl:if test="$styleId != '' and $classValue != ''">
-					<xsl:variable name="previousParagraphStyleId"><xsl:value-of select="preceding-sibling::w:p[1]/w:pPr/w:pStyle/@w:val"/></xsl:variable>
-					<xsl:variable name="nextParagraphStyleId"><xsl:value-of select="following-sibling::w:p[1]/w:pPr/w:pStyle/@w:val"/></xsl:variable>
-					
-					<xsl:choose>
-						<!--Debo abrir el div?-->
-						<xsl:when test="$styleId != $previousParagraphStyleId and $styleId = $nextParagraphStyleId">O</xsl:when>
-						<xsl:when test="$styleId = $previousParagraphStyleId">
-							<xsl:choose>
-								<!--Está el párrafo actual dentro de un div que ya fue abierto anteriormente, y que
-									todavía no debe ser cerrado, porque hay al menos otro párrafo más con el mismo estilo?-->
-								<xsl:when test="$styleId = $nextParagraphStyleId">N</xsl:when>
-								<!--Debo cerrar el div?-->
-								<xsl:otherwise>C</xsl:otherwise>
-							</xsl:choose>
-						</xsl:when>
-					</xsl:choose>							
 				</xsl:if>
 			</xsl:variable>
 			
@@ -338,13 +340,24 @@
 			<!--Cierro el div, si es necesario-->
 			<xsl:if test="$divContainer = 'C'">
 				<xsl:text disable-output-escaping="yes">&lt;/div&gt;</xsl:text>						
-			</xsl:if>
+			</xsl:if>			
 		</xsl:when>
-		<xsl:when test="not(descendant::w:t) and (descendant::pic:pic[1] or descendant::w:pict[1])">
-			<xsl:element name="{$tag}">
-				<xsl:attribute name="class">ilustra</xsl:attribute>
-				<xsl:apply-templates/>
-			</xsl:element>
+		<xsl:when test="not(descendant::w:t)">			
+			<!--Si el párrafo no tiene texto, aun así debo cerrar el div que agrupa estilos si
+				es necesario. Si no lo hago, puede darse el caso de que el párrafo actual (sin texto) que estoy
+				procesando tenga el estilo X aplicado, y el párrafo anterior también, pero el párrafo siguiente 
+				no. Es decir, que el párrafo actual debe cerrar el div, pero nunca lo voy a hacer si solamente cierro 
+				los divs cuando el párrafo tiene texto...-->
+			<xsl:if test="$divContainer = 'C'">
+				<xsl:text disable-output-escaping="yes">&lt;/div&gt;</xsl:text>						
+			</xsl:if>
+			
+			<xsl:if test="descendant::pic:pic[1] or descendant::w:pict[1]">
+				<xsl:element name="{$tag}">
+					<xsl:attribute name="class">ilustra</xsl:attribute>
+					<xsl:apply-templates/>
+				</xsl:element>
+			</xsl:if>
 		</xsl:when>
 	</xsl:choose>
 </xsl:template>
