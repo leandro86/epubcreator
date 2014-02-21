@@ -33,7 +33,7 @@
 					</xsl:when>
 					<xsl:otherwise>
 						<p>Suspiró entonces mío Cid, de pesadumbre cargado, y comenzó a hablar así, justamente mesurado: «¡Loado seas, Señor, Padre que estás en lo alto! Todo esto me han urdido mis enemigos malvados».</p>
-						<p class="salto05"><span class="versalita">ANÓNIMO</span></p>
+						<p class="salto05">A<small>NÓNIMO</small></p>
 					</xsl:otherwise>
 				</xsl:choose>
 			</div>

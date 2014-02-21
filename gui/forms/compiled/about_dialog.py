@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\about_dialog.ui'
+# Form implementation generated from reading ui file 'L:/Proyectos/python/projects/epubcreator/src/gui\forms\about_dialog.ui'
 #
-# Created: Sun Sep  1 19:23:35 2013
-#      by: PyQt4 UI code generator 4.10.2
+# Created: Fri Feb 21 17:14:50 2014
+#      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
 

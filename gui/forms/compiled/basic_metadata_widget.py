@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\basic_metadata_widget.ui'
+# Form implementation generated from reading ui file 'L:/Proyectos/python/projects/epubcreator/src/gui\forms\basic_metadata_widget.ui'
 #
-# Created: Sun Sep  1 19:23:36 2013
-#      by: PyQt4 UI code generator 4.10.2
+# Created: Fri Feb 21 17:14:50 2014
+#      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -213,17 +213,17 @@ class Ui_BasicMetadata(object):
         QtCore.QMetaObject.connectSlotsByName(BasicMetadata)
 
     def retranslateUi(self, BasicMetadata):
-        self.label_5.setText(_translate("BasicMetadata", "Portada", None))
+        self.label_5.setText(_translate("BasicMetadata", "Cubierta", None))
         self.label_3.setText(_translate("BasicMetadata", "Autores", None))
         self.label.setText(_translate("BasicMetadata", "Título", None))
         self.label_2.setText(_translate("BasicMetadata", "Subtítulo", None))
         self.label_4.setText(_translate("BasicMetadata", "Nombre", None))
         self.label_9.setText(_translate("BasicMetadata", "Mostrar como", None))
         self.addAuthorButton.setText(_translate("BasicMetadata", "Agregar Autor", None))
-        self.coverImage.setText(_translate("BasicMetadata", "<html><head/><body><p><span style=\" text-decoration: underline; color:#0000ff;\">Haga click aquí para seleccionar la imagen de portada</span></p></body></html>", None))
+        self.coverImage.setText(_translate("BasicMetadata", "<html><head/><body><p><span style=\" text-decoration: underline; color:#0000ff;\">Haga click aquí para seleccionar la imagen de cubierta</span></p></body></html>", None))
         self.label_12.setText(_translate("BasicMetadata", "Modificación", None))
         self.label_13.setText(_translate("BasicMetadata", "Diseñador", None))
         self.label_6.setText(_translate("BasicMetadata", "Sinopsis", None))
 
-from gui.custom_widgets import ExtendedQListWidget, ExtendedQLabel
+from gui.custom_widgets import ExtendedQLabel, ExtendedQListWidget
 from . import basic_metadata_widget_rc

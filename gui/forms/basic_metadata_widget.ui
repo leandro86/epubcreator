@@ -30,7 +30,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Portada</string>
+      <string>Cubierta</string>
      </property>
     </widget>
    </item>
@@ -232,7 +232,7 @@
            </size>
           </property>
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Haga click aquí para seleccionar la imagen de portada&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Haga click aquí para seleccionar la imagen de cubierta&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="scaledContents">
            <bool>true</bool>

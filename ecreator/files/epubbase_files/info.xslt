@@ -50,8 +50,8 @@
 				</xsl:if>
 				
 				<xsl:if test="$coverDesigner">
-					<p><xsl:value-of select="$coverDesignOrTweak"/> de portada: <xsl:value-of select="$coverDesigner"/></p>
-					<xsl:comment> usar la palabra «Diseño» si la portada fue creada especialmente para esta edición; «Retoque» si es una adaptación de otra existente </xsl:comment>
+					<p><xsl:value-of select="$coverDesignOrTweak"/> de cubierta: <xsl:value-of select="$coverDesigner"/></p>
+					<xsl:comment> usar la palabra «Diseño» si la cubierta fue creada especialmente para esta edición; «Retoque» si es una adaptación de otra existente </xsl:comment>
 				</xsl:if>
 				
 				<p class="salto10">Editor digital: <xsl:value-of select="$editor"/></p>
@@ -60,9 +60,9 @@
 				<xsl:comment>&lt;p&gt;Tercer editor: Editor3 (r3.0 a 3.x)&lt;/p&gt;</xsl:comment><xsl:text>&#10;</xsl:text>
 				<xsl:comment>&lt;p&gt;Corrección de erratas: ColaboradorA, ColaboradorB y ColaboradorC&lt;/p&gt;</xsl:comment>
 				
-				<p>ePub base r1.0</p>
+				<p>ePub base r1.1</p>
 			</div>
-			<p class="centrado"><img alt="" src="../Images/ex_libris.png" /></p>
+            <div class="vineta"><img alt="" height="20%" src="../Images/ex_libris.png"/></div>            
 		</body>
 </html>
 </xsl:template>

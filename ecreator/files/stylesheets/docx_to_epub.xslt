@@ -169,7 +169,7 @@
 						
 			<xsl:call-template name="insertNoteReturn">
 				<xsl:with-param name="sectionName" select="$sectionName"/>
-				<xsl:with-param name="noteId" select="concat('nota', $noteNumber, 'ref')"/>
+				<xsl:with-param name="noteId" select="concat('rf', $noteNumber)"/>
 			</xsl:call-template>
 		</xsl:if>
 	</p>

@@ -84,7 +84,7 @@
 <xsl:template name="insertNoteReference">
 	<xsl:param name="noteNumber"/>
 
-	<a id="nota{$noteNumber}ref" href="../Text/notas.xhtml#nota{$noteNumber}"><sup>[<xsl:value-of select="$noteNumber"/>]</sup></a>
+	<a id="rf{$noteNumber}" href="../Text/notas.xhtml#nt{$noteNumber}"><sup>[<xsl:value-of select="$noteNumber"/>]</sup></a>
 </xsl:template>
 
 <!--***********************************************************************************************
@@ -116,7 +116,7 @@
 <xsl:template name="insertNoteNumber">
 	<xsl:param name="noteNumber"/>
 
-	<a id="nota{$noteNumber}"></a>
+	<a id="nt{$noteNumber}"></a>
 	<sup>
 		<xsl:text>[</xsl:text><xsl:value-of select="$noteNumber"/><xsl:text>]</xsl:text>
 	</sup>

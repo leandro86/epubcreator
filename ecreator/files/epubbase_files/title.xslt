@@ -28,24 +28,24 @@
 		
 		<body>
 			<p class="tlogo"><span><img alt="" src="../Images/EPL_logo.png" width="100%" /></span></p>				
-			<p class="tautor"><code class="sans"><xsl:value-of select="$author"/></code></p>
-			<h1 class="ttitulo"><strong class="sans"><xsl:value-of select="$title"/></strong></h1>
+			<p class="tautor"><xsl:value-of select="$author"/></p>
+			<h1 class="ttitulo"><xsl:value-of select="$title"/></h1>
 			
 			<xsl:if test="$subtitle">
-				<p class="tsubtitulo"><strong class="sans"><xsl:value-of select="$subtitle"/></strong></p>
+				<p class="tsubtitulo"><xsl:value-of select="$subtitle"/></p>
 				<xsl:comment> esta línea es opcional, debe eliminarse si no tiene texto </xsl:comment>
 			</xsl:if>
 			
-			<p class="trevision"><strong class="sans">ePub r1.0</strong></p>		
+			<p class="trevision">ePub r1.1</p>		
 			<p class="tfirma">
-				<strong class="sans"><xsl:value-of select="$editor"/></strong>
+				<xsl:value-of select="$editor"/>
 				<xsl:text> </xsl:text>
 
 				<xsl:variable name="day"><xsl:call-template name="currentDay"/></xsl:variable>
 				<xsl:variable name="month"><xsl:call-template name="currentMonth"/></xsl:variable>
 				<xsl:variable name="year"><xsl:call-template name="currentYear"/></xsl:variable>
 									
-				<code class="tfecha sans"><xsl:value-of select="concat($day, '.', $month, '.', $year)"/></code>
+				<span class="tfecha"><xsl:value-of select="concat($day, '.', $month, '.', $year)"/></span>
 			</p>
 		</body>
 	</html>

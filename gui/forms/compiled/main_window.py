@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'L:/Proyectos/python/epubcreator/gui\forms\main_window.ui'
+# Form implementation generated from reading ui file 'L:/Proyectos/python/projects/epubcreator/src/gui\forms\main_window.ui'
 #
-# Created: Sun Sep  1 19:23:37 2013
-#      by: PyQt4 UI code generator 4.10.2
+# Created: Fri Feb 21 17:14:51 2014
+#      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
 
