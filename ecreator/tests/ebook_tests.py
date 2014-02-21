@@ -1,20 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2013 Leandro
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import unittest
 import tempfile
 import datetime
@@ -26,8 +9,7 @@ from ecreator import ebook, ebook_data
 
 
 class TestEbook(unittest.TestCase):
-
-    _NAMESPACES = {"x" : "http://www.w3.org/1999/xhtml"}
+    _NAMESPACES = {"x": "http://www.w3.org/1999/xhtml"}
 
     def setUp(self):
         self._outputFile = tempfile.TemporaryFile()
@@ -36,8 +18,8 @@ class TestEbook(unittest.TestCase):
 
     def tearDown(self):
         self._outputFile.close()
-        
-        if  self._outputEpub:
+
+        if self._outputEpub:
             self._outputEpub.close()
 
     def testCoverFileExists(self):
@@ -115,8 +97,8 @@ class TestEbook(unittest.TestCase):
                          ["Párrafo 3 de la sinopsis."])
 
     def testDedicationFileData(self):
-        self._metadata.dedication = ("Párrafo 1 de la dedicatoria.\nPárrafo 2 de la dedicatoria.\nPárrafo 3 de " \
-                                    "la dedicatoria.")
+        self._metadata.dedication = ("Párrafo 1 de la dedicatoria.\nPárrafo 2 de la dedicatoria.\nPárrafo 3 de "
+                                     "la dedicatoria.")
 
         self._generateEbook()
         dedication = self._getDedicationFile()
@@ -170,7 +152,7 @@ class TestEbook(unittest.TestCase):
         # que viene por defecto en el base.
         self.assertTrue(self._xpath(synopsis,
                                     "/x:html/x:body/x:div[@class = 'sinopsis']/x:p[1]/text()")[0]
-                                    .startswith("Yo por bien tengo que cosas tan señaladas"))
+                        .startswith("Yo por bien tengo que cosas tan señaladas"))
 
     def testDedicationFileExistsIfNotDedicationText(self):
         self._generateEbook()
@@ -178,7 +160,7 @@ class TestEbook(unittest.TestCase):
 
         # Al igual que en la sinopsis, si no agregué texto de dedicatoria, igualmente agrego dedicatoria.xhtml
         self.assertTrue(self._xpath(dedication, "/x:html/x:body/x:div[@class = 'dedicatoria']/x:p[1]/text()")[0]
-                                                .startswith("Suspiró entonces mío Cid"))
+                        .startswith("Suspiró entonces mío Cid"))
 
     def testAuthorFileData(self):
         self._metadata.authorBiography = ("Párrafo 1 de la biografía.\nPárrafo 2 de la biografía.\nPárrafo 3 de "
@@ -211,7 +193,7 @@ class TestEbook(unittest.TestCase):
 
         # Compruebo que autor.xhtml se haya agregado cuando no especifiqué una biografía de autor.
         self.assertTrue(self._xpath(author, "/x:html/x:body/x:p[@class = 'asangre' and position() = 2]/text()")[0]
-                                            .startswith("NOMBRE DEL AUTOR. Lorem ipsum dolor"))
+                        .startswith("NOMBRE DEL AUTOR. Lorem ipsum dolor"))
 
     def testAuthorFileIsSecondToLastWhenEbookContainsNotes(self):
         files = [ebook_data.File(ebook.Ebook.NOTES_EP_NAME, ebook_data.File.FILE_TYPE.TEXT, "bla")]
@@ -254,8 +236,9 @@ class TestEbook(unittest.TestCase):
         # Compruebo que en los metadatos se hayan agregado los traductores correctamente
         translators = self._outputEpub.getTranslators()
         self.assertEqual(len(translators), 1)
-        self.assertEqual(translators[0], ("Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & G. K. Chesterton",
-                                          "Borges, Jorge Luis & Poe, Edgar Allan & Shakespeare, William & Chesterton, G. K."))
+        self.assertEqual(translators[0],
+                         ("Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & G. K. Chesterton",
+                          "Borges, Jorge Luis & Poe, Edgar Allan & Shakespeare, William & Chesterton, G. K."))
 
     def testMultipleIlustrators(self):
         self._metadata.ilustrators.append(ebook_data.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
@@ -273,8 +256,9 @@ class TestEbook(unittest.TestCase):
         # Compruebo que en los metadatos se hayan agregado los ilustradores correctamente
         ilustrators = self._outputEpub.getIlustrators()
         self.assertEqual(len(ilustrators), 1)
-        self.assertEqual(ilustrators[0], ("Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & G. K. Chesterton",
-                                          "Borges, Jorge Luis & Poe, Edgar Allan & Shakespeare, William & Chesterton, G. K."))
+        self.assertEqual(ilustrators[0],
+                         ("Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & G. K. Chesterton",
+                          "Borges, Jorge Luis & Poe, Edgar Allan & Shakespeare, William & Chesterton, G. K."))
 
     def testSimpleCollection(self):
         self._metadata.subCollectionName = "Esta es la saga"
@@ -355,7 +339,8 @@ class TestEbook(unittest.TestCase):
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] Perez, Juan - Titulo del libro (r1.0 Editor del libro).epub")
+        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] Perez, Juan - Titulo del "
+                                   "libro (r1.0 Editor del libro).epub")
 
     def testEpubFileNameTwoAuthorsubCollection(self):
         self._metadata.title = "Título del libro"
@@ -368,10 +353,10 @@ class TestEbook(unittest.TestCase):
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName,
-                         "[Esta es la saga] [Esta es la serie 10] Perez, Juan & Gomez, Roberto - Titulo del libro (r1.0 Editor del libro).epub")
+        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] Perez, Juan & Gomez, Roberto - Titulo del "
+                                   "libro (r1.0 Editor del libro).epub")
 
-    def _generateEbook(self, files = None):
+    def _generateEbook(self, files=None):
         eebook = ebook.Ebook(files=files, metadata=self._metadata)
         fileName = eebook.save(self._outputFile)
         self._outputEpub = epub.EpubReader(self._outputFile)
@@ -427,7 +412,7 @@ class TestEbook(unittest.TestCase):
 
         @return: el resultado de la expresión xpath.
         """
-        return element.xpath(xpath, namespaces = TestEbook._NAMESPACES)
+        return element.xpath(xpath, namespaces=TestEbook._NAMESPACES)
 
 
 if __name__ == "__main__":

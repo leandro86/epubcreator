@@ -1,25 +1,7 @@
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2013 Leandro
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 from misc import utils
 
 
 class File:
-
     FILE_TYPE = utils.Utilities.enum(TEXT=1, IMAGE=2)
 
     def __init__(self, name, fileType, content):
@@ -36,7 +18,6 @@ class File:
 
 
 class Title:
-    
     def __init__(self, titleLocation, text):
         """
         Crea un nuevo Title.
@@ -48,21 +29,20 @@ class Title:
         self.titleLocation = titleLocation
         self.text = text
         self.childTitles = []
-        
+
     def addTitle(self, sectionName, text):
         """
         Agrega un título que tiene como padre al título actual.
 
         @param sectionName: nombre del archivo donde se encuentra el título.
         @param text: el texto del título.
-        """        
+        """
         childTitle = Title(sectionName, text)
         self.childTitles.append(childTitle)
         return childTitle
 
 
 class Metadata:
-
     def __init__(self):
         self.title = ""
         self.subtitle = ""
@@ -103,14 +83,12 @@ class Metadata:
 
 
 class Person:
-
     def __init__(self, name, fileAs):
         self.name = name
         self.fileAs = fileAs
 
 
 class Genre:
-
     def __init__(self, genreType, genre, subGenre):
         self.genreType = genreType
         self.genre = genre

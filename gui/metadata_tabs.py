@@ -1,20 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2013 Leandro
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import datetime
 
 from PyQt4 import QtGui, QtCore
@@ -26,7 +9,6 @@ from ecreator.misc import epub_base_misc
 
 
 class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
-
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
@@ -140,7 +122,6 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
 
 
 class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_AdditionalMetadata):
-
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
@@ -359,7 +340,8 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
         self.genreTypeInput.currentIndexChanged.connect(self._populateGenresAndSubGenres)
         self.genresList.deleteKeyPressed.connect(self._removeCurrentItemFromList)
 
-        self.subCollectionNameInput.textChanged.connect(lambda s: self.collectionVolumeInput.setEnabled(len(s.strip()) != 0))
+        self.subCollectionNameInput.textChanged.connect(
+            lambda s: self.collectionVolumeInput.setEnabled(len(s.strip()) != 0))
 
         self.addTranslatorButton.clicked.connect(self._addTranslatorToList)
         self.translatorsList.deleteKeyPressed.connect(self._removeCurrentItemFromList)
@@ -375,8 +357,7 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
 
 
 class AuthorMetadata(QtGui.QWidget, author_metadata_widget.Ui_AuthorMetadata):
-
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
 
@@ -413,7 +394,6 @@ class AuthorMetadata(QtGui.QWidget, author_metadata_widget.Ui_AuthorMetadata):
 
 
 class ValidationException(Exception):
-
     def __init__(self, error, description, tab, widget):
         self.error = error
         self.description = description

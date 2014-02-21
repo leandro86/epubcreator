@@ -1,20 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2013 Leandro
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import re
 import sys
 
@@ -24,7 +7,6 @@ from ecreator import ebook_data
 
 
 class Fi:
-
     VALID_IMAGE_TYPES = ("png", "jpg", "jpeg", "gif")
 
     _XHTML_NS = "http://www.w3.org/1999/xhtml"
@@ -45,7 +27,7 @@ class Fi:
         @return: una tupla con la lista de secciones y la lista de títulos.
         """
         ebookSections = []
-        
+
         sections = Fi._SECTION_REGEX_SPLITTER.split(self._fi)
 
         htmlHead = sections[0]
@@ -57,7 +39,7 @@ class Fi:
             ebookSections.append(ebook_data.File(sections[i],
                                                  ebook_data.File.FILE_TYPE.TEXT,
                                                  htmlHead + sections[i + 1] + htmlTail))
-        
+
         return ebookSections, self._parseTitles(ebookSections)
 
     def _parseTitles(self, ebookSections):
@@ -73,7 +55,7 @@ class Fi:
         """
         # Contiene todos los títulos de primer nivel del libro (los h1). Es una lista de Title.
         ebookRootTitles = []
-        
+
         # Indica cuál fue el nivel de heading anterior procesado
         previousHeadingNumber = 0
 
@@ -90,7 +72,7 @@ class Fi:
         # con los t2. No puedo suponer que los t1 van a ser siempre mi título de nivel 1. Incluso puede darse
         # el caso de una toc que no tenga t1, sino que absolutamente todos los títulos estén corridos.
         headingBase = sys.maxsize
-        
+
         for ebookSection in ebookSections:
             sectionXml = etree.XML(ebookSection.content)
             body = self._xpath(sectionXml, "/x:html/x:body")[0]
@@ -121,7 +103,7 @@ class Fi:
                     # va a ser un título de primer nivel.
                     titlesStack = [(title, currentHeadingNumber)]
                 else:
-                    if currentHeadingNumber < previousHeadingNumber:                                            
+                    if currentHeadingNumber < previousHeadingNumber:
                         # Si el nivel de título actual es menor al anterior, debo sacar los títulos necesarios
                         # de mi pila para poner el título actual en el nivel que corresponde. Ejemplo:
                         #           1
@@ -144,7 +126,7 @@ class Fi:
                         # Si tengo que insertar un nuevo título 5 en la toc de arriba, debo sacar el título 5 de la
                         # cima de la pila para que quede el título 4 en la cima.
                         titlesStack.pop()
-                    
+
                     # Inserto el título cuando no es un título de primer nivel.
                     childTitle = titlesStack[-1][0].addTitle(titleLocation, titleText)
                     titlesStack.append((childTitle, currentHeadingNumber))
@@ -186,4 +168,4 @@ class Fi:
         return text
 
     def _xpath(self, element, xpath):
-        return element.xpath(xpath, namespaces = {"x" : Fi._XHTML_NS})
+        return element.xpath(xpath, namespaces={"x": Fi._XHTML_NS})

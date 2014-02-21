@@ -1,20 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2013 Leandro
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import os
 import unittest
 
@@ -25,7 +8,6 @@ from ecreator import ebook_data
 
 
 class DocxTransformerTests(unittest.TestCase):
-
     def testOneParagraph(self):
         files = self._getOutput("one_paragraph.docx")[0]
 
@@ -241,17 +223,18 @@ class DocxTransformerTests(unittest.TestCase):
         @return: un string con el contenido del archivo.
         """
         testName = os.path.splitext(testFileName)[0]
-        with open(os.path.join("test_data", "{0}_output".format(testName), fileName), encoding = "utf-8") as file:
+        with open(os.path.join("test_data", "{0}_output".format(testName), fileName), encoding="utf-8") as file:
             return file.read()
 
-    def _getOutput(self, docxTestFileName, ignoreEmptyParagraphs = True):
-        transformer = docx_transformer.DocxTransformer(os.path.join("test_data", docxTestFileName), ignoreEmptyParagraphs)
+    def _getOutput(self, docxTestFileName, ignoreEmptyParagraphs=True):
+        transformer = docx_transformer.DocxTransformer(os.path.join("test_data", docxTestFileName),
+                                                       ignoreEmptyParagraphs)
         files, titles, logMessages = transformer.transform()
         return files, titles, logMessages
 
     def _saveFileToDisk(self, files, folderPath):
         for file in [f for f in files if f.fileType == ebook_data.File.FILE_TYPE.TEXT]:
-            with open(os.path.join(folderPath, file.name), "w", encoding = "utf-8") as outputFile:
+            with open(os.path.join(folderPath, file.name), "w", encoding="utf-8") as outputFile:
                 outputFile.write(file.content)
 
     def _printFiles(self, files):
@@ -260,7 +243,6 @@ class DocxTransformerTests(unittest.TestCase):
 
 
 class _XmlComparer:
-
     """
     Clase para comparar dos xmls.
     Parte del código sacado de: https://bitbucket.org/ianb/formencode/src/tip/formencode/doctest_xml_compare.py
@@ -302,7 +284,7 @@ class _XmlComparer:
         cl2 = x2.getchildren()
         if len(cl1) != len(cl2):
             print('children length differs, %i != %i'
-                         % (len(cl1), len(cl2)))
+                  % (len(cl1), len(cl2)))
             return False
         i = 0
         for c1, c2 in zip(cl1, cl2):

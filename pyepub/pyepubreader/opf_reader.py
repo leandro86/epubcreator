@@ -1,25 +1,7 @@
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2013 Leandro
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 from lxml import etree
 
 
 class OpfReader:
-
     OPF_NS = "http://www.idpf.org/2007/opf"
     DC_NS = "http://purl.org/dc/elements/1.1/"
 
@@ -67,7 +49,7 @@ class OpfReader:
 
     def getCalibreSerie(self):
         serieName = ""
-        serieIndex= ""
+        serieIndex = ""
 
         calibreSerie = self._xpath(self._opf, "/opf:package/opf:metadata/opf:meta[@name = 'calibre:series']")
         if len(calibreSerie) != 0:
@@ -80,5 +62,5 @@ class OpfReader:
         return serieName, serieIndex
 
     def _xpath(self, element, xpath):
-        return element.xpath(xpath, namespaces={"opf" : OpfReader.OPF_NS, "dc" : OpfReader.DC_NS})
+        return element.xpath(xpath, namespaces={"opf": OpfReader.OPF_NS, "dc": OpfReader.DC_NS})
 

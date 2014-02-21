@@ -1,20 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2013 Leandro
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import os
 import datetime
 
@@ -27,7 +10,6 @@ import config
 
 
 class Ebook:
-
     COVER_EP_NAME = "cubierta.xhtml"
     SYNOPSIS_EP_NAME = "sinopsis.xhtml"
     TITLE_EP_NAME = "titulo.xhtml"
@@ -38,7 +20,7 @@ class Ebook:
     COVER_IMAGE_EP_NAME = "cover.jpg"
     AUTHOR_IMAGE_EP_NAME = "autor.jpg"
 
-    def __init__(self, files = None, titles = None, metadata = None):
+    def __init__(self, files=None, titles=None, metadata=None):
         self._files = files or []
         self._titles = titles or []
         self._metadata = metadata or ebook_data.Metadata()
@@ -136,7 +118,8 @@ class Ebook:
         outputEpub.addImageData(Ebook.COVER_IMAGE_EP_NAME, coverImageData)
         outputEpub.addImageData(Ebook.AUTHOR_IMAGE_EP_NAME, authorImageData)
 
-        with open(logoPath, "rb") as logo, open(exLibrisPath, "rb") as exLibris, open(styleCssPath, encoding="utf-8") as styleCss:
+        with open(logoPath, "rb") as logo, open(exLibrisPath, "rb") as exLibris, open(styleCssPath,
+                                                                                      encoding="utf-8") as styleCss:
             outputEpub.addImageData("EPL_logo.png", logo.read())
             outputEpub.addImageData("ex_libris.png", exLibris.read())
             outputEpub.addStyleData("style.css", styleCss.read())
@@ -247,7 +230,7 @@ class Ebook:
         if self._files and self._files[-1].name == Ebook.NOTES_EP_NAME:
             pos = len(self._titles) - 1
         self._titles.insert(pos, ebook_data.Title(Ebook.AUTHOR_EP_NAME, "Autor"))
-        
+
         for title in self._titles:
             rootNavPoint = outputEpub.addNavPoint(title.titleLocation, title.text)
             self._addTitlesToToc(rootNavPoint, title.childTitles)
@@ -303,7 +286,6 @@ class Ebook:
 
 
 class _EpubBaseTemplate:
-
     def __init__(self, epubBaseTemplatesPath):
         self._templatesPath = epubBaseTemplatesPath
 
@@ -317,14 +299,14 @@ class _EpubBaseTemplate:
         # planilla de transformación que crea el archivo base correspondiente. Es decir, en este caso, el
         # parámetro "synopsis" se llama de igual manera dentro de la planilla "sinopsis.xslt".
         params = locals()
-        del(params["self"])
+        del (params["self"])
         self._prepareParams(params)
 
         return self._getTemplate("synopsis.xslt", params)
 
     def getTitle(self, author, title, subtitle, editor):
         params = locals()
-        del(params["self"])
+        del (params["self"])
         self._prepareParams(params)
 
         return self._getTemplate("title.xslt", params)
@@ -332,21 +314,21 @@ class _EpubBaseTemplate:
     def getInfo(self, originalTitle, author, publicationYear, translator, ilustrator, coverDesigner,
                 coverDesignOrTweak, editor):
         params = locals()
-        del(params["self"])
+        del (params["self"])
         self._prepareParams(params)
 
         return self._getTemplate("info.xslt", params)
 
     def getDedication(self, dedication):
         params = locals()
-        del(params["self"])
+        del (params["self"])
         self._prepareParams(params)
 
         return self._getTemplate("dedication.xslt", params)
 
     def getAuthor(self, authorBiography):
         params = locals()
-        del(params["self"])
+        del (params["self"])
         self._prepareParams(params)
 
         return self._getTemplate("author.xslt", params)
@@ -363,9 +345,9 @@ class _EpubBaseTemplate:
             if value:
                 params[key] = etree.XSLT.strparam(value)
             else:
-                del(params[key])
+                del (params[key])
 
-    def _getTemplate(self, templateFileName, params = None):
+    def _getTemplate(self, templateFileName, params=None):
         """
         Retorna el template del epubbase construido de acuerdo a los parámetros pasados.
 

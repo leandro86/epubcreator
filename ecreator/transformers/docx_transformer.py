@@ -1,20 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2013 Leandro
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import zipfile
 import io
 
@@ -26,8 +9,7 @@ import config
 
 
 class DocxTransformer(transformer_base.AbstractTransformer):
-
-    def __init__(self, inputFile, ignoreEmptyParagraphs = True):
+    def __init__(self, inputFile, ignoreEmptyParagraphs=True):
         self._inputFile = inputFile
 
         self._params = locals()
@@ -35,8 +17,8 @@ class DocxTransformer(transformer_base.AbstractTransformer):
         # Nombré los parámetros del método de igual manera a como están en la planilla de transformación, de
         # esta manera puedo pasar los parámetros directamente.
         # Solo me interesan los argumentos para la planilla. Borro todoo el resto de variables locales.
-        del(self._params["self"])
-        del(self._params["inputFile"])
+        del (self._params["self"])
+        del (self._params["inputFile"])
         self._prepareParams(self._params)
 
     def transform(self):
@@ -107,7 +89,6 @@ class DocxTransformer(transformer_base.AbstractTransformer):
 
 
 class _DocxResolver(etree.Resolver):
-
     def __init__(self, footnotes, styles, documentRels):
         self._footnotes = footnotes
         self._styles = styles

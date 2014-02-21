@@ -1,20 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2013 Leandro
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 # Script para generar un ejecutable con cx_freeze en los distintos sistemas operativos.
 # En windows y linux ejecutar así: python3 setup.py build
 # En mac: python3 setup.py bdist_mac --bundle-icon=app_icon.icns
@@ -51,22 +34,23 @@ def getImgFormatsPluginsPath():
     else:
         raise "Missing qt imageformats directory!"
 
-        
+
 def freezeApp():
     options = {}
-    
+
     includes = ["PyQt4", "PyQt4.QtCore", "PyQt4.QtGui"]
     packages = ["lxml"]
-    excludes = ["PyQt4.QtSvg", "PyQt4.QtNetwork", "PyQt4.QtOpenGL", "PyQt4.QtScript", "PyQt4.QtSql", "PyQt4.Qsci", "PyQt4.QtXml", "PyQt4.QtTest"]
+    excludes = ["PyQt4.QtSvg", "PyQt4.QtNetwork", "PyQt4.QtOpenGL", "PyQt4.QtScript", "PyQt4.QtSql", "PyQt4.Qsci",
+                "PyQt4.QtXml", "PyQt4.QtTest"]
     include_files = [("ecreator/files", "files"),
                      ("gui/resources/translations/qt_es.qm", "translations/qt_es.qm")]
 
-    options["icon"] = "gui/resources/images/icons/app_icon.ico"    
-    options["build_exe"] = "build/epubcreator"          
+    options["icon"] = "gui/resources/images/icons/app_icon.ico"
+    options["build_exe"] = "build/epubcreator"
 
     if config.IS_RUNNING_ON_LINUX:
         libsPath = "/usr/lib/i386-linux-gnu"
-        if sys.maxsize > 2**32:
+        if sys.maxsize > 2 ** 32:
             libsPath = "/usr/lib/x86_64-linux-gnu"
         include_files.append((os.path.join(libsPath, "libxslt.so.1"), "libxslt.so.1"))
         include_files.append((os.path.join(libsPath, "libexslt.so.0"), "libexslt.so.0"))
@@ -78,17 +62,18 @@ def freezeApp():
         if config.IS_RUNNING_ON_WIN:
             include_files.append((os.path.join(imgPluginsPath, "qjpeg4.dll"), "plugins/imageformats/qjpeg4.dll"))
         elif config.IS_RUNNING_ON_MAC:
-            include_files.append((os.path.join(imgPluginsPath, "libqjpeg.dylib"), "plugins/imageformats/libqjpeg.dylib"))
+            include_files.append(
+                (os.path.join(imgPluginsPath, "libqjpeg.dylib"), "plugins/imageformats/libqjpeg.dylib"))
             include_files.append(("/opt/local/lib/libjpeg.9.dylib", "libjpeg.9.dylib"))
 
             # Elimino el archivo ".ico": en mac el ícono es un archivo ".icns", que luego
             # me encargo de copiar manualmente
-            del(options["icon"])
-            
+            del (options["icon"])
+
             # En mac, al utilizar bdist_mac para crear el bundle, intenta leer los archivos desde el
             # directorio: "exe.macos-i386..." (algo así), independientemente de que yo especifique otro
             # directorio de destino... por eso no puedo modificarlo, y debo dejar el que crea por defecto.      
-            del(options["build_exe"])
+            del (options["build_exe"])
 
     options["packages"] = packages
     options["includes"] = includes
@@ -105,7 +90,8 @@ def freezeApp():
           options={"build_exe": options},
           executables=[Executable("main.py",
                                   base="Win32GUI" if config.IS_RUNNING_ON_WIN else None,
-                                  targetName="{0}{1}".format(version.APP_NAME, ".exe" if config.IS_RUNNING_ON_WIN else ""))])
+                                  targetName="{0}{1}".format(version.APP_NAME,
+                                                             ".exe" if config.IS_RUNNING_ON_WIN else ""))])
 
     if config.IS_RUNNING_ON_WIN:
         # Necesito el archivo qt.conf vacío. Si está vacío, Qt carga todos los paths por defecto, que
@@ -154,7 +140,8 @@ def freezeApp():
                     subprocess.call(("install_name_tool", "-change", filename, newfilename, lib))
 
         # Copio el ícono
-        shutil.copy("gui/resources/images/icons/app_icon.icns", "build/{0}-{1}.app/Contents/Resources".format(version.APP_NAME, version.VERSION))
+        shutil.copy("gui/resources/images/icons/app_icon.icns",
+                    "build/{0}-{1}.app/Contents/Resources".format(version.APP_NAME, version.VERSION))
 
         # Renombro el bundle, porque no quiero que el nombre incluya la versión
         os.rename(bundlePath, "build/EpubCreator.app")
