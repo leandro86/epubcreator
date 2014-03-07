@@ -39,6 +39,9 @@ class EpubReader:
     def hasFile(self, fileName):
         return any("/" + fileName in x for x in self._epub.namelist())
 
+    def getFullPathToFile(self, fileName):
+        return next((f for f in self._epub.namelist() if f.endswith("/" + fileName)), None)
+
     def getAuthors(self):
         return self._opf.getAuthors()
 

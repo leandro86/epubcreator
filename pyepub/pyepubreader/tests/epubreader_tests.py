@@ -58,6 +58,10 @@ class EpubReaderTests(unittest.TestCase):
                                                   ("Autor", "Text/autor.xhtml"),
                                                   ("Notas", "Text/notas.xhtml")])
 
+    def test_get_full_path_to_file(self):
+        self.assertEqual(self._epub.getFullPathToFile("cubierta.xhtml"), "OEBPS/Text/cubierta.xhtml")
+        self.assertEqual(self._epub.getFullPathToFile("style.css"), "OEBPS/Styles/style.css")
+
 
 if __name__ == '__main__':
     unittest.main()

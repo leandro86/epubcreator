@@ -372,13 +372,26 @@ class EbookTests(unittest.TestCase):
         self.assertTrue(titles[2][1].endswith(epubbase_names.AUTHOR_FILENAME))
         self.assertTrue(titles[3][1].endswith(epubbase_names.NOTES_FILENAME))
 
-    def test_images_exist(self):
+    def test_default_images_exist(self):
         self._generateEbook()
 
         self.assertTrue(self._outputEpub.hasFile(epubbase_names.EPL_LOGO_FILENAME))
         self.assertTrue(self._outputEpub.hasFile(epubbase_names.AUTHOR_IMAGE_FILENAME))
         self.assertTrue(self._outputEpub.hasFile(epubbase_names.COVER_IMAGE_FILENAME))
         self.assertTrue(self._outputEpub.hasFile(epubbase_names.EX_LIBRIS_FILENAME))
+
+    def test_custom_cover_image_and_author_image_exist(self):
+        # Si bien estas dos variables deben contener una serie de bytes que representan
+        # una imagen, para propósitos de testeo puedo usar simplemente un string.
+        self._metadata.coverImage = "cover image"
+        self._metadata.authorImage = "author image"
+
+        self._generateEbook()
+
+        coverImage = self._outputEpub.read(self._outputEpub.getFullPathToFile(epubbase_names.COVER_IMAGE_FILENAME))
+        self.assertEqual(coverImage.decode(), "cover image")
+        authorImage = self._outputEpub.read(self._outputEpub.getFullPathToFile(epubbase_names.AUTHOR_IMAGE_FILENAME))
+        self.assertEqual(authorImage.decode(), "author image")
 
     def test_css_exists(self):
         self._generateEbook()
