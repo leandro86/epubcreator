@@ -1,11 +1,15 @@
 import zipfile
+import os
 
 from lxml import etree
 
-from pyepub.pyepubreader import opf_reader
+from pyepub.pyepubreader import opf, toc
 
 
 class EpubReader:
+    """ Simple clase para leer el contenido de un epub, que la hice con el
+        único de propósito de usarla para los unittests, por ahora. """
+
     def __init__(self, fileInput):
         """
         Abre un epub.
@@ -13,7 +17,16 @@ class EpubReader:
         @param fileInput: el path del epub a abrir, o un objeto de tipo file.
         """
         self._epub = zipfile.ZipFile(fileInput, "r")
-        self._opfReader = opf_reader.OpfReader(self._epub.read(self._getPathToOpf()))
+
+        pathToOpf = self._getPathToOpf()
+        # En el directorio donde esté ubicado content.opf, es donde se encuentran
+        # el resto de los archivos
+        self._rootDir = os.path.split(pathToOpf)[0]
+        self._opf = opf.Opf(self._epub.read(pathToOpf))
+
+        # No puedo hacer un os.path.join, porque imperiosamente necesito usar esta barra: "/" y
+        # no esta "\".
+        self._toc = toc.Toc(self._epub.read("/".join(("OEBPS", self._opf.getPathToToc()))))
 
     def getHtmlFileNamesReadingOrder(self):
         """
@@ -21,16 +34,19 @@ class EpubReader:
 
         @return: una lista de strings con el nombre de cada html.
         """
-        return self._opfReader.getSpineItems()
+        return self._opf.getSpineItems()
+
+    def hasFile(self, fileName):
+        return any("/" + fileName in x for x in self._epub.namelist())
 
     def getAuthors(self):
-        return self._opfReader.getAuthors()
+        return self._opf.getAuthors()
 
     def getTranslators(self):
-        return self._opfReader.getTranslators()
+        return self._opf.getTranslators()
 
     def getIlustrators(self):
-        return self._opfReader.getIlustrators()
+        return self._opf.getIlustrators()
 
     def getCalibreSerie(self):
         """
@@ -38,7 +54,10 @@ class EpubReader:
 
         @return: una tupla de strings: el primer elemento es el nombre de la serie, y el segundo el índice.
         """
-        return self._opfReader.getCalibreSerie()
+        return self._opf.getCalibreSerie()
+
+    def getTitles(self):
+        return self._toc.getTitles()
 
     def read(self, fileName):
         """
@@ -47,8 +66,6 @@ class EpubReader:
         @param fileName: el archivo a leer.
 
         @return: un string con el contenido.
-
-        @raise: KeyError: si no se encuentra el archivo.
         """
         return self._epub.read(fileName)
 

@@ -48,6 +48,15 @@ class EpubWriter:
         self._opf.manifest.addItem("Styles/{0}".format(name), name)
         self._files["OEBPS/Styles/{0}".format(name)] = content
 
+    def addMetaFile(self, name, content):
+        """
+        Agrega un archivo al directorio META-INF.
+
+        @param name: el nombre con el que se va a guardar el archivo en el epub.
+        @param content: el contenido del archivo. Puede ser un string o bytes.
+        """
+        self._files["META-INF/{0}".format(name)] = content
+
     def addNavPoint(self, ref, title):
         """
         Agrega un navPoint de primer nivel a la toc.

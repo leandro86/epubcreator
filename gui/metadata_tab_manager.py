@@ -1,6 +1,6 @@
 from PyQt4 import QtGui, QtCore
 
-from ecreator import ebook_data
+from epubcreator import ebook_metadata
 from gui.forms.compiled import metadata_tab_manager_widget
 from gui import metadata_tabs
 
@@ -19,7 +19,7 @@ class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget.Ui_MetadataT
 
         @return: un objeto Metadata si no hubo errores, sino None.
         """
-        metadata = ebook_data.Metadata()
+        metadata = ebook_metadata.Metadata()
 
         if (self._populateBasicMetadata(metadata) and
                 self._populateAdditionalMetadata(metadata) and

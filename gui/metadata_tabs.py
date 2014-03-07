@@ -4,8 +4,8 @@ from PyQt4 import QtGui, QtCore
 
 from misc import language, utils
 from gui.forms.compiled import basic_metadata_widget, additional_metadata_widget, author_metadata_widget
-from ecreator import ebook_data
-from ecreator.misc import epub_base_misc
+from epubcreator import ebook_metadata
+from epubcreator.misc import epub_base_misc
 
 
 class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
@@ -90,7 +90,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
                     return
 
             item = QtGui.QListWidgetItem("{0} --> {1}".format(name, fileAs))
-            item.setData(QtCore.Qt.UserRole, ebook_data.Person(name, fileAs))
+            item.setData(QtCore.Qt.UserRole, ebook_metadata.Person(name, fileAs))
             self.authorsList.addItem(item)
 
     def _removeSelectedAuthorFromList(self):
@@ -319,7 +319,7 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
             if self.genresList.item(i).text() == item.text():
                 return
 
-        item.setData(QtCore.Qt.UserRole, ebook_data.Genre(genreType, genreGenre, genreSubGenre))
+        item.setData(QtCore.Qt.UserRole, ebook_metadata.Genre(genreType, genreGenre, genreSubGenre))
         self.genresList.addItem(item)
 
         self.genresList.sortItems()
@@ -332,7 +332,7 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
             if listWidget.item(i).data(QtCore.Qt.UserRole).name == name:
                 return
 
-        item.setData(QtCore.Qt.UserRole, ebook_data.Person(name, fileAs))
+        item.setData(QtCore.Qt.UserRole, ebook_metadata.Person(name, fileAs))
         listWidget.addItem(item)
 
     def _connectSignals(self):

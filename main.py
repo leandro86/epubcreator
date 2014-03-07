@@ -18,7 +18,7 @@ def handleUnknownException(exc_type, exc_value, exc_traceback):
 
 if __name__ == "__main__":
     # Cualquier excepción no controlada que ocurra la redirijo a un método propio para manejarla
-    sys.excepthook = handleUnknownException
+    #sys.excepthook = handleUnknownException
 
     # Necesito llamar a este método porque sino pyqt crashea cuando se cierra python (al menos en windows).
     # No crashea siempre, sino que lo hace bajo alguna circunstancias. Por ejemplo, a mi me crasheaba cuando el form

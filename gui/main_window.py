@@ -3,8 +3,8 @@ import subprocess
 
 from PyQt4 import QtGui, QtCore
 
-from ecreator.transformers import docx_transformer
-from ecreator import ebook
+from epubcreator import ebook
+from epubcreator.converters.docx import converter
 from misc import settings_store, utils
 from gui.forms.compiled import main_window
 from gui import preferences, log_window, about
@@ -63,8 +63,8 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
             settings = settings_store.SettingsStore()
             metadata.editor = settings.editor
 
-            files, titles, logMessages = self._prepareEbook()
-            eebook = ebook.Ebook(files, titles, metadata)
+            data, logMessages = self._prepareEbook()
+            eebook = ebook.Ebook(data, metadata)
 
             # Por defecto guardo el epub en el mismo directorio donde se encuentra
             # el archivo de origen.
@@ -157,15 +157,14 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
     def _prepareEbook(self):
         settings = settings_store.SettingsStore()
 
-        files = []
-        titles = []
-        logMessages = []
+        data = None
+        logMessages = None
 
         if self._workingFilePath.endswith(".docx"):
-            transformer = docx_transformer.DocxTransformer(self._workingFilePath, settings.docxIgnoreEmptyParagraphs)
-            files, titles, logMessages = transformer.transform()
+            transformer = converter.DocxConverter(self._workingFilePath, settings.docxIgnoreEmptyParagraphs)
+            data, logMessages = transformer.convert()
 
-        return files, titles, logMessages
+        return data, logMessages
 
     def _close(self):
         QtGui.qApp.closeAllWindows()

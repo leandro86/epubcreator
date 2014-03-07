@@ -16,10 +16,10 @@ IS_RUNNING_ON_MAC = sys.platform == "darwin"
 
 ############################# Directorios #############################
 ROOT_DIR_PATH = os.path.dirname(sys.executable if _isFrozen else __file__)
-EPUBBASE_FILES_DIR_PATH = os.path.join(ROOT_DIR_PATH, "" if _isFrozen else "ecreator", "files", "epubbase_files")
+EPUBBASE_FILES_DIR_PATH = os.path.join(ROOT_DIR_PATH, "" if _isFrozen else "epubcreator", "files", "epubbase_files")
 
 ############################# Archivos ################################
-DOCX_TO_EPUB_STYLESHEET_PATH = os.path.join(ROOT_DIR_PATH, "" if _isFrozen else "ecreator", "files", "stylesheets",
+DOCX_TO_EPUB_STYLESHEET_PATH = os.path.join(ROOT_DIR_PATH, "" if _isFrozen else "epubcreator", "files", "stylesheets",
                                             "docx_to_epub.xslt")
 QT_SP_TRANSLATION_PATH = os.path.join(ROOT_DIR_PATH, "" if _isFrozen else os.path.join("gui", "resources"),
                                       "translations", "qt_es.qm")
