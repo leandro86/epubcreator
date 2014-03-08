@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'L:/Proyectos/python/projects/epubcreator/src/gui\forms\about_dialog.ui'
+# Form implementation generated from reading ui file 'about_dialog.ui'
 #
-# Created by PyQt4 UI code generator
+# Created: Sat Mar  8 13:25:20 2014
+#      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -141,7 +142,7 @@ class Ui_Dialog(object):
         self.versionLabel.setText(_translate("Dialog", "program version", None))
         self.label_5.setText(_translate("Dialog", "Versión de Qt:", None))
         self.qtVersionLabel.setText(_translate("Dialog", "qt version", None))
-        self.label_8.setText(_translate("Dialog", "Desarroladores:", None))
+        self.label_8.setText(_translate("Dialog", "Desarrolladores:", None))
         self.label_9.setText(_translate("Dialog", "Mcphist y Tarloth", None))
         self.label_12.setText(_translate("Dialog", "Sitio web:", None))
         self.label_13.setText(_translate("Dialog", "<a href=\"http://www.epublibre.org/foro/viewtopic.php?f=29&t=2954\">http://www.epublibre.org/foro/viewtopic.php?f=29&t=2954</a>", None))
