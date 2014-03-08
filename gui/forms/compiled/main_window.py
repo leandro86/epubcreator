@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'L:/Proyectos/python/projects/epubcreator/src/gui\forms\main_window.ui'
 #
-# Created: Fri Feb 21 17:14:51 2014
-#      by: PyQt4 UI code generator 4.10.3
+# Created by PyQt4 UI code generator
 #
 # WARNING! All changes made in this file will be lost!
 

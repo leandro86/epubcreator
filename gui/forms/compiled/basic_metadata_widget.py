@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'L:/Proyectos/python/projects/epubcreator/src/gui\forms\basic_metadata_widget.ui'
 #
-# Created: Fri Feb 21 17:14:50 2014
-#      by: PyQt4 UI code generator 4.10.3
+# Created by PyQt4 UI code generator
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -225,5 +224,5 @@ class Ui_BasicMetadata(object):
         self.label_13.setText(_translate("BasicMetadata", "Diseñador", None))
         self.label_6.setText(_translate("BasicMetadata", "Sinopsis", None))
 
-from gui.custom_widgets import ExtendedQLabel, ExtendedQListWidget
+from gui.custom_widgets import ExtendedQListWidget, ExtendedQLabel
 from . import basic_metadata_widget_rc
