@@ -123,6 +123,8 @@ class DocxConverter(converter_base.AbstractConverter):
                     previousEmptyParagraphsCount = 0
                 else:
                     previousEmptyParagraphsCount += 1
+            elif child.tag.endswith("}tbl"):
+                self._processTable(child)
 
     def _processHeading(self, paragraph, hasText):
         if hasText:
@@ -344,6 +346,21 @@ class DocxConverter(converter_base.AbstractConverter):
             # Si la lista se termina, debo cerrar el primer "ul" de todos.
             if nextParagraphListLevel == -1:
                 self._currentSection.closeTag("ul")
+
+    def _processTable(self, table):
+        self._currentSection.openTag("table", dict(frame="box", rules="all"))
+
+        for child in table:
+            if child.tag.endswith("tr"):
+                self._currentSection.openTag("tr")
+
+                for node in child:
+                    if node.tag.endswith("tc"):
+                        self._processMainContent(node, "td")
+
+                self._currentSection.closeTag("tr")
+
+        self._currentSection.closeTag("table")
 
     def _processRunFormats(self, runFormats, previousRunFormats):
         if runFormats != previousRunFormats:

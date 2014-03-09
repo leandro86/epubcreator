@@ -187,6 +187,12 @@ class DocxConverterTests(unittest.TestCase):
         self.assertEqual(len(data.sections), 1)
         self.assertTrue(self._compareSections("unordered_list.docx", data.sections))
 
+    def test_table(self):
+        data = self._getOutput("table.docx")
+
+        self.assertEqual(len(data.sections), 1)
+        self.assertTrue(self._compareSections("table.docx", data.sections))
+
     def _compareSections(self, docxTestFileName, sections):
         for section in sections:
             expectedOutput = self._readExpectedOutput(docxTestFileName, section.name)
