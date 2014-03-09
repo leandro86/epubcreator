@@ -111,7 +111,11 @@ class DocxConverter(converter_base.AbstractConverter):
                 if self._styles.hasParagraphHeadingStyle(child):
                     self._processHeading(child, hasParagraphText)
                 else:
-                    self._processParagraph(child, hasParagraphText, tag, previousEmptyParagraphsCount)
+                    listLevel = utils.getListLevel(child)
+                    if listLevel > -1:
+                        self._processList(child, listLevel)
+                    else:
+                        self._processParagraph(child, hasParagraphText, tag, previousEmptyParagraphsCount)
 
                 if utils.isPageBreakOnEnd(child):
                     self._saveCurrentSection()
@@ -306,6 +310,39 @@ class DocxConverter(converter_base.AbstractConverter):
 
     def _processText(self, node):
         self._currentSection.appendText(node.text)
+
+    def _processList(self, paragraph, listLevel):
+        previousParagraph = utils.getPreviousParagraph(paragraph)
+        nextParagraph = utils.getNextParagraph(paragraph)
+
+        previousParagraphListLevel = utils.getListLevel(previousParagraph) if previousParagraph is not None else -1
+        nextParagraphListLevel = utils.getListLevel(nextParagraph) if nextParagraph is not None else -1
+
+        if listLevel > previousParagraphListLevel:
+            self._currentSection.openTag("ul")
+
+        self._currentSection.openTag("li")
+        self._processParagraphContent(paragraph)
+
+        if nextParagraphListLevel == listLevel:
+            self._currentSection.closeTag("li")
+        elif nextParagraphListLevel < listLevel:
+            self._currentSection.closeTag("li")
+
+            # Cuando el siguiente nivel es menor al actual, debo cerrar los anidamientos correctamente.
+            # Para saber cuántos anidamientos cerrar, solamente tengo que restarle al nivel actual el
+            # siguiente (claro que supongo que los anidamientos son válidos...).
+            # Si no hay próximo nivel (es decir, se termina la lista), entonces simplemente el nivel
+            # actual me dice cuántos anidamientos debo cerrar
+            iterations = (listLevel - (nextParagraphListLevel if nextParagraphListLevel != -1 else 0))
+
+            for i in range(iterations):
+                self._currentSection.closeTag("ul")
+                self._currentSection.closeTag("li")
+
+            # Si la lista se termina, debo cerrar el primer "ul" de todos.
+            if nextParagraphListLevel == -1:
+                self._currentSection.closeTag("ul")
 
     def _processRunFormats(self, runFormats, previousRunFormats):
         if runFormats != previousRunFormats:

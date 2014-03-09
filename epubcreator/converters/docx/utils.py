@@ -70,3 +70,8 @@ def getNextRun(run):
 def getPreviousRun(run):
     previousRun = xml_utils.xpath(run, "preceding-sibling::w:r[1]", NAMESPACES)
     return previousRun[0] if previousRun else None
+
+
+def getListLevel(paragraph):
+    level = xml_utils.xpath(paragraph, "w:pPr/w:numPr/w:ilvl/@w:val", NAMESPACES)
+    return int(level[0]) if level else -1
