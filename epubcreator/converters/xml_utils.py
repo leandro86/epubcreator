@@ -32,18 +32,4 @@ def hasText(node):
 
 
 def getAllText(node):
-    """
-    Retorna el texto de un nodo, incluyendo el texto de todos los nodos descendientes.
-
-    @param node: un lxml Element.
-
-    @return: un string con el texto del nodo.
-    """
-    text = node.text or ""
-
-    for child in node:
-        text += getAllText(child)
-
-    text += node.tail or ""
-
-    return text
+    return "".join(xpath(node, "descendant::text()"))
