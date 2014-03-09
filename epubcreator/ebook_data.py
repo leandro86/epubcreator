@@ -28,7 +28,6 @@ class Section:
 
     def __init__(self, sectionNumber):
         self.name = self._generateSectionName(sectionNumber)
-        self._openedTags = []
         self._content = []
 
     def appendText(self, text):
@@ -36,16 +35,9 @@ class Section:
 
     def openTag(self, tag, attributes=None):
         self.appendText(self._generateOpenTag(tag, attributes))
-        self._openedTags.append(tag)
 
     def closeTag(self, tag):
-        openedTag = self._openedTags[-1]
-
-        if tag != openedTag:
-            raise Exception('Tag "{0}" does not match opened tag "{1}"'.format(tag, openedTag))
-
         self.appendText(self._generateCloseTag(tag))
-        self._openedTags.pop()
 
     def openHeading(self, level, headingId=None):
         tag = "h{0}".format(level)
@@ -59,9 +51,6 @@ class Section:
     def appendImg(self, imageName):
         self.openTag("img", dict(alt="", src="../Images/{0}".format(imageName)))
         self.closeTag("img")
-
-    def getOpenedTags(self):
-        return self._openedTags
 
     def toHtml(self):
         html = "".join((Section._XML_DECLARATION,

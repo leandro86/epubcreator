@@ -105,7 +105,6 @@ class DocxConverter(converter_base.AbstractConverter):
 
                 if utils.isPageBreakOnBeginning(child):
                     self._saveCurrentSection()
-                    self._startNewTextSection()
                     hasParagraphPageBreak = True
 
                 if self._styles.hasParagraphHeadingStyle(child):
@@ -119,7 +118,6 @@ class DocxConverter(converter_base.AbstractConverter):
 
                 if utils.isPageBreakOnEnd(child):
                     self._saveCurrentSection()
-                    self._startNewTextSection()
 
                 if hasParagraphText or hasParagraphPageBreak:
                     previousEmptyParagraphsCount = 0
@@ -188,50 +186,45 @@ class DocxConverter(converter_base.AbstractConverter):
                 self._currentSection.closeHeading(fixedHeadingNumber)
 
     def _processParagraph(self, paragraph, hasText, tag="p", previousEmptyParagraphsCount=0):
-        if hasText:
-            isParagraphInsideDiv = False
-            needToCloseDiv = False
-            attributes = None
-            classValue = []
+        isParagraphInsideDiv = False
+        needToCloseDiv = False
+        classValue = []
 
+        customStyleName = self._styles.getParagaphCustomStyleName(paragraph)
+        if customStyleName:
+            previousParagraph = utils.getPreviousParagraph(paragraph)
+            nextParagraph = utils.getNextParagraph(paragraph)
+
+            styleId = self._styles.getParagraphStyleId(paragraph)
+            previousParagraphStyleId = None
+            nextParagraphStyleId = None
+
+            if previousParagraph is not None:
+                previousParagraphStyleId = self._styles.getParagraphStyleId(previousParagraph)
+
+            if nextParagraph is not None:
+                nextParagraphStyleId = self._styles.getParagraphStyleId(nextParagraph)
+
+            if styleId != previousParagraphStyleId and styleId == nextParagraphStyleId:
+                self._currentSection.openTag("div", {"class": customStyleName})
+                isParagraphInsideDiv = True
+            elif styleId == previousParagraphStyleId:
+                if styleId != nextParagraphStyleId:
+                    needToCloseDiv = True
+                isParagraphInsideDiv = True
+
+        if hasText:
             if not self._ignoreEmptyParagraphs and previousEmptyParagraphsCount > 0:
                 classValue.append("salto25" if previousEmptyParagraphsCount > 1 else "salto10")
 
-            customStyleName = self._styles.getParagaphCustomStyleName(paragraph)
-            if customStyleName:
-                previousParagraph = utils.getPreviousParagraph(paragraph)
-                nextParagraph = utils.getNextParagraph(paragraph)
+            if customStyleName and not isParagraphInsideDiv:
+                classValue.append(customStyleName)
 
-                styleId = self._styles.getParagraphStyleId(paragraph)
-                previousParagraphStyleId = None
-                nextParagraphStyleId = None
-
-                if previousParagraph is not None:
-                    previousParagraphStyleId = self._styles.getParagraphStyleId(previousParagraph)
-
-                if nextParagraph is not None:
-                    nextParagraphStyleId = self._styles.getParagraphStyleId(nextParagraph)
-
-                if styleId != previousParagraphStyleId and styleId == nextParagraphStyleId:
-                    self._currentSection.openTag("div", {"class": customStyleName})
-                    isParagraphInsideDiv = True
-                elif styleId == previousParagraphStyleId:
-                    if styleId != nextParagraphStyleId:
-                        needToCloseDiv = True
-                    isParagraphInsideDiv = True
-
-                if not isParagraphInsideDiv:
-                    classValue.append(customStyleName)
-
-            if classValue:
-                attributes = {"class": " ".join(classValue)}
+            attributes = {"class": " ".join(classValue)} if classValue else None
 
             self._currentSection.openTag(tag, attributes)
             self._processParagraphContent(paragraph)
             self._currentSection.closeTag(tag)
-
-            if needToCloseDiv:
-                self._currentSection.closeTag("div")
         else:
             pic = xml_utils.find(paragraph,
                                  "w:r/w:drawing/wp:inline/a:graphic/a:graphicData/pic:pic",
@@ -240,6 +233,14 @@ class DocxConverter(converter_base.AbstractConverter):
                 self._currentSection.openTag("p", {"class": "ilustra"})
                 self._processPic(pic)
                 self._currentSection.closeTag("p")
+
+        # Aun si el párrafo no tiene texto, debo cerrar el div que agrupa estilos si es necesario. Si no
+        # lo hago, puede darse el caso de que el párrafo actual (sin texto) que estoy procesando tenga el
+        # estilo X aplicado, y el párrafo anterior también, pero el párrafo siguiente no. Es decir, que el
+        # párrafo actual debe cerrar el div, pero nunca lo voy a hacer si solamente cierro los divs cuando el
+        # párrafo tiene texto.
+        if needToCloseDiv:
+            self._currentSection.closeTag("div")
 
     def _processParagraphContent(self, paragraph):
         previousRunFormats = []
@@ -392,10 +393,5 @@ class DocxConverter(converter_base.AbstractConverter):
         self._processMainContent(txbxContent, "span")
 
     def _saveCurrentSection(self):
-        for openedTag in self._currentSection.getOpenedTags():
-            self._currentSection.closeTag(openedTag)
-
         self._ebookData.addSection(self._currentSection)
-
-    def _startNewTextSection(self):
         self._currentSection = ebook_data.TextSection(len(self._ebookData.sections))
