@@ -4,7 +4,7 @@ import subprocess
 from PyQt4 import QtGui, QtCore
 
 from epubcreator import ebook
-from epubcreator.converters.docx import converter
+from epubcreator.converters.docx import docx_converter
 from misc import settings_store, utils
 from gui.forms.compiled import main_window
 from gui import preferences, log_window, about
@@ -161,7 +161,7 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
         logMessages = None
 
         if self._workingFilePath.endswith(".docx"):
-            transformer = converter.DocxConverter(self._workingFilePath, settings.docxIgnoreEmptyParagraphs)
+            transformer = docx_converter.DocxConverter(self._workingFilePath, settings.docxIgnoreEmptyParagraphs)
             data, logMessages = transformer.convert()
 
         return data, logMessages

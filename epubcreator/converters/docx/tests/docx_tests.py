@@ -3,7 +3,7 @@ import unittest
 
 from lxml import etree
 
-from epubcreator.converters.docx import converter
+from epubcreator.converters.docx import docx_converter
 
 
 class DocxConverterTests(unittest.TestCase):
@@ -213,7 +213,7 @@ class DocxConverterTests(unittest.TestCase):
 
     def _getOutput(self, docxTestFileName, ignoreEmptyParagraphs=True):
         pathToDocxTestFile = os.path.join(self._pathToTestDataFolder, docxTestFileName)
-        transformer = converter.DocxConverter(pathToDocxTestFile, ignoreEmptyParagraphs)
+        transformer = docx_converter.DocxConverter(pathToDocxTestFile, ignoreEmptyParagraphs)
         ebookData, logMessages = transformer.convert()
         return ebookData
 
