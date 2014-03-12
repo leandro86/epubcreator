@@ -250,6 +250,10 @@ class DocxConverter(converter_base.AbstractConverter):
         for child in paragraph:
             if child.tag.endswith("}r"):
                 previousRunFormats = self._processRun(child, previousRunFormats)
+            elif child.tag.endswith("}hyperlink"):
+                # Un hyperlink puede contener los mismos nodos que un párrafo, exceptuando el nodo w:pPr.
+                # Por ahora, no aplico ningún tratamiendo especial a los hyperlinks.
+                self._processParagraphContent(child)
 
     def _processRun(self, run, previousRunFormats):
         styleId = self._styles.getRunStyleId(run)
