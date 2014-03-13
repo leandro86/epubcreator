@@ -256,9 +256,14 @@ class DocxConverter(converter_base.AbstractConverter):
         for child in paragraph:
             if child.tag.endswith("}r"):
                 previousRunFormats = self._processRun(child, previousRunFormats)
-            elif child.tag.endswith("}hyperlink"):
-                # Un hyperlink puede contener los mismos nodos que un párrafo, exceptuando el nodo w:pPr.
-                # Por ahora, no aplico ningún tratamiendo especial a los hyperlinks.
+            else:
+                # Si de algún lado llame a este método que procesa el contenido de un párrafo, entonces
+                # probablemente significa que dentro del nodo, en alguna parte hay texto, es decir, un
+                # elemento w:t, y debo procesarlo.
+                # Un párrafo (w:p) puede contener, además de w:r, w:hyperlink, w:smartag, etc., y todos
+                # ellos pueden contener a su vez los mismos elementos que un w:p contiene, por lo que
+                # me basta hacer un call recursivo para procesar este nodo, de manera tal que eventualmente
+                # voy a terminar procesando los w:r que contienen el texto.
                 self._processParagraphContent(child)
 
     def _processRun(self, run, previousRunFormats):
