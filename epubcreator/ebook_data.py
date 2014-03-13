@@ -94,6 +94,15 @@ class TextSection(Section):
         self.closeTag("sup")
         self.closeTag("a")
 
+    def toRawText(self):
+        html = lxml.html.fromstring("".join(self._content))
+
+        sups = html.xpath("//sup[parent::a]")
+        for sup in sups:
+            sup.text = ""
+
+        return html.text_content()
+
     def _generateSectionName(self, sectionNumber):
         return epubbase_names.generateTextSectionName(sectionNumber)
 
@@ -138,6 +147,22 @@ class NotesSection(Section):
         self._content.insert(pos, returnLink)
 
         self.closeTag("div")
+
+    def toRawText(self):
+        html = lxml.html.fromstring("".join(self._content))
+
+        title = html.xpath("h1[text() = 'Notas']")[0]
+        title.text = ""
+
+        sups = html.xpath("//sup[parent::p[@id]]")
+        for sup in sups:
+            sup.text = ""
+
+        anchors = html.xpath("//a")
+        for a in anchors:
+            a.text = ""
+
+        return html.text_content()
 
     def _generateSectionName(self, sectionNumber):
         return epubbase_names.NOTES_FILENAME

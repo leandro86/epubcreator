@@ -1,5 +1,6 @@
 import os
 import subprocess
+import re
 
 from PyQt4 import QtGui, QtCore
 
@@ -173,7 +174,13 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
 
     def _checkForMissingText(self, sections, rawText):
         sectionsText = "".join((s.toRawText() for s in sections))
-        isTextMissing = sectionsText != rawText
+
+        # Elimino absolutamente todos los espacios (espacios, tabs, non breaking spaces, etc) al comparar el texto.
+        # No solo lo hago porque principalemente lo único que me importa es que no se haya perdido texto en la
+        # conversión, sino porque el documento fuente y el texto resultante de la conversión no necesariamente deben
+        # coincidir en un 100%: el documento fuente puede contener párrafos en blanco (tal vez con espacios
+        # incluso, o no), por ejemplo, que tal vez no haya que convertir.
+        isTextMissing = re.sub(r"\s+", "", rawText) != re.sub(r"\s+", "", sectionsText)
 
         if isTextMissing:
             utils.Utilities.displayStdErrorDialog("Se ha perdido texto en la conversión. Por favor, repórtalo a los "

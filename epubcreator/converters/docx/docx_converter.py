@@ -82,7 +82,10 @@ class DocxConverter(converter_base.AbstractConverter):
         return self._ebookData, logMessages
 
     def getRawText(self):
-        return "".join(xml_utils.xpath(self._documentXml, "//w:t/text()", namespaces=utils.NAMESPACES))
+        docText = "".join(xml_utils.xpath(self._documentXml, "//w:t/text()", namespaces=utils.NAMESPACES))
+        footnotesText = "".join(self._footnotes.getRawText()) if self._footnotes else ""
+
+        return docText + footnotesText
 
     def _processDocument(self):
         self._currentSection = ebook_data.TextSection(0)
