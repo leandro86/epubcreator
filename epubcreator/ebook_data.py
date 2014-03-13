@@ -1,3 +1,5 @@
+import lxml.html
+
 from epubcreator import epubbase_names
 
 
@@ -63,6 +65,9 @@ class Section:
                         self._generateCloseTag("html")))
 
         return html
+
+    def toRawText(self):
+        return lxml.html.fromstring("".join(self._content)).text_content()
 
     def _generateOpenTag(self, tag, attributes=None):
         if attributes is None:

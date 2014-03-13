@@ -45,7 +45,7 @@ class Utilities:
         return type("Enum", (), enums)
 
     @staticmethod
-    def displayStdErrorDialog(message, details):
+    def displayStdErrorDialog(message, details=None):
         msgBox = QtGui.QMessageBox(QtGui.QApplication.activeWindow())
         msgBox.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
         msgBox.setModal(True)

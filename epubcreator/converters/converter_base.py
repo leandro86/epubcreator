@@ -11,6 +11,9 @@ class AbstractConverter:
     def getMetadata(self):
         raise NotImplemented
 
+    def getRawText(self):
+        raise NotImplemented
+
 
 class ConverterLogMessage:
     MSG_TYPE = utils.Utilities.enum(WARNING=1, ERROR=2)

@@ -63,8 +63,11 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
             settings = settings_store.SettingsStore()
             metadata.editor = settings.editor
 
-            data, logMessages = self._prepareEbook()
+            data, logMessages, rawText = self._prepareEbook()
             eebook = ebook.Ebook(data, metadata)
+
+            if data:
+                self._checkForMissingText(data.sections, rawText)
 
             # Por defecto guardo el epub en el mismo directorio donde se encuentra
             # el archivo de origen.
@@ -159,12 +162,22 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
 
         data = None
         logMessages = None
+        rawText = None
 
         if self._workingFilePath.endswith(".docx"):
-            transformer = docx_converter.DocxConverter(self._workingFilePath, settings.docxIgnoreEmptyParagraphs)
-            data, logMessages = transformer.convert()
+            converter = docx_converter.DocxConverter(self._workingFilePath, settings.docxIgnoreEmptyParagraphs)
+            data, logMessages = converter.convert()
+            rawText = converter.getRawText()
 
-        return data, logMessages
+        return data, logMessages, rawText
+
+    def _checkForMissingText(self, sections, rawText):
+        sectionsText = "".join((s.toRawText() for s in sections))
+        isTextMissing = sectionsText != rawText
+
+        if isTextMissing:
+            utils.Utilities.displayStdErrorDialog("Se ha perdido texto en la conversión. Por favor, repórtalo a los "
+                                                  "desarrolladores y adjunta el documento fuente.")
 
     def _close(self):
         QtGui.qApp.closeAllWindows()
