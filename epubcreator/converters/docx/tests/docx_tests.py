@@ -1,5 +1,6 @@
 import os
 import unittest
+import re
 
 from lxml import etree
 
@@ -238,7 +239,14 @@ class _XmlComparer:
 
     @staticmethod
     def compare(x1, x2):
-        return _XmlComparer._performCompare(etree.XML(bytes(x1, "utf-8")), etree.XML(bytes(x2, "utf-8")))
+        # Normalizo los xmls de una forma bastante tosca, pero que me permite preservar los espacios
+        # en el texto. Otra opción sería serializar el xml mediante lxml, pero resulta que los atributos
+        # no mantienen ningún orden específico al hacerlo.
+        normalizedX1 = re.sub(r"\n\s*<", "<", x1)
+        normalizedX2 = re.sub(r"\n\s*<", "<", x2)
+
+        return _XmlComparer._performCompare(etree.XML(bytes(normalizedX1, "utf-8")),
+                                            etree.XML(bytes(normalizedX2, "utf-8")))
 
     @staticmethod
     def _performCompare(x1, x2):
@@ -279,7 +287,7 @@ class _XmlComparer:
             return True
         if t1 == '*' or t2 == '*':
             return True
-        return (t1 or '').strip() == (t2 or '').strip()
+        return (t1 or '') == (t2 or '')
 
 
 if __name__ == '__main__':
