@@ -7,7 +7,8 @@ NAMESPACES = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main
               "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
               "rels": "http://schemas.openxmlformats.org/package/2006/relationships",
               "mc": "http://schemas.openxmlformats.org/markup-compatibility/2006",
-              "wps": "http://schemas.microsoft.com/office/word/2010/wordprocessingShape"}
+              "wps": "http://schemas.microsoft.com/office/word/2010/wordprocessingShape",
+              "ct": "http://schemas.openxmlformats.org/package/2006/content-types"}
 
 
 def getRunFormats(run):
