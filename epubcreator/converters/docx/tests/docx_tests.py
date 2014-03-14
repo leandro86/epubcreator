@@ -121,7 +121,7 @@ class DocxConverterTests(unittest.TestCase):
         self.assertEqual(len(data.sections), 1)
         self.assertTrue(self._compareSections("paragraph_styles.docx", data.sections))
 
-    def testCharacterStyles(self):
+    def test_character_styles(self):
         # Testea estilos que son aplicados a nivel carácter, es decir, que pueden
         # aplicarse a partes dentro del párrafo. Para ello necesito utilizar la
         # etiqueta span.
