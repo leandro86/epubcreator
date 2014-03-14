@@ -142,8 +142,10 @@ class NotesSection(Section):
 
     def closeNote(self):
         pos = len(self._content) - 1
-        returnLink = '<a href="../Text/{0}#rf{1}">&lt;&lt;</a>'.format(self._currentFootnoteSection,
-                                                                       self._footnotesCount)
+
+        # Debe haber un espacio antes del link de retorno.
+        returnLink = ' <a href="../Text/{0}#rf{1}">&lt;&lt;</a>'.format(self._currentFootnoteSection,
+                                                                        self._footnotesCount)
         self._content.insert(pos, returnLink)
 
         self.closeTag("div")
