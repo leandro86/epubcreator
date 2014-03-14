@@ -79,5 +79,5 @@ def getListLevel(paragraph):
 
 
 def hasText(node):
-    t = xml_utils.xpath(node, "descendant::w:t[1][normalize-space() != '']", NAMESPACES)
+    t = xml_utils.xpath(node, "descendant::w:t[normalize-space() != ''][1]", NAMESPACES)
     return True if t else False
