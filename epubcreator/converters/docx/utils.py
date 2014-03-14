@@ -78,6 +78,11 @@ def getListLevel(paragraph):
     return int(level[0]) if level else -1
 
 
+def getPic(node):
+    pic = xml_utils.xpath(node, "descendant::pic:pic[pic:blipFill/a:blip/@r:embed]", NAMESPACES)
+    return pic[0] if pic else None
+
+
 def hasText(node):
     t = xml_utils.xpath(node, "descendant::w:t[normalize-space() != ''][1]", NAMESPACES)
     return True if t else False

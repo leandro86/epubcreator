@@ -272,10 +272,10 @@ class DocxConverter(converter_base.AbstractConverter):
             self._processParagraphContent(paragraph)
             self._currentSection.closeTag(tag)
         else:
-            pic = xml_utils.xpath(paragraph, "descendant::pic:pic", utils.NAMESPACES)
-            if pic:
+            pic = utils.getPic(paragraph)
+            if pic is not None:
                 self._currentSection.openTag("p", {"class": "ilustra"})
-                self._processPic(pic[0])
+                self._processPic(pic)
                 self._currentSection.closeTag("p")
 
         # Aun si el párrafo no tiene texto, debo cerrar el div que agrupa estilos si es necesario. Si no
@@ -347,9 +347,9 @@ class DocxConverter(converter_base.AbstractConverter):
                 self._footnotesIdSection.append((footnoteId, self._currentSection.name))
                 self._currentSection.insertNoteReference(len(self._footnotesIdSection))
             elif child.tag.endswith("}drawing"):
-                pic = xml_utils.xpath(child, "descendant::pic:pic", utils.NAMESPACES)
-                if pic:
-                    self._processPic(pic[0])
+                pic = utils.getPic(child)
+                if pic is not None:
+                    self._processPic(pic)
             elif child.tag.endswith("}AlternateContent"):
                 self._processAlternateContent(child)
 
