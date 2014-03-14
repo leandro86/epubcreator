@@ -106,7 +106,7 @@ class DocxConverter(converter_base.AbstractConverter):
 
         for child in node:
             if child.tag.endswith("}p"):
-                hasParagraphText = xml_utils.hasText(child)
+                hasParagraphText = utils.hasText(child)
                 hasParagraphPageBreak = False
 
                 if utils.isPageBreakOnBeginning(child):
@@ -234,12 +234,10 @@ class DocxConverter(converter_base.AbstractConverter):
             self._processParagraphContent(paragraph)
             self._currentSection.closeTag(tag)
         else:
-            pic = xml_utils.find(paragraph,
-                                 "w:r/w:drawing/wp:inline/a:graphic/a:graphicData/pic:pic",
-                                 utils.NAMESPACES)
-            if pic is not None:
+            pic = xml_utils.xpath(paragraph, "descendant::pic:pic", utils.NAMESPACES)
+            if pic:
                 self._currentSection.openTag("p", {"class": "ilustra"})
-                self._processPic(pic)
+                self._processPic(pic[0])
                 self._currentSection.closeTag("p")
 
         # Aun si el párrafo no tiene texto, debo cerrar el div que agrupa estilos si es necesario. Si no
@@ -311,9 +309,9 @@ class DocxConverter(converter_base.AbstractConverter):
                 self._footnotesIdSection.append((footnoteId, self._currentSection.name))
                 self._currentSection.insertNoteReference(len(self._footnotesIdSection))
             elif child.tag.endswith("}drawing"):
-                pic = xml_utils.find(child, "wp:inline/a:graphic/a:graphicData/pic:pic", utils.NAMESPACES)
-                if pic is not None:
-                    self._processPic(pic)
+                pic = xml_utils.xpath(child, "descendant::pic:pic", utils.NAMESPACES)
+                if pic:
+                    self._processPic(pic[0])
             elif child.tag.endswith("}AlternateContent"):
                 self._processAlternateContent(child)
 
@@ -404,7 +402,7 @@ class DocxConverter(converter_base.AbstractConverter):
 
         for child in footnote:
             if child.tag.endswith("}p"):
-                hasText = xml_utils.hasText(child)
+                hasText = utils.hasText(child)
                 self._processParagraph(child, hasText)
 
         self._currentSection.closeNote()

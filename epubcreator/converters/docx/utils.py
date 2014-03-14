@@ -75,3 +75,8 @@ def getPreviousRun(run):
 def getListLevel(paragraph):
     level = xml_utils.xpath(paragraph, "w:pPr/w:numPr/w:ilvl/@w:val", NAMESPACES)
     return int(level[0]) if level else -1
+
+
+def hasText(node):
+    a = xml_utils.xpath(node, "descendant::w:t[1][normalize-space() != '']", NAMESPACES)
+    return True if a else False

@@ -21,15 +21,15 @@ def find(node, path, namespaces=None):
     return node.find(path, namespaces=namespaces)
 
 
-def hasText(node):
-    if node.text and node.text.strip():
-        return True
-    else:
-        for child in node:
-            if (child.tail and child.tail.strip()) or hasText(child):
-                return True
-        return False
-
-
 def getAllText(node):
     return "".join(xpath(node, "descendant::text()"))
+
+
+# def hasText(node):
+    # if node.text and node.text.strip():
+    #     return True
+    # else:
+    #     for child in node:
+    #         if (child.tail and child.tail.strip()) or hasText(child):
+    #             return True
+    #     return False
