@@ -108,9 +108,6 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
     def _updateAuthorFileAs(self, authorName):
         self.authorFileAsInput.setText(utils.Utilities.orderByLastName(authorName.strip()))
 
-    def _authorInputKeyPressed(self, event):
-        print(event)
-
     def _connectSignals(self):
         self.coverImage.clicked.connect(self._changeCoverImage)
 
