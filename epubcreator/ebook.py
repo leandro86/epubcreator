@@ -163,27 +163,16 @@ class Ebook:
                                                                                      self._metadata.coverDesigner,
                                                                                      self._metadata.coverDesignOrTweak,
                                                                                      self._metadata.editor))
-        outputEpub.addHtmlData(epubbase_names.DEDICATION_FILENAME,
-                               Ebook._epubBase.getDedication(self._metadata.dedication))
-
-        # Cargo la cover por defecto si el usuario no especificó una
-        if self._metadata.coverImage is None:
-            self._metadata.coverImage = Ebook._epubBase.getCoverImage()
+        outputEpub.addHtmlData(epubbase_names.DEDICATION_FILENAME, Ebook._epubBase.getDedication(self._metadata.dedication))
 
         outputEpub.addImageData(epubbase_names.COVER_IMAGE_FILENAME, self._metadata.coverImage)
-
-        # Cargo la imagen de autor por defecto si el usuario no especificó una
-        if self._metadata.authorImage is None:
-            self._metadata.authorImage = Ebook._epubBase.getAuthorImage()
-
         outputEpub.addImageData(epubbase_names.AUTHOR_IMAGE_FILENAME, self._metadata.authorImage)
 
         # Agrego el resto de los archivos del epubbase
         outputEpub.addImageData(epubbase_names.EPL_LOGO_FILENAME, Ebook._epubBase.getEplLogoImage())
         outputEpub.addImageData(epubbase_names.EX_LIBRIS_FILENAME, Ebook._epubBase.getExLibrisImage())
         outputEpub.addStyleData(epubbase_names.STYLE_FILENAME, Ebook._epubBase.getCss())
-        outputEpub.addMetaFile(epubbase_names.IBOOKS_EMBEDDED_FONTS_FILENAME,
-                               Ebook._epubBase.getIBooksEmbeddedFontsFile())
+        outputEpub.addMetaFile(epubbase_names.IBOOKS_EMBEDDED_FONTS_FILENAME, Ebook._epubBase.getIBooksEmbeddedFontsFile())
 
     def _addSections(self, outputEpub):
         for section in self._ebookData.sections[:-1] if self._hasEbookNotes else self._ebookData.sections:
@@ -203,9 +192,6 @@ class Ebook:
             outputEpub.addImageData(image.name, image.content)
 
     def _addMetadata(self, outputEpub):
-        if not self._metadata.publisher:
-            self._metadata.publisher = "ePubLibre"
-
         # Ordeno los géneros alfabéticamente...
         self._metadata.genres.sort(key=lambda x: (x.genreType, x.genre, x.subGenre))
 
@@ -361,3 +347,12 @@ class Ebook:
 
         if not self._metadata.authorBiography:
             self._metadata.authorBiography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
+
+        if not self._metadata.publisher:
+            self._metadata.publisher = "ePubLibre"
+
+        if self._metadata.coverImage is None:
+            self._metadata.coverImage = Ebook._epubBase.getCoverImage()
+
+        if self._metadata.authorImage is None:
+            self._metadata.authorImage = Ebook._epubBase.getAuthorImage()
