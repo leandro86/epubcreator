@@ -141,9 +141,7 @@ class Ebook:
 
     def _addEpubBaseFiles(self, outputEpub):
         publicationYear = self._metadata.publicationDate.year if self._metadata.publicationDate else ""
-        authors = self._formatPersons(self._metadata.authors)[0]
-        translators = self._formatPersons(self._metadata.translators)[0]
-        ilustrators = self._formatPersons(self._metadata.ilustrators)[0]
+        authors = self._metadata.getAuthorsAsText()[0]
 
         # Agrego los xhtml requeridos
         outputEpub.addHtmlData(epubbase_names.COVER_FILENAME, Ebook._epubBase.getCover())
@@ -155,8 +153,8 @@ class Ebook:
         outputEpub.addHtmlData(epubbase_names.INFO_FILENAME, Ebook._epubBase.getInfo(self._metadata.originalTitle,
                                                                                      authors,
                                                                                      publicationYear,
-                                                                                     translators,
-                                                                                     ilustrators,
+                                                                                     self._metadata.getTranslatorsAsText()[0],
+                                                                                     self._metadata.getIlustratorsAsText()[0],
                                                                                      self._metadata.coverDesigner,
                                                                                      self._metadata.coverDesignOrTweak,
                                                                                      self._metadata.editor))
@@ -200,7 +198,7 @@ class Ebook:
                 previousGenre = genre.genre
             genres.append(genre.subGenre)
 
-        authors = self._formatPersons(self._metadata.authors)
+        authors = self._metadata.getAuthorsAsText()
 
         # Agrego semántica a cubierta.xhtml
         outputEpub.addReference(epubbase_names.COVER_FILENAME, "Cover", "cover")
@@ -216,11 +214,11 @@ class Ebook:
         outputEpub.addSubject(", ".join(genres))
 
         if self._metadata.translators:
-            translators = self._formatPersons(self._metadata.translators)
+            translators = self._metadata.getTranslatorsAsText()
             outputEpub.addTranslator(translators[0], translators[1])
 
         if self._metadata.ilustrators:
-            ilustrators = self._formatPersons(self._metadata.ilustrators)
+            ilustrators = self._metadata.getIlustratorsAsText()
             outputEpub.addIlustrator(ilustrators[0], ilustrators[1])
 
         if self._metadata.publicationDate is not None:
@@ -294,17 +292,6 @@ class Ebook:
         fileName.append(" (r1.0 {0})".format(self._metadata.editor if self._metadata.editor else "El Editor"))
 
         return utils.Utilities.purgeString("{0}.epub".format("".join(fileName)))
-
-    def _formatPersons(self, personsList):
-        """
-        Formatea una lista de Person de manera acorde según el epubbase para ser insertada en el epub.
-
-        @param personsList: una lista de Person.
-
-        @return: una tupla cuyo primer elemento es un string concatenado con todos los nombres, y el
-                 segundo un string concatenado con todos los file-as.
-        """
-        return " & ".join([p.name for p in personsList]), " & ".join([p.fileAs for p in personsList])
 
     def _purgeStringForMetadata(self, s):
         """
