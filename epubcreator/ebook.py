@@ -210,7 +210,7 @@ class Ebook:
         outputEpub.addAuthor(authors[0], authors[1])
         outputEpub.addLanguage(self._metadata.language)
         outputEpub.addDescription(self._purgeStringForMetadata(self._metadata.synopsis))
-        outputEpub.addPublisher(self._metadata.publisher)
+        outputEpub.addPublisher("ePubLibre")
         outputEpub.addSubject(", ".join(genres))
 
         if self._metadata.translators:
@@ -331,9 +331,6 @@ class Ebook:
 
         if not self._metadata.authorBiography:
             self._metadata.authorBiography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
-
-        if not self._metadata.publisher:
-            self._metadata.publisher = "ePubLibre"
 
         if self._metadata.coverImage is None:
             self._metadata.coverImage = Ebook._epubBase.getCoverImage()

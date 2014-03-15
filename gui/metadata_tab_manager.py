@@ -64,7 +64,6 @@ class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget.Ui_MetadataT
             isValid = False
 
         metadata.language = self.additionalMetadata.getLanguageCode()
-        metadata.publisher = self.additionalMetadata.getPublisher()
 
         for translator in self.additionalMetadata.getTranslators():
             metadata.translators.append(translator)

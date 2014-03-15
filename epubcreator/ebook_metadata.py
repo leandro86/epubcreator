@@ -57,7 +57,6 @@ class Metadata:
         # Una lista de Genre con los géneros
         self.genres = []
 
-        self.publisher = ""
         self.coverDesignOrTweak = ""
         self.coverDesigner = ""
         self.language = ""

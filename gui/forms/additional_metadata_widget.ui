@@ -21,29 +21,6 @@
 }</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="2">
-    <widget class="QLabel" name="label_17">
-     <property name="text">
-      <string>Editorial</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QComboBox" name="languageInput">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="3">
     <widget class="QLineEdit" name="publicationDateInput">
      <property name="sizePolicy">
@@ -79,16 +56,6 @@
      </property>
      <property name="text">
       <string>Géneros</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3">
-    <widget class="QLineEdit" name="publisherInput">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
      </property>
     </widget>
    </item>
@@ -567,6 +534,22 @@
      </layout>
     </widget>
    </item>
+   <item row="1" column="1" colspan="3">
+    <widget class="QComboBox" name="languageInput">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -580,7 +563,6 @@
   <tabstop>originalTitleInput</tabstop>
   <tabstop>publicationDateInput</tabstop>
   <tabstop>languageInput</tabstop>
-  <tabstop>publisherInput</tabstop>
   <tabstop>translatorInput</tabstop>
   <tabstop>translatorFileAsInput</tabstop>
   <tabstop>addTranslatorButton</tabstop>

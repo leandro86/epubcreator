@@ -132,9 +132,6 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
 
         self.collectionVolumeInput.setEnabled(False)
 
-        # Editorial por defecto.
-        self.publisherInput.setText("ePubLibre")
-
         # Por defecto, el combobox del lenguaje muestra "español"
         self.languageInput.setCurrentIndex(self.languageInput.findText(language.Language.getLanguageName("es")))
 
@@ -159,9 +156,6 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
                                                                             "debe ser: dd-mm-aaaa. Si no conoce el "
                                                                             "día o mes exacto, coloque el 1 de enero.",
                                           self, self.publicationDateInput)
-
-    def getPublisher(self):
-        return self.publisherInput.text().strip()
 
     def getLanguageCode(self):
         return language.Language.getLanguageCode(self.languageInput.currentText())

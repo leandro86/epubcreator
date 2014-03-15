@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'L:/Proyectos/python/projects/epubcreator/src/gui\forms\additional_metadata_widget.ui'
+# Form implementation generated from reading ui file 'additional_metadata_widget.ui'
 #
-# Created by PyQt4 UI code generator
+# Created: Sat Mar 15 13:33:32 2014
+#      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -33,18 +34,6 @@ class Ui_AdditionalMetadata(object):
 "}"))
         self.gridLayout = QtGui.QGridLayout(AdditionalMetadata)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.label_17 = QtGui.QLabel(AdditionalMetadata)
-        self.label_17.setObjectName(_fromUtf8("label_17"))
-        self.gridLayout.addWidget(self.label_17, 1, 2, 1, 1)
-        self.languageInput = QtGui.QComboBox(AdditionalMetadata)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.languageInput.sizePolicy().hasHeightForWidth())
-        self.languageInput.setSizePolicy(sizePolicy)
-        self.languageInput.setMinimumSize(QtCore.QSize(0, 0))
-        self.languageInput.setObjectName(_fromUtf8("languageInput"))
-        self.gridLayout.addWidget(self.languageInput, 1, 1, 1, 1)
         self.publicationDateInput = QtGui.QLineEdit(AdditionalMetadata)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -63,14 +52,6 @@ class Ui_AdditionalMetadata(object):
         self.label_6.setSizePolicy(sizePolicy)
         self.label_6.setObjectName(_fromUtf8("label_6"))
         self.gridLayout.addWidget(self.label_6, 4, 0, 1, 1)
-        self.publisherInput = QtGui.QLineEdit(AdditionalMetadata)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.publisherInput.sizePolicy().hasHeightForWidth())
-        self.publisherInput.setSizePolicy(sizePolicy)
-        self.publisherInput.setObjectName(_fromUtf8("publisherInput"))
-        self.gridLayout.addWidget(self.publisherInput, 1, 3, 1, 1)
         self.label_4 = QtGui.QLabel(AdditionalMetadata)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -335,13 +316,21 @@ class Ui_AdditionalMetadata(object):
         self.collectionNameInput.setObjectName(_fromUtf8("collectionNameInput"))
         self.gridLayout_5.addWidget(self.collectionNameInput, 0, 1, 1, 1)
         self.gridLayout.addWidget(self.groupBox_4, 5, 1, 1, 3)
+        self.languageInput = QtGui.QComboBox(AdditionalMetadata)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.languageInput.sizePolicy().hasHeightForWidth())
+        self.languageInput.setSizePolicy(sizePolicy)
+        self.languageInput.setMinimumSize(QtCore.QSize(0, 0))
+        self.languageInput.setObjectName(_fromUtf8("languageInput"))
+        self.gridLayout.addWidget(self.languageInput, 1, 1, 1, 3)
 
         self.retranslateUi(AdditionalMetadata)
         QtCore.QMetaObject.connectSlotsByName(AdditionalMetadata)
         AdditionalMetadata.setTabOrder(self.originalTitleInput, self.publicationDateInput)
         AdditionalMetadata.setTabOrder(self.publicationDateInput, self.languageInput)
-        AdditionalMetadata.setTabOrder(self.languageInput, self.publisherInput)
-        AdditionalMetadata.setTabOrder(self.publisherInput, self.translatorInput)
+        AdditionalMetadata.setTabOrder(self.languageInput, self.translatorInput)
         AdditionalMetadata.setTabOrder(self.translatorInput, self.translatorFileAsInput)
         AdditionalMetadata.setTabOrder(self.translatorFileAsInput, self.addTranslatorButton)
         AdditionalMetadata.setTabOrder(self.addTranslatorButton, self.translatorsList)
@@ -360,7 +349,6 @@ class Ui_AdditionalMetadata(object):
 
     def retranslateUi(self, AdditionalMetadata):
         AdditionalMetadata.setWindowTitle(_translate("AdditionalMetadata", "Form", None))
-        self.label_17.setText(_translate("AdditionalMetadata", "Editorial", None))
         self.publicationDateInput.setInputMask(_translate("AdditionalMetadata", "00-00-0000; ", None))
         self.label_6.setText(_translate("AdditionalMetadata", "Géneros", None))
         self.label_4.setText(_translate("AdditionalMetadata", "Traductores", None))
