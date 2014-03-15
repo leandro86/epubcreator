@@ -286,20 +286,12 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
         if selectedIlustrator is None:
             return
 
-        data = selectedIlustrator.data(QtCore.Qt.UserRole)
-        self.authorInput.setText(data[0])
-        self.authorFileAasInput.setText(data[1])
-
-    def _updateIlustratorFileAs(self, ilustratorName):
-        self.ilustratorFileAsInput.setText(utils.Utilities.orderByLastName(ilustratorName.strip()))
-
-    def _populateCurrentIlustratorData(self, selectedIlustrator):
-        if selectedIlustrator is None:
-            return
-
         person = selectedIlustrator.data(QtCore.Qt.UserRole)
         self.ilustratorInput.setText(person.name)
         self.ilustratorFileAsInput.setText(person.fileAs)
+
+    def _updateIlustratorFileAs(self, ilustratorName):
+        self.ilustratorFileAsInput.setText(utils.Utilities.orderByLastName(ilustratorName.strip()))
 
     def _addGenreToList(self):
         genreType = self.genreTypeInput.currentText()
