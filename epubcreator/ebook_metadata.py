@@ -76,18 +76,6 @@ class Metadata:
         else:
             raise ValueError("Date expected.")
 
-    def addAuthor(self, name, fileAs=None):
-        self.authors.append(Person(name, fileAs or name))
-
-    def addIlustrator(self, name, fileAs=None):
-        self.ilustrators.append(Person(name, fileAs or name))
-
-    def addTranslator(self, name, fileAs=None):
-        self.translators.append(Person(name, fileAs or name))
-
-    def addGenre(self, genreType, genre, subGenre):
-        self.genres.append(Genre(genreType, genre, subGenre))
-
     def getAuthorsAsText(self):
         return self._getPersonsListAsText(self.authors)
 

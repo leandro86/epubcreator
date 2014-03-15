@@ -312,7 +312,7 @@ class Ebook:
             self._metadata.title = ebook_metadata.Metadata.DEFAULT_TITLE
 
         if not self._metadata.authors:
-            self._metadata.addAuthor(ebook_metadata.Metadata.DEFAULT_AUTHOR, ebook_metadata.Metadata.DEFAULT_AUTHOR)
+            self._metadata.authors.append(ebook_metadata.Person(ebook_metadata.Metadata.DEFAULT_AUTHOR, ebook_metadata.Metadata.DEFAULT_AUTHOR))
 
         if not self._metadata.editor:
             self._metadata.editor = ebook_metadata.Metadata.DEFAULT_EDITOR

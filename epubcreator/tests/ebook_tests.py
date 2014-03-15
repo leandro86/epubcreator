@@ -114,7 +114,7 @@ class EbookTests(unittest.TestCase):
         self.assertEqual(self._xpath(title, "x:body/x:p[@class = 'tautor']/text()")[0], ebook_metadata.Metadata.DEFAULT_AUTHOR)
 
     def test_single_author_in_title_file(self):
-        self._metadata.addAuthor("Jorge Luis Borges")
+        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
 
         self._generateEbook()
 
@@ -123,10 +123,10 @@ class EbookTests(unittest.TestCase):
         self.assertEqual(self._xpath(title, "x:body/x:p[@class = 'tautor']/text()")[0], "Jorge Luis Borges")
 
     def test_multiple_authors_in_title_file(self):
-        self._metadata.addAuthor("Jorge Luis Borges")
-        self._metadata.addAuthor("Edgar Allan Poe")
-        self._metadata.addAuthor("William Shakespeare")
-        self._metadata.addAuthor("H. P. Lovecraft")
+        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
+        self._metadata.authors.append(ebook_metadata.Person("Edgar Allan Poe", "bla"))
+        self._metadata.authors.append(ebook_metadata.Person("William Shakespeare", "bla"))
+        self._metadata.authors.append(ebook_metadata.Person("H. P. Lovecraft", "bla"))
 
         self._generateEbook()
 
@@ -145,7 +145,7 @@ class EbookTests(unittest.TestCase):
         self.assertEqual(authors[0], (ebook_metadata.Metadata.DEFAULT_AUTHOR, ebook_metadata.Metadata.DEFAULT_AUTHOR))
 
     def test_single_author_in_metadata(self):
-        self._metadata.addAuthor("Jorge Luis Borges", "Borges, Jorge Luis")
+        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
 
         self._generateEbook()
 
@@ -154,10 +154,10 @@ class EbookTests(unittest.TestCase):
         self.assertEqual(authors[0], ("Jorge Luis Borges", "Borges, Jorge Luis"))
 
     def test_multiple_authors_in_metadata(self):
-        self._metadata.addAuthor("Jorge Luis Borges", "Borges, Jorge Luis")
-        self._metadata.addAuthor("Edgar Allan Poe", "Poe, Edgar Allan")
-        self._metadata.addAuthor("William Shakespeare", "Shakespeare, William")
-        self._metadata.addAuthor("H. P. Lovecraft", "Lovecraft, H. P.")
+        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+        self._metadata.authors.append(ebook_metadata.Person("Edgar Allan Poe", "Poe, Edgar Allan"))
+        self._metadata.authors.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
+        self._metadata.authors.append(ebook_metadata.Person("H. P. Lovecraft", "Lovecraft, H. P."))
 
         self._generateEbook()
 
@@ -287,7 +287,7 @@ class EbookTests(unittest.TestCase):
         self.assertEqual(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[1]/text()")[0], ebook_metadata.Metadata.DEFAULT_AUTHOR)
 
     def test_single_author_in_info_file(self):
-        self._metadata.addAuthor("Jorge Luis Borges")
+        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
 
         self._generateEbook()
 
@@ -296,10 +296,10 @@ class EbookTests(unittest.TestCase):
         self.assertEqual(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[1]/text()")[0], "Jorge Luis Borges")
 
     def test_multiple_authors_in_info_file(self):
-        self._metadata.addAuthor("Jorge Luis Borges")
-        self._metadata.addAuthor("Edgar Allan Poe")
-        self._metadata.addAuthor("William Shakespeare")
-        self._metadata.addAuthor("H. P. Lovecraft")
+        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
+        self._metadata.authors.append(ebook_metadata.Person("Edgar Allan Poe", "bla"))
+        self._metadata.authors.append(ebook_metadata.Person("William Shakespeare", "bla"))
+        self._metadata.authors.append(ebook_metadata.Person("H. P. Lovecraft", "bla"))
 
         self._generateEbook()
 
@@ -344,7 +344,7 @@ class EbookTests(unittest.TestCase):
         self.assertIsNone(self._outputEpub.getPublicationDate())
 
     def test_single_translator_in_info_file(self):
-        self._metadata.addTranslator("Jorge Luis Borges")
+        self._metadata.translators.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
 
         self._generateEbook()
 
@@ -353,10 +353,10 @@ class EbookTests(unittest.TestCase):
         self.assertEqual(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0], "Traducción: Jorge Luis Borges")
 
     def test_multiple_translators_in_info_file(self):
-        self._metadata.addTranslator("Jorge Luis Borges")
-        self._metadata.addTranslator("Edgar Allan Poe")
-        self._metadata.addTranslator("William Shakespeare")
-        self._metadata.addTranslator("H. P. Lovecraft")
+        self._metadata.translators.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
+        self._metadata.translators.append(ebook_metadata.Person("Edgar Allan Poe", "bla"))
+        self._metadata.translators.append(ebook_metadata.Person("William Shakespeare", "bla"))
+        self._metadata.translators.append(ebook_metadata.Person("H. P. Lovecraft", "bla"))
 
         self._generateEbook()
 
@@ -375,7 +375,7 @@ class EbookTests(unittest.TestCase):
         self.assertFalse(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[starts-with(text(), 'Traducción')]"))
 
     def test_single_translator_in_metadata(self):
-        self._metadata.addTranslator("Jorge Luis Borges", "Borges, Jorge Luis")
+        self._metadata.translators.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
 
         self._generateEbook()
 
@@ -384,10 +384,10 @@ class EbookTests(unittest.TestCase):
         self.assertEqual(translators[0], ("Jorge Luis Borges", "Borges, Jorge Luis"))
 
     def test_multiple_translators_in_metadata(self):
-        self._metadata.addTranslator("Jorge Luis Borges", "Borges, Jorge Luis")
-        self._metadata.addTranslator("Edgar Allan Poe", "Poe, Edgar Allan")
-        self._metadata.addTranslator("William Shakespeare", "Shakespeare, William")
-        self._metadata.addTranslator("H. P. Lovecraft", "Lovecraft, H. P.")
+        self._metadata.translators.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+        self._metadata.translators.append(ebook_metadata.Person("Edgar Allan Poe", "Poe, Edgar Allan"))
+        self._metadata.translators.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
+        self._metadata.translators.append(ebook_metadata.Person("H. P. Lovecraft", "Lovecraft, H. P."))
 
         self._generateEbook()
 
@@ -404,7 +404,7 @@ class EbookTests(unittest.TestCase):
         self.assertFalse(self._outputEpub.getTranslators())
 
     def test_single_ilustrator_in_info_file(self):
-        self._metadata.addIlustrator("Jorge Luis Borges")
+        self._metadata.ilustrators.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
 
         self._generateEbook()
 
@@ -413,10 +413,10 @@ class EbookTests(unittest.TestCase):
         self.assertEqual(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0], "Ilustraciones: Jorge Luis Borges")
 
     def test_multiple_ilustrators_in_info_file(self):
-        self._metadata.addIlustrator("Jorge Luis Borges")
-        self._metadata.addIlustrator("Edgar Allan Poe")
-        self._metadata.addIlustrator("William Shakespeare")
-        self._metadata.addIlustrator("H. P. Lovecraft")
+        self._metadata.ilustrators.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
+        self._metadata.ilustrators.append(ebook_metadata.Person("Edgar Allan Poe", "bla"))
+        self._metadata.ilustrators.append(ebook_metadata.Person("William Shakespeare", "bla"))
+        self._metadata.ilustrators.append(ebook_metadata.Person("H. P. Lovecraft", "bla"))
 
         self._generateEbook()
 
@@ -435,7 +435,7 @@ class EbookTests(unittest.TestCase):
         self.assertFalse(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[starts-with(text(), 'Ilustraciones')]"))
 
     def test_single_ilustrator_in_metadata(self):
-        self._metadata.addIlustrator("Jorge Luis Borges", "Borges, Jorge Luis")
+        self._metadata.ilustrators.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
 
         self._generateEbook()
 
@@ -444,10 +444,10 @@ class EbookTests(unittest.TestCase):
         self.assertEqual(ilustrators[0], ("Jorge Luis Borges", "Borges, Jorge Luis"))
 
     def test_multiple_ilustrators_in_metadata(self):
-        self._metadata.addIlustrator("Jorge Luis Borges", "Borges, Jorge Luis")
-        self._metadata.addIlustrator("Edgar Allan Poe", "Poe, Edgar Allan")
-        self._metadata.addIlustrator("William Shakespeare", "Shakespeare, William")
-        self._metadata.addIlustrator("H. P. Lovecraft", "Lovecraft, H. P.")
+        self._metadata.ilustrators.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+        self._metadata.ilustrators.append(ebook_metadata.Person("Edgar Allan Poe", "Poe, Edgar Allan"))
+        self._metadata.ilustrators.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
+        self._metadata.ilustrators.append(ebook_metadata.Person("H. P. Lovecraft", "Lovecraft, H. P."))
 
         self._generateEbook()
 
@@ -683,7 +683,7 @@ class EbookTests(unittest.TestCase):
     def test_epub_file_name_when_one_author_and_no_collection(self):
         self._metadata.title = "Titulo"
         self._metadata.editor = "Editor"
-        self._metadata.addAuthor("Jorge Luis Borges", "Borges, Jorge Luis")
+        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
 
         fileName = self._generateEbook()
 
@@ -692,8 +692,8 @@ class EbookTests(unittest.TestCase):
     def test_epub_file_name_when_two_authors_and_no_collection(self):
         self._metadata.title = "Titulo"
         self._metadata.editor = "Editor"
-        self._metadata.addAuthor("Jorge Luis Borges", "Borges, Jorge Luis")
-        self._metadata.addAuthor("William Shakespeare", "Shakespeare, William")
+        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+        self._metadata.authors.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
 
         fileName = self._generateEbook()
 
@@ -702,9 +702,9 @@ class EbookTests(unittest.TestCase):
     def test_epub_file_name_when_three_authors_and_no_collection(self):
         self._metadata.title = "Titulo"
         self._metadata.editor = "Editor"
-        self._metadata.addAuthor("Jorge Luis Borges", "Borges, Jorge Luis")
-        self._metadata.addAuthor("William Shakespeare", "Shakespeare, William")
-        self._metadata.addAuthor("H. P. Lovecraft", "Lovecraft, H. P.")
+        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+        self._metadata.authors.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
+        self._metadata.authors.append(ebook_metadata.Person("H. P. Lovecraft", "Lovecraft, H. P."))
 
         fileName = self._generateEbook()
 
@@ -713,7 +713,7 @@ class EbookTests(unittest.TestCase):
     def test_epub_file_name_when_one_author_and_simple_collection(self):
         self._metadata.title = "Titulo"
         self._metadata.editor = "Editor"
-        self._metadata.addAuthor("Jorge Luis Borges", "Borges, Jorge Luis")
+        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
         self._metadata.subCollectionName = "Esta es la serie"
         self._metadata.collectionVolume = "10"
 
@@ -724,7 +724,7 @@ class EbookTests(unittest.TestCase):
     def test_epub_file_name_when_one_author_and_subcollection(self):
         self._metadata.title = "Titulo"
         self._metadata.editor = "Editor"
-        self._metadata.addAuthor("Jorge Luis Borges", "Borges, Jorge Luis")
+        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
         self._metadata.collectionName = "Esta es la saga"
         self._metadata.subCollectionName = "Esta es la serie"
         self._metadata.collectionVolume = "10"
@@ -736,8 +736,8 @@ class EbookTests(unittest.TestCase):
     def test_epub_file_name_when_two_authors_and_subcollection(self):
         self._metadata.title = "Titulo"
         self._metadata.editor = "Editor"
-        self._metadata.addAuthor("Jorge Luis Borges", "Borges, Jorge Luis")
-        self._metadata.addAuthor("William Shakespeare", "Shakespeare, William")
+        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+        self._metadata.authors.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
         self._metadata.collectionName = "Esta es la saga"
         self._metadata.subCollectionName = "Esta es la serie"
         self._metadata.collectionVolume = "10"
@@ -750,9 +750,9 @@ class EbookTests(unittest.TestCase):
     def test_epub_file_name_when_three_authors_and_subcollection(self):
         self._metadata.title = "Titulo"
         self._metadata.editor = "Editor"
-        self._metadata.addAuthor("Jorge Luis Borges", "Borges, Jorge Luis")
-        self._metadata.addAuthor("William Shakespeare", "Shakespeare, William")
-        self._metadata.addAuthor("H. P. Lovecraft", "Lovecraft, H. P.")
+        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+        self._metadata.authors.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
+        self._metadata.authors.append(ebook_metadata.Person("H. P. Lovecraft", "Lovecraft, H. P."))
         self._metadata.collectionName = "Esta es la saga"
         self._metadata.subCollectionName = "Esta es la serie"
         self._metadata.collectionVolume = "10"
@@ -792,55 +792,55 @@ class EbookTests(unittest.TestCase):
         self.assertTrue(self._outputEpub.getLanguage(), "en")
 
     def test_one_genretype_one_genre_one_subgenre_in_metadata(self):
-        self._metadata.addGenre("Tipo1", "Genero1", "Subgenero1")
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
 
         self._generateEbook()
 
         self.assertEqual(self._outputEpub.getSubject(), "Genero1, Subgenero1")
 
     def test_one_genretype_one_genre_two_subgenres_in_metadata(self):
-        self._metadata.addGenre("Tipo1", "Genero1", "Subgenero1")
-        self._metadata.addGenre("Tipo1", "Genero1", "Subgenero2")
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero2"))
 
         self._generateEbook()
 
         self.assertEqual(self._outputEpub.getSubject(), "Genero1, Subgenero1, Subgenero2")
 
     def test_one_genretype_two_genres_one_subgenre_in_metadata(self):
-        self._metadata.addGenre("Tipo1", "Genero1", "Subgenero1")
-        self._metadata.addGenre("Tipo1", "Genero2", "Subgenero1")
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero2", "Subgenero1"))
 
         self._generateEbook()
 
         self.assertEqual(self._outputEpub.getSubject(), "Genero1, Subgenero1, Genero2, Subgenero1")
 
     def test_one_genretype_two_genres_two_subgenres_in_metadata(self):
-        self._metadata.addGenre("Tipo1", "Genero1", "Subgenero1")
-        self._metadata.addGenre("Tipo1", "Genero1", "Subgenero2")
-        self._metadata.addGenre("Tipo1", "Genero2", "Subgenero1")
-        self._metadata.addGenre("Tipo1", "Genero2", "Subgenero2")
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero2"))
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero2", "Subgenero1"))
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero2", "Subgenero2"))
 
         self._generateEbook()
 
         self.assertEqual(self._outputEpub.getSubject(), "Genero1, Subgenero1, Subgenero2, Genero2, Subgenero1, Subgenero2")
 
     def test_genretype_not_get_saved_in_metadata(self):
-        self._metadata.addGenre("Tipo1", "Genero1", "Subgenero1")
-        self._metadata.addGenre("Tipo1", "Genero1", "Subgenero2")
-        self._metadata.addGenre("Tipo2", "Genero2", "Subgenero1")
-        self._metadata.addGenre("Tipo2", "Genero2", "Subgenero2")
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero2"))
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo2", "Genero2", "Subgenero1"))
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo2", "Genero2", "Subgenero2"))
 
         self._generateEbook()
 
         self.assertEqual(self._outputEpub.getSubject(), "Genero1, Subgenero1, Subgenero2, Genero2, Subgenero1, Subgenero2")
 
     def test_genres_are_sorted_in_metadata(self):
-        self._metadata.addGenre("Tipo1", "d", "f")
-        self._metadata.addGenre("Tipo1", "k", "a")
-        self._metadata.addGenre("Tipo1", "a", "b")
-        self._metadata.addGenre("Tipo1", "u", "a")
-        self._metadata.addGenre("Tipo1", "a", "a")
-        self._metadata.addGenre("Tipo1", "d", "e")
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "d", "f"))
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "k", "a"))
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "a", "b"))
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "u", "a"))
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "a", "a"))
+        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "d", "e"))
 
         self._generateEbook()
 
