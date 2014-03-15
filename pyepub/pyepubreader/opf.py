@@ -61,6 +61,34 @@ class Opf:
 
         return serieName, serieIndex
 
+    def getDescription(self):
+        description = self._xpath(self._opf, "/opf:package/opf:metadata/dc:description/text()")
+        return description[0] if description else None
+
+    def getTitle(self):
+        title = self._xpath(self._opf, "/opf:package/opf:metadata/dc:title/text()")
+        return title[0] if title else None
+
+    def getLanguage(self):
+        language = self._xpath(self._opf, "/opf:package/opf:metadata/dc:language/text()")
+        return language[0] if language else None
+
+    def getModificationDate(self):
+        modificationDate = self._xpath(self._opf, "/opf:package/opf:metadata/dc:date[@opf:event = 'modification']/text()")
+        return modificationDate[0] if modificationDate else None
+
+    def getPublicationDate(self):
+        publicationDate = self._xpath(self._opf, "/opf:package/opf:metadata/dc:date[@opf:event = 'publication']/text()")
+        return publicationDate[0] if publicationDate else None
+
+    def getPublisher(self):
+        publisher = self._xpath(self._opf, "/opf:package/opf:metadata/dc:publisher/text()")
+        return publisher[0] if publisher else None
+
+    def getSubject(self):
+        subject = self._xpath(self._opf, "/opf:package/opf:metadata/dc:subject/text()")
+        return subject[0] if subject else None
+
     def getPathToToc(self):
         return self._xpath(self._opf, "/opf:package/opf:manifest/opf:item[@media-type = 'application/x-dtbncx+xml']"
                                       "/@href")[0]

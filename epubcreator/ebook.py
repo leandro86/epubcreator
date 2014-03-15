@@ -1,5 +1,6 @@
 import os
 import datetime
+import re
 
 import mako.template
 from pyepub.pyepubwriter import epub
@@ -105,6 +106,10 @@ class Ebook:
         self._metadata = metadata or ebook_metadata.Metadata()
         self._hasEbookNotes = self._ebookData.sections and type(self._ebookData.sections[-1]) == ebook_data.NotesSection
 
+        # Hay algunos datos que indefectiblemente deben estar en el epub, por más
+        # que el usuario no los haya especificado.
+        self._setDefaultMetadata()
+
     def save(self, file):
         """
         Genera y guarda el epub.
@@ -198,22 +203,6 @@ class Ebook:
             outputEpub.addImageData(image.name, image.content)
 
     def _addMetadata(self, outputEpub):
-        # Me aseguro de tener algunos metadatos por defecto, en caso de que estén vacíos...
-        if not self._metadata.title:
-            self._metadata.title = "Título"
-
-        if not self._metadata.authors:
-            self._metadata.authors.append(ebook_metadata.Person("Nombre Apellido", "Apellido, Nombre"))
-
-        if not self._metadata.language:
-            self._metadata.language = "es"
-
-        if not self._metadata.genres:
-            self._metadata.genres.append(ebook_metadata.Genre("Bla", "Género", "Subgéneros"))
-
-        if not self._metadata.synopsis:
-            self._metadata.synopsis = "Sinopsis"
-
         if not self._metadata.publisher:
             self._metadata.publisher = "ePubLibre"
 
@@ -229,8 +218,6 @@ class Ebook:
             genres.append(genre.subGenre)
 
         authors = self._formatPersons(self._metadata.authors)
-        translators = self._formatPersons(self._metadata.translators)
-        ilustrators = self._formatPersons(self._metadata.ilustrators)
 
         # Agrego semántica a cubierta.xhtml
         outputEpub.addReference(epubbase_names.COVER_FILENAME, "Cover", "cover")
@@ -241,14 +228,16 @@ class Ebook:
         outputEpub.addTitle(self._metadata.title)
         outputEpub.addAuthor(authors[0], authors[1])
         outputEpub.addLanguage(self._metadata.language)
-        outputEpub.addDescription(self._metadata.synopsis)
+        outputEpub.addDescription(self._purgeStringForMetadata(self._metadata.synopsis))
         outputEpub.addPublisher(self._metadata.publisher)
         outputEpub.addSubject(", ".join(genres))
 
-        if translators:
+        if self._metadata.translators:
+            translators = self._formatPersons(self._metadata.translators)
             outputEpub.addTranslator(translators[0], translators[1])
 
-        if ilustrators:
+        if self._metadata.ilustrators:
+            ilustrators = self._formatPersons(self._metadata.ilustrators)
             outputEpub.addIlustrator(ilustrators[0], ilustrators[1])
 
         if self._metadata.publicationDate is not None:
@@ -333,3 +322,42 @@ class Ebook:
                  segundo un string concatenado con todos los file-as.
         """
         return " & ".join([p.name for p in personsList]), " & ".join([p.fileAs for p in personsList])
+
+    def _purgeStringForMetadata(self, s):
+        """
+        Elimina tags de un string y convierte los saltos de línea por un espacio, de
+        manera tal de que sea válido para agregarlo a los metadatos del epub.
+
+        @param s: el string a convertir.
+
+        @return: el string convertido.
+        """
+        return re.sub("<[^>]*>", "", s.replace("\n", " "))
+
+    def _setDefaultMetadata(self):
+        if not self._metadata.synopsis:
+            self._metadata.synopsis = ebook_metadata.Metadata.DEFAULT_SYNOPSIS
+
+        if not self._metadata.title:
+            self._metadata.title = ebook_metadata.Metadata.DEFAULT_TITLE
+
+        if not self._metadata.authors:
+            self._metadata.addAuthor(ebook_metadata.Metadata.DEFAULT_AUTHOR, ebook_metadata.Metadata.DEFAULT_AUTHOR)
+
+        if not self._metadata.editor:
+            self._metadata.editor = ebook_metadata.Metadata.DEFAULT_EDITOR
+
+        if not self._metadata.language:
+            self._metadata.language = ebook_metadata.Metadata.DEFAULT_LANGUAGE
+
+        if not self._metadata.coverDesignOrTweak:
+            self._metadata.coverDesignOrTweak = "Diseño"
+
+        if not self._metadata.coverDesigner:
+            self._metadata.coverDesigner = ebook_metadata.Metadata.DEFAULT_EDITOR
+
+        if not self._metadata.dedication:
+            self._metadata.dedication = ebook_metadata.Metadata.DEFAULT_DEDICATION
+
+        if not self._metadata.authorBiography:
+            self._metadata.authorBiography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY

@@ -10,16 +10,10 @@
 
 <body>
     <div class="dedicatoria">
-        % if dedication:
-              <% paragraphs = dedication.splitlines() %>
-              % for p in paragraphs:
-                    <p>${p}</p>
-              % endfor
-        % else:
-              <p>Suspiró entonces mío Cid, de pesadumbre cargado, y comenzó a hablar así, justamente mesurado: «¡Loado seas, Señor, Padre que estás en lo alto! Todo esto me han urdido mis enemigos malvados».</p>
-
-              <p class="salto05">A<small>NÓNIMO</small></p>
-        % endif
+        <% paragraphs = dedication.splitlines() %>
+         % for p in paragraphs:
+               <p>${p}</p>
+         % endfor
     </div>
 </body>
 </html>

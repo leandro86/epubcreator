@@ -62,6 +62,27 @@ class EpubReader:
     def getTitles(self):
         return self._toc.getTitles()
 
+    def getDescription(self):
+        return self._opf.getDescription()
+
+    def getTitle(self):
+        return self._opf.getTitle()
+
+    def getLanguage(self):
+        return self._opf.getLanguage()
+
+    def getModificationDate(self):
+        return self._opf.getModificationDate()
+
+    def getPublicationDate(self):
+        return self._opf.getPublicationDate()
+
+    def getPublisher(self):
+        return self._opf.getPublisher()
+
+    def getSubject(self):
+        return self._opf.getSubject()
+
     def read(self, fileName):
         """
         Lee el contenido de un archivo.

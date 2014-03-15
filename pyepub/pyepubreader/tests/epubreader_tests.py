@@ -62,6 +62,27 @@ class EpubReaderTests(unittest.TestCase):
         self.assertEqual(self._epub.getFullPathToFile("cubierta.xhtml"), "OEBPS/Text/cubierta.xhtml")
         self.assertEqual(self._epub.getFullPathToFile("style.css"), "OEBPS/Styles/style.css")
 
+    def test_description(self):
+        self.assertEqual(self._epub.getDescription(), "Sinopsis")
+
+    def test_title(self):
+        self.assertEqual(self._epub.getTitle(), "Título")
+
+    def test_language(self):
+        self.assertEqual(self._epub.getLanguage(), "es")
+
+    def test_modification_date(self):
+        self.assertEqual(self._epub.getModificationDate(), "2013-07-23")
+
+    def test_publication_date(self):
+        self.assertEqual(self._epub.getPublicationDate(), "2013-04-23")
+
+    def test_publisher(self):
+        self.assertEqual(self._epub.getPublisher(), "ePubLibre")
+
+    def test_subject(self):
+        self.assertEqual(self._epub.getSubject(), "Género, Subgéneros")
+
 
 if __name__ == '__main__':
     unittest.main()
