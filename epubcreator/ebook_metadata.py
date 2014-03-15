@@ -1,3 +1,6 @@
+import datetime
+
+
 class Metadata:
     DEFAULT_TITLE = "Título"
     DEFAULT_AUTHOR = "Autor"
@@ -25,6 +28,8 @@ class Metadata:
                                 "Nunc luctus accumsan ligula eu molestie.")
 
     def __init__(self):
+        self._publicationDate = None
+
         self.title = ""
         self.synopsis = ""
 
@@ -49,9 +54,6 @@ class Metadata:
         # Una lista de Person con los ilustradores
         self.ilustrators = []
 
-        # Un date con la fecha de publicación en el idioma original
-        self.publicationDate = None
-
         # Una lista de Genre con los géneros
         self.genres = []
 
@@ -62,6 +64,18 @@ class Metadata:
         self.dedication = ""
         self.coverImage = None
         self.authorImage = None
+
+    # Un date con la fecha de publicación en el idioma original.
+    @property
+    def publicationDate(self):
+        return self._publicationDate
+
+    @publicationDate.setter
+    def publicationDate(self, value):
+        if type(value) is datetime.date or value is None:
+            self._publicationDate = value
+        else:
+            raise ValueError("Date expected.")
 
     def addAuthor(self, name, fileAs=None):
         self.authors.append(Person(name, fileAs or name))

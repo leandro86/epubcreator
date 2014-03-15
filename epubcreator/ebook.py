@@ -140,10 +140,7 @@ class Ebook:
             return epubName
 
     def _addEpubBaseFiles(self, outputEpub):
-        publicationYear = ""
-        if type(self._metadata.publicationDate) is datetime.date:
-            publicationYear = str(self._metadata.publicationDate.year)
-
+        publicationYear = self._metadata.publicationDate.year if self._metadata.publicationDate else ""
         authors = self._formatPersons(self._metadata.authors)[0]
         translators = self._formatPersons(self._metadata.translators)[0]
         ilustrators = self._formatPersons(self._metadata.ilustrators)[0]
