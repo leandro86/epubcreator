@@ -124,7 +124,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
         self.authorFileAsInput.setText(person.fileAs)
 
     def _updateAuthorFileAs(self, authorName):
-        self.authorFileAsInput.setText(utils.Utilities.orderByLastName(authorName.strip()))
+        self.authorFileAsInput.setText(ebook_metadata.Metadata.convertNameToFileAsFormat(authorName.strip()))
 
     def _connectSignals(self):
         self.coverImage.clicked.connect(self._changeCoverImage)
@@ -277,7 +277,7 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
         self.translatorFileAsInput.setText(person.fileAs)
 
     def _updateTranslatorFileAs(self, translatorName):
-        self.translatorFileAsInput.setText(utils.Utilities.orderByLastName(translatorName.strip()))
+        self.translatorFileAsInput.setText(ebook_metadata.Metadata.convertNameToFileAsFormat(translatorName.strip()))
 
     def _addIlustratorToList(self):
         name = self.ilustratorInput.text().strip()
@@ -295,7 +295,7 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
         self.ilustratorFileAsInput.setText(person.fileAs)
 
     def _updateIlustratorFileAs(self, ilustratorName):
-        self.ilustratorFileAsInput.setText(utils.Utilities.orderByLastName(ilustratorName.strip()))
+        self.ilustratorFileAsInput.setText(ebook_metadata.Metadata.convertNameToFileAsFormat(ilustratorName.strip()))
 
     def _addGenreToList(self):
         genreType = self.genreTypeInput.currentText()

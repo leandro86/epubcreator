@@ -1,4 +1,5 @@
 import datetime
+import math
 
 
 class Metadata:
@@ -86,6 +87,33 @@ class Metadata:
 
     def getTranslatorsAsText(self):
         return self._getPersonsListAsText(self.translators)
+
+    @staticmethod
+    def convertNameToFileAsFormat(name):
+        """
+        Convierte un nombre al formato file-as.
+        Ejemplo: "Edgar Allan Poe" es convertido en: "Poe, Edgar Allan".
+
+        @param name: un string con el nombre a convertir.
+
+        @return: un string con el nombre convertido.
+        """
+        words = name.split(" ")
+        if len(words) > 1:
+            pivot = math.ceil(len(words) / 2)
+            orderedName = []
+
+            words[-1] += ","
+
+            for i in range(pivot, len(words)):
+                orderedName.append(words[i])
+
+            for i in range(pivot):
+                orderedName.append(words[i])
+
+            return " ".join(orderedName)
+        else:
+            return name
 
     def _getPersonsListAsText(self, persons):
         """
