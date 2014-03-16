@@ -30,6 +30,8 @@ class Metadata:
                                 "Nunc luctus accumsan ligula eu molestie.")
 
     DEFAULT_COVER_MODIFICATION = "Diseño"
+
+    # Las modificaciones posibles que pueden hacerse a la cubierta.
     COVER_MODIFICATION_OPTIONS = (("Diseño", "Elija esta opción si se conserva la cubierta original aun con algún ajuste menor de "
                                              "contraste y color (de la que, eso sí, es obligatorio quitar el logo o cualquier referencia "
                                              "a la editorial). Debe introducirse el nombre del diseñador de la cubierta. \n"
@@ -37,6 +39,105 @@ class Metadata:
                                              "el nombre) del creador."),
                                   ("Retoque", "Elija esta opción si la cubierta original se ha modificado significativamente. Deben "
                                               "introducirse los nombres del diseñador original y el alias de quien la haya retocado."))
+
+    # Todos los géneros posibles.
+    # Es un diccionario de la siguiente forma:
+    # Key -> el tipo de género
+    # Value -> una tupla de dos elementos:
+    #           1 -> los géneros: un conjunto de tuplas de dos elementos:
+    #                               1 -> el nombre del género.
+    #                               2 -> la descripción del género.
+    #           2 -> los subgéneros: un conjunto de tuplas de dos elementos:
+    #                               1 -> el nombre del subgénero.
+    #                               2 -> la descripción del subgénero.
+    GENRES = {
+        "Ficción": (
+            (
+                ("Guión", "Obra compuesta o adaptada para medios masivos (cine, televisión, radio, Internet)."),
+                ("Novela", "Obra narrativa en prosa, extensa y compleja, de sucesos imaginados y parecidos a la realidad."),
+                ("Poesía", "Obra lírica, usualmente en verso, con fines estético-emocionales."),
+                ("Relato", "Obra narrativa en prosa, de menor extensión que la novela. Puede ser corta (Cuento) o mediana "
+                           "(Relato propiamente dicho)."),
+                ("Teatro", "Obra compuesta para ser representada en un escenario, ante público.")),
+            (
+                ("Aventuras", "Narra sucesos fuera de lo común, a menudo en escenarios exóticos. Incluye Acción, Exploradores, "
+                              "Piratas, Viajeros, Western."),
+                ("Bélico", "Trata de campañas, batallas o guerras. Suele presentar con detalle estrategias militares (reales o "
+                           "verosímiles)."),
+                ("Ciencia ficción", "Explora el impacto de posibles avances científicos, tecnológicos, sociales o culturales "
+                                    "(presentes o futuros), sobre la sociedad o los individuos."),
+                ("Didáctico", "Con clara intención de dejar una enseñanza. Incluye Fábulas, Parábolas."),
+                ("Drama", "Narra hechos que conmueven al lector, usualmente desembocando en un final trágico. Incluye, por "
+                          "supuesto, Tragedia."),
+                ("Erótico", "Se relaciona directamente con la sensualidad y el sexo, presentándolos de forma implícita "
+                            "o explícita."),
+                ("Fantástico", "Utiliza la magia y otras formas sobrenaturales como un elemento primario del argumento, "
+                               "la temática o el ambiente. Incluye Mitología."),
+                ("Filosófico", "Una parte significativa de la obra se dedica a la filosofía discursiva (en temas como la "
+                               "función y el papel de la sociedad, el propósito de la vida, la ética o la moral, el papel "
+                               "del arte en la vida humana y el rol de la experiencia o la razón en el desarrollo del "
+                               "conocimiento). Incluye Novela de ideas."),
+                ("Histórico", "Ofrece una visión verosímil de una época histórica (preferiblemente lejana). Suele utilizar "
+                              "acontecimientos verídicos aunque los personajes principales \nsean inventados."),
+                ("Humor", "Usa el absurdo, en personajes o situaciones, para provocar la hilaridad. Incluye Comedia."),
+                ("Infantil", "Dirigido a los niños. Incluye Cuentos de hadas."),
+                ("Interactivo", "Exige una participación más activa del lector, que puede escoger varios «caminos» argumentales."),
+                ("Intriga", "Las acciones se ejecutan con inteligencia y astucia, y ocultan acontecimientos \nimportantes "
+                            "para suscitar interés y tensión en el lector. Incluye Misterio, Suspenso."),
+                ("Juvenil", "Dirigido a adolescentes y jóvenes."),
+                ("Policial", "Su móvil principal es la resolución de un enigma, generalmente criminal, mediante procesos "
+                             "mentales (como la deducción). Incluye Novela negra, Espionaje."),
+                ("Psicológico", "Enfatiza la caracterización interior de sus personajes, sus motivos, circunstancias y "
+                                "acción interna. Usa técnicas como flujo de conciencia o monólogo interior."),
+                ("Realista", "Apela a recursos pseudo documentales, principalmente para denunciar una situación injusta (social "
+                             "o individual). Incluye Costumbrismo, Narrativa social."),
+                ("Romántico", "Su tema primordial es el amor y las relaciones de pareja. (No se trata del movimiento "
+                              "Romanticismo de los siglos XVIII y XIX)."),
+                ("Sátira", "A diferencia del mero humor, apela a la ironía y el sarcasmo, con propósito moralizador, lúdico o "
+                           "meramente burlesco. Incluye Parodia, Picaresca."),
+                ("Terror", "Busca provocar el espanto en el lector, frecuentemente a través de elementos paranormales. "
+                           "Incluye Gore, Gótico, Horror, Thriller."),
+                ("Otros", "De no ubicarse en ninguno de los subgéneros anteriores.")
+            )
+        ),
+        "No Ficción": (
+            (
+                ("Crónica", "Texto con estructura esencialmente cronológica, que suele emplear recursos literarios o periodísticos."),
+                ("Divulgación", "Texto informativo, sin excesivo rigor metodológico, que interpreta y hace accesible el conocimiento "
+                                "científico al público general."),
+                ("Ensayo", "Texto que presenta un punto de vista personal y subjetivo, sin aparato documental, de manera libre y asistemática "
+                           "y con voluntad de estilo."),
+                ("Referencia", "Texto con rigor académico/científico y estructura sistematizada, normalmente dividida en apartados "
+                               "o lecciones.")),
+            (
+                ("Arte", "(Arquitectura, Danza, Escultura, Música, Pintura...)."),
+                ("Autoayuda", "(Superación)."),
+                ("Ciencias exactas", "(Lógica, Matemática...)."),
+                ("Ciencias naturales", "(Astronomía, Biología, Geología, Geografía, Física, Química...)."),
+                ("Ciencias sociales", "(Administración, Antropología, Arqueología, Demografía, Derecho, Economía, Educación, Política, "
+                                      "Sociología...). Excepciones, por popularidad: Historia, Psicología."),
+                ("Comunicación", "(Cine, Diseño gráfico, Espectáculo, Fotografía, Historieta, Lingüística, Periodismo, Publicidad, "
+                                 "Televisión...)."),
+                ("Crítica y teoría literaria", ""),
+                ("Deportes y juegos", ""),
+                ("Diccionarios y enciclopedias", ""),
+                ("Espiritualidad", "(Esoterismo, Religión)."),
+                ("Filosofía", ""),
+                ("Historia", ""),
+                ("Hogar", "(Bricolaje, Cocina, Decoración, Jardinería, Mascotas...)."),
+                ("Humor", ""),
+                ("Idiomas", ""),
+                ("Manuales y cursos", ""),
+                ("Memorias", "(Autobiografía, Biografía, Cartas, Diarios...)."),
+                ("Padres e hijos", ""),
+                ("Psicología", "(Psiquiatría...). Excepciones: Autoayuda, Sexualidad, Padres e hijos."),
+                ("Salud y bienestar", "(Medicina, Nutrición, Terapias alternativas...)."),
+                ("Sexualidad", ""),
+                ("Tecnología", "(Electrónica, Industria, Informática, Telecomunicaciones...)."),
+                ("Viajes", ""),
+                ("Otros", "De no ubicarse en ninguno de los subgéneros anteriores.")
+            )
+        )}
 
     def __init__(self):
         self._publicationDate = None

@@ -5,7 +5,6 @@ from PyQt4 import QtGui, QtCore
 from misc import language, utils
 from gui.forms.compiled import basic_metadata_widget, additional_metadata_widget, author_metadata_widget
 from epubcreator import ebook_metadata
-from epubcreator.misc import epub_base_misc
 
 
 class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
@@ -237,13 +236,13 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
             return collectionName, subCollectionName, collectionVolume
 
     def _populateGenreTypes(self):
-        for genreType in epub_base_misc.Genre.getTypes():
+        for genreType in ebook_metadata.Metadata.GENRES:
             self.genreTypeInput.addItem(genreType)
 
     def _populateGenresAndSubGenres(self):
         selectedGenreType = self.genreTypeInput.currentText()
-        genres = epub_base_misc.Genre.getGenres(selectedGenreType)
-        subGenres = epub_base_misc.Genre.getSubGenres(selectedGenreType)
+        genres = ebook_metadata.Metadata.GENRES[selectedGenreType][0]
+        subGenres = ebook_metadata.Metadata.GENRES[selectedGenreType][1]
 
         self.genreGenreInput.clear()
         self.genreSubGenreInput.clear()
