@@ -100,7 +100,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
         name = self.authorInput.text().strip()
         fileAs = self.authorFileAsInput.text().strip()
 
-        if name:
+        if name and fileAs:
             # Compruebo que el nombre del autor no haya sido agregado ya a la lista
             for i in range(self.authorsList.count()):
                 if self.authorsList.item(i).data(QtCore.Qt.UserRole).name == name:
@@ -262,7 +262,7 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
         name = self.translatorInput.text().strip()
         fileAs = self.translatorFileAsInput.text().strip()
 
-        if name:
+        if name and fileAs:
             self._addPersonToList(self.translatorsList, name, fileAs)
 
             self.translatorInput.clear()
@@ -288,7 +288,7 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
         name = self.ilustratorInput.text().strip()
         fileAs = self.ilustratorFileAsInput.text().strip()
 
-        if name:
+        if name and fileAs:
             self._addPersonToList(self.ilustratorsList, name, fileAs)
 
             self.ilustratorInput.clear()
