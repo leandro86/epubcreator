@@ -289,7 +289,7 @@ class Ebook:
                 fileName.append(collection)
 
         fileName.append(self._metadata.title)
-        fileName.append(" (r1.0 {0})".format(self._metadata.editor if self._metadata.editor else "El Editor"))
+        fileName.append(" [{0}] (r1.0 {1})".format(self._metadata.bookId, self._metadata.editor))
 
         return utils.Utilities.purgeString("{0}.epub".format("".join(fileName)))
 
@@ -310,6 +310,9 @@ class Ebook:
 
         if not self._metadata.title:
             self._metadata.title = ebook_metadata.Metadata.DEFAULT_TITLE
+
+        if not self._metadata.bookId:
+            self._metadata.bookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
 
         if not self._metadata.authors:
             self._metadata.authors.append(ebook_metadata.Person(ebook_metadata.Metadata.DEFAULT_AUTHOR, ebook_metadata.Metadata.DEFAULT_AUTHOR))

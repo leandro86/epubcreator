@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'L:/Proyectos/python/projects/epubcreator/src/gui\forms\basic_metadata_widget.ui'
+# Form implementation generated from reading ui file 'basic_metadata_widget.ui'
 #
-# Created by PyQt4 UI code generator
+# Created: Sun Mar 16 11:54:52 2014
+#      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -41,10 +42,10 @@ class Ui_BasicMetadata(object):
         sizePolicy.setHeightForWidth(self.label_5.sizePolicy().hasHeightForWidth())
         self.label_5.setSizePolicy(sizePolicy)
         self.label_5.setObjectName(_fromUtf8("label_5"))
-        self.gridLayout_2.addWidget(self.label_5, 3, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.label_5, 4, 0, 1, 1)
         self.label_3 = QtGui.QLabel(BasicMetadata)
         self.label_3.setObjectName(_fromUtf8("label_3"))
-        self.gridLayout_2.addWidget(self.label_3, 2, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.label_3, 3, 0, 1, 1)
         self.label = QtGui.QLabel(BasicMetadata)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -66,7 +67,7 @@ class Ui_BasicMetadata(object):
         self.titleInput.setFont(font)
         self.titleInput.setAlignment(QtCore.Qt.AlignCenter)
         self.titleInput.setObjectName(_fromUtf8("titleInput"))
-        self.gridLayout_2.addWidget(self.titleInput, 0, 1, 1, 2)
+        self.gridLayout_2.addWidget(self.titleInput, 0, 1, 1, 3)
         self.label_2 = QtGui.QLabel(BasicMetadata)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -88,7 +89,7 @@ class Ui_BasicMetadata(object):
         self.subtitleInput.setFont(font)
         self.subtitleInput.setAlignment(QtCore.Qt.AlignCenter)
         self.subtitleInput.setObjectName(_fromUtf8("subtitleInput"))
-        self.gridLayout_2.addWidget(self.subtitleInput, 1, 1, 1, 2)
+        self.gridLayout_2.addWidget(self.subtitleInput, 1, 1, 1, 3)
         self.groupBox = QtGui.QGroupBox(BasicMetadata)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -134,7 +135,7 @@ class Ui_BasicMetadata(object):
         self.authorsList.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.authorsList.setObjectName(_fromUtf8("authorsList"))
         self.gridLayout_3.addWidget(self.authorsList, 0, 2, 3, 1)
-        self.gridLayout_2.addWidget(self.groupBox, 2, 1, 1, 2)
+        self.gridLayout_2.addWidget(self.groupBox, 3, 1, 1, 3)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.frame = QtGui.QFrame(BasicMetadata)
@@ -206,10 +207,48 @@ class Ui_BasicMetadata(object):
         self.horizontalLayout.addWidget(self.synopsisInput)
         self.horizontalLayout.setStretch(0, 1)
         self.horizontalLayout.setStretch(2, 1)
-        self.gridLayout_2.addLayout(self.horizontalLayout, 3, 1, 1, 2)
+        self.gridLayout_2.addLayout(self.horizontalLayout, 4, 1, 1, 3)
+        self.label_7 = QtGui.QLabel(BasicMetadata)
+        self.label_7.setObjectName(_fromUtf8("label_7"))
+        self.gridLayout_2.addWidget(self.label_7, 2, 0, 1, 1)
+        self.languageInput = QtGui.QComboBox(BasicMetadata)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.languageInput.sizePolicy().hasHeightForWidth())
+        self.languageInput.setSizePolicy(sizePolicy)
+        self.languageInput.setObjectName(_fromUtf8("languageInput"))
+        self.gridLayout_2.addWidget(self.languageInput, 2, 1, 1, 1)
+        self.idInput = QtGui.QLineEdit(BasicMetadata)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.idInput.sizePolicy().hasHeightForWidth())
+        self.idInput.setSizePolicy(sizePolicy)
+        self.idInput.setMaximumSize(QtCore.QSize(50, 16777215))
+        self.idInput.setObjectName(_fromUtf8("idInput"))
+        self.gridLayout_2.addWidget(self.idInput, 2, 3, 1, 1)
+        self.label_8 = QtGui.QLabel(BasicMetadata)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_8.sizePolicy().hasHeightForWidth())
+        self.label_8.setSizePolicy(sizePolicy)
+        self.label_8.setObjectName(_fromUtf8("label_8"))
+        self.gridLayout_2.addWidget(self.label_8, 2, 2, 1, 1)
 
         self.retranslateUi(BasicMetadata)
         QtCore.QMetaObject.connectSlotsByName(BasicMetadata)
+        BasicMetadata.setTabOrder(self.titleInput, self.subtitleInput)
+        BasicMetadata.setTabOrder(self.subtitleInput, self.languageInput)
+        BasicMetadata.setTabOrder(self.languageInput, self.idInput)
+        BasicMetadata.setTabOrder(self.idInput, self.authorInput)
+        BasicMetadata.setTabOrder(self.authorInput, self.authorFileAsInput)
+        BasicMetadata.setTabOrder(self.authorFileAsInput, self.addAuthorButton)
+        BasicMetadata.setTabOrder(self.addAuthorButton, self.authorsList)
+        BasicMetadata.setTabOrder(self.authorsList, self.coverModificationInput)
+        BasicMetadata.setTabOrder(self.coverModificationInput, self.coverDesignerInput)
+        BasicMetadata.setTabOrder(self.coverDesignerInput, self.synopsisInput)
 
     def retranslateUi(self, BasicMetadata):
         self.label_5.setText(_translate("BasicMetadata", "Cubierta", None))
@@ -223,6 +262,8 @@ class Ui_BasicMetadata(object):
         self.label_12.setText(_translate("BasicMetadata", "Modificación", None))
         self.label_13.setText(_translate("BasicMetadata", "Diseñador", None))
         self.label_6.setText(_translate("BasicMetadata", "Sinopsis", None))
+        self.label_7.setText(_translate("BasicMetadata", "Idioma", None))
+        self.label_8.setText(_translate("BasicMetadata", "ID", None))
 
-from gui.custom_widgets import ExtendedQListWidget, ExtendedQLabel
+from gui.custom_widgets import ExtendedQLabel, ExtendedQListWidget
 from . import basic_metadata_widget_rc

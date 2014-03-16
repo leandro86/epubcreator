@@ -6,6 +6,7 @@ class Metadata:
     DEFAULT_AUTHOR = "Autor"
     DEFAULT_EDITOR = "Editor"
     DEFAULT_LANGUAGE = "es"
+    DEFAULT_BOOK_ID = "0000"
     DEFAULT_SYNOPSIS = ("Yo por bien tengo que cosas tan señaladas, y por ventura nunca oídas ni vistas, vengan a noticia de muchos y no se "
                         "entierren en la sepultura del olvido, pues podría ser que alguno que las lea halle algo que le agrade, y a los que "
                         "no ahondaren tanto los deleite.\n"
@@ -32,6 +33,7 @@ class Metadata:
 
         self.title = ""
         self.synopsis = ""
+        self.bookId = ""
 
         self.subtitle = ""
         self.authorBiography = ""

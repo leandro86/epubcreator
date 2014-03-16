@@ -24,6 +24,14 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
         self._coverImageBytes = None
 
         self._populateCoverModificationOptions()
+        self._populateLanguages()
+
+        # Por defecto, el combobox del lenguaje muestra "español"
+        self.languageInput.setCurrentIndex(self.languageInput.findText(language.Language.getLanguageName("es")))
+
+        # En el campo id del libro solo pueden ingresar números.
+        self.idInput.setValidator(QtGui.QIntValidator(self))
+
         self._connectSignals()
 
     def getTitle(self):
@@ -52,6 +60,12 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
     def getCoverDesigner(self):
         return self.coverDesignerInput.text().strip()
 
+    def getLanguageCode(self):
+        return language.Language.getLanguageCode(self.languageInput.currentText())
+
+    def getBookId(self):
+        return self.idInput.text().strip()
+
     def getSynopsis(self):
         return self.synopsisInput.toPlainText().strip()
 
@@ -67,6 +81,10 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
         for i, option in enumerate(epub_base_misc.CoverModification.getOptions()):
             self.coverModificationInput.addItem(option[0])
             self.coverModificationInput.setItemData(i, option[1], QtCore.Qt.ToolTipRole)
+
+    def _populateLanguages(self):
+        for languageName in language.Language.getSortedLanguagesNames():
+            self.languageInput.addItem(languageName)
 
     def _changeCoverImage(self):
         imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen",
@@ -123,14 +141,10 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
         super().__init__(parent)
         self.setupUi(self)
 
-        self._populateLanguages()
         self._populateGenreTypes()
         self._populateGenresAndSubGenres()
 
         self.collectionVolumeInput.setEnabled(False)
-
-        # Por defecto, el combobox del lenguaje muestra "español"
-        self.languageInput.setCurrentIndex(self.languageInput.findText(language.Language.getLanguageName("es")))
 
         self._connectSignals()
 
@@ -153,9 +167,6 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
                                                                             "debe ser: dd-mm-aaaa. Si no conoce el "
                                                                             "día o mes exacto, coloque el 1 de enero.",
                                           self, self.publicationDateInput)
-
-    def getLanguageCode(self):
-        return language.Language.getLanguageCode(self.languageInput.currentText())
 
     def getTranslators(self):
         """
@@ -224,10 +235,6 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
                                       self.collectionVolumeInput)
         else:
             return collectionName, subCollectionName, collectionVolume
-
-    def _populateLanguages(self):
-        for languageName in language.Language.getSortedLanguagesNames():
-            self.languageInput.addItem(languageName)
 
     def _populateGenreTypes(self):
         for genreType in epub_base_misc.Genre.getTypes():

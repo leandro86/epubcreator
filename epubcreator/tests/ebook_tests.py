@@ -687,7 +687,7 @@ class EbookTests(unittest.TestCase):
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "Borges, Jorge Luis - Titulo (r1.0 Editor).epub")
+        self.assertEqual(fileName, "Borges, Jorge Luis - Titulo [0000] (r1.0 Editor).epub")
 
     def test_epub_file_name_when_two_authors_and_no_collection(self):
         self._metadata.title = "Titulo"
@@ -697,7 +697,7 @@ class EbookTests(unittest.TestCase):
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "Borges, Jorge Luis & Shakespeare, William - Titulo (r1.0 Editor).epub")
+        self.assertEqual(fileName, "Borges, Jorge Luis & Shakespeare, William - Titulo [0000] (r1.0 Editor).epub")
 
     def test_epub_file_name_when_three_authors_and_no_collection(self):
         self._metadata.title = "Titulo"
@@ -708,7 +708,7 @@ class EbookTests(unittest.TestCase):
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "AA. VV. - Titulo (r1.0 Editor).epub")
+        self.assertEqual(fileName, "AA. VV. - Titulo [0000] (r1.0 Editor).epub")
 
     def test_epub_file_name_when_one_author_and_simple_collection(self):
         self._metadata.title = "Titulo"
@@ -719,7 +719,7 @@ class EbookTests(unittest.TestCase):
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "Borges, Jorge Luis - [Esta es la serie 10] Titulo (r1.0 Editor).epub")
+        self.assertEqual(fileName, "Borges, Jorge Luis - [Esta es la serie 10] Titulo [0000] (r1.0 Editor).epub")
 
     def test_epub_file_name_when_one_author_and_subcollection(self):
         self._metadata.title = "Titulo"
@@ -731,7 +731,7 @@ class EbookTests(unittest.TestCase):
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] Borges, Jorge Luis - Titulo (r1.0 Editor).epub")
+        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] Borges, Jorge Luis - Titulo [0000] (r1.0 Editor).epub")
 
     def test_epub_file_name_when_two_authors_and_subcollection(self):
         self._metadata.title = "Titulo"
@@ -745,7 +745,7 @@ class EbookTests(unittest.TestCase):
         fileName = self._generateEbook()
 
         self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] Borges, Jorge Luis & Shakespeare, William - "
-                                   "Titulo (r1.0 Editor).epub")
+                                   "Titulo [0000] (r1.0 Editor).epub")
 
     def test_epub_file_name_when_three_authors_and_subcollection(self):
         self._metadata.title = "Titulo"
@@ -759,7 +759,17 @@ class EbookTests(unittest.TestCase):
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] AA. VV. - Titulo (r1.0 Editor).epub")
+        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] AA. VV. - Titulo [0000] (r1.0 Editor).epub")
+
+    def test_epub_file_name_bookid(self):
+        self._metadata.title = "Titulo"
+        self._metadata.editor = "Editor"
+        self._metadata.authors.append(ebook_metadata.Person("Autor", "Autor"))
+        self._metadata.bookId = "1234"
+
+        fileName = self._generateEbook()
+
+        self.assertEqual(fileName, "Autor - Titulo [1234] (r1.0 Editor).epub")
 
     def test_cover_image(self):
         self._metadata.coverImage = "cover image"

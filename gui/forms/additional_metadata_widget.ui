@@ -46,7 +46,7 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
+   <item row="3" column="0">
     <widget class="QLabel" name="label_6">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -59,7 +59,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="1" column="0">
     <widget class="QLabel" name="label_4">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -123,23 +123,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Idioma</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
+   <item row="2" column="0">
     <widget class="QLabel" name="label_5">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -155,7 +139,7 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
+   <item row="4" column="0">
     <widget class="QLabel" name="label_12">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -171,7 +155,7 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0">
+   <item row="5" column="0">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -184,7 +168,7 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="1" colspan="3">
+   <item row="1" column="1" colspan="3">
     <widget class="QGroupBox" name="groupBox">
      <property name="styleSheet">
       <string notr="true"/>
@@ -278,7 +262,7 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="1" colspan="3">
+   <item row="2" column="1" colspan="3">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string/>
@@ -346,7 +330,7 @@
      </layout>
     </widget>
    </item>
-   <item row="4" column="1" colspan="3">
+   <item row="3" column="1" colspan="3">
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
       <string/>
@@ -457,7 +441,7 @@
      </layout>
     </widget>
    </item>
-   <item row="5" column="1" colspan="3">
+   <item row="4" column="1" colspan="3">
     <widget class="QGroupBox" name="groupBox_4">
      <property name="title">
       <string/>
@@ -534,22 +518,6 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="1" colspan="3">
-    <widget class="QComboBox" name="languageInput">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -562,7 +530,6 @@
  <tabstops>
   <tabstop>originalTitleInput</tabstop>
   <tabstop>publicationDateInput</tabstop>
-  <tabstop>languageInput</tabstop>
   <tabstop>translatorInput</tabstop>
   <tabstop>translatorFileAsInput</tabstop>
   <tabstop>addTranslatorButton</tabstop>

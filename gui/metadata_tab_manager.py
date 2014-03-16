@@ -33,6 +33,8 @@ class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget.Ui_MetadataT
 
         metadata.coverImage = self.basicMetadata.getCoverImage()
         metadata.title = self.basicMetadata.getTitle()
+        metadata.language = self.basicMetadata.getLanguageCode()
+        metadata.bookId = self.basicMetadata.getBookId()
         metadata.subtitle = self.basicMetadata.getSubtitle()
         metadata.synopsis = self.basicMetadata.getSynopsis()
         metadata.coverDesignOrTweak = self.basicMetadata.getCoverModification()
@@ -62,8 +64,6 @@ class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget.Ui_MetadataT
         except metadata_tabs.ValidationException as e:
             self._showError(e.error, e.description, e.tab, e.widget)
             isValid = False
-
-        metadata.language = self.additionalMetadata.getLanguageCode()
 
         for translator in self.additionalMetadata.getTranslators():
             metadata.translators.append(translator)
