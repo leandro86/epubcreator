@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'L:/Proyectos/python/projects/epubcreator/src/gui\forms\main_window.ui'
+# Form implementation generated from reading ui file 'main_window.ui'
 #
-# Created by PyQt4 UI code generator
+# Created: Sun Mar 16 16:47:04 2014
+#      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -70,9 +71,6 @@ class Ui_MainWindow(object):
         self.toggleToolBarAction = QtGui.QAction(MainWindow)
         self.toggleToolBarAction.setCheckable(True)
         self.toggleToolBarAction.setObjectName(_fromUtf8("toggleToolBarAction"))
-        self.toggleLogWindowAction = QtGui.QAction(MainWindow)
-        self.toggleLogWindowAction.setCheckable(True)
-        self.toggleLogWindowAction.setObjectName(_fromUtf8("toggleLogWindowAction"))
         self.aboutAction = QtGui.QAction(MainWindow)
         self.aboutAction.setMenuRole(QtGui.QAction.AboutRole)
         self.aboutAction.setObjectName(_fromUtf8("aboutAction"))
@@ -85,8 +83,6 @@ class Ui_MainWindow(object):
         self.menuArchivo.addSeparator()
         self.menuArchivo.addAction(self.quitAction)
         self.menuVer.addAction(self.toggleToolBarAction)
-        self.menuVer.addSeparator()
-        self.menuVer.addAction(self.toggleLogWindowAction)
         self.menuAyuda.addAction(self.aboutAction)
         self.menubar.addAction(self.menuArchivo.menuAction())
         self.menubar.addAction(self.menuVer.menuAction())
@@ -107,7 +103,6 @@ class Ui_MainWindow(object):
         self.preferencesAction.setText(_translate("MainWindow", "Preferencias", None))
         self.quitAction.setText(_translate("MainWindow", "Salir", None))
         self.toggleToolBarAction.setText(_translate("MainWindow", "Barra de Herramientas", None))
-        self.toggleLogWindowAction.setText(_translate("MainWindow", "Log de Conversión", None))
         self.aboutAction.setText(_translate("MainWindow", "Acerca de...", None))
 
 from gui.metadata_tab_manager import MetadataTabManager

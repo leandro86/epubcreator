@@ -13,11 +13,3 @@ class AbstractConverter:
 
     def getRawText(self):
         raise NotImplemented
-
-
-class ConverterLogMessage:
-    MSG_TYPE = utils.Utilities.enum(WARNING=1, ERROR=2)
-
-    def __init__(self, msgType, message):
-        self.msgType = msgType
-        self.message = message

@@ -71,8 +71,6 @@
      <string>Ver</string>
     </property>
     <addaction name="toggleToolBarAction"/>
-    <addaction name="separator"/>
-    <addaction name="toggleLogWindowAction"/>
    </widget>
    <widget class="QMenu" name="menuAyuda">
     <property name="title">
@@ -127,14 +125,6 @@
    </property>
    <property name="text">
     <string>Barra de Herramientas</string>
-   </property>
-  </action>
-  <action name="toggleLogWindowAction">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Log de Conversión</string>
    </property>
   </action>
   <action name="aboutAction">

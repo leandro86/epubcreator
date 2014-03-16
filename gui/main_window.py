@@ -8,7 +8,7 @@ from epubcreator import ebook
 from epubcreator.converters.docx import docx_converter
 from misc import settings_store, utils
 from gui.forms.compiled import main_window
-from gui import preferences, log_window, about
+from gui import preferences, about
 import version
 import config
 
@@ -29,17 +29,10 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
         # archivos del epubbase.
         self._workingFilePath = ""
 
-        # La ventana de log
-        self._logWindow = log_window.LogWindow(self)
-
         # El path de la última ubicación desde la cual se abrió un archivo.
         self._lastFolderOpen = ""
 
         self.setWindowTitle(version.APP_NAME)
-
-        # Agrego la ventana de log, por defecto oculta.
-        self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self._logWindow)
-        self._logWindow.hide()
 
         self._connectSignals()
         self._readSettings()
@@ -64,7 +57,7 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
             settings = settings_store.SettingsStore()
             metadata.editor = settings.editor
 
-            data, logMessages, rawText = self._prepareEbook()
+            data, rawText = self._prepareEbook()
             eebook = ebook.Ebook(data, metadata)
 
             if data:
@@ -82,10 +75,6 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
             if outputDir:
                 try:
                     fileName = eebook.save(outputDir)
-                    self._logWindow.addlogMessages(logMessages)
-
-                    if logMessages:
-                        self._logWindow.show()
 
                     statusBarMsg = "ePub generado. "
 
@@ -162,15 +151,14 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
         settings = settings_store.SettingsStore()
 
         data = None
-        logMessages = None
         rawText = None
 
         if self._workingFilePath.endswith(".docx"):
             converter = docx_converter.DocxConverter(self._workingFilePath, settings.docxIgnoreEmptyParagraphs)
-            data, logMessages = converter.convert()
+            data = converter.convert()
             rawText = converter.getRawText()
 
-        return data, logMessages, rawText
+        return data, rawText
 
     def _checkForMissingText(self, sections, rawText):
         sectionsText = "".join((s.toRawText() for s in sections))
@@ -194,8 +182,6 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
         self.openFileAction.triggered.connect(self._openFile)
         self.generateEpubAction.triggered.connect(self._generateEpub)
         self.preferencesAction.triggered.connect(lambda: preferences.Preferences(self).exec())
-        self.toggleLogWindowAction.triggered.connect(self._logWindow.setVisible)
-        self._logWindow.visibilityChanged.connect(self.toggleLogWindowAction.setChecked)
         self.toggleToolBarAction.triggered.connect(self.toolBar.setVisible)
         self.toolBar.visibilityChanged.connect(self.toggleToolBarAction.setChecked)
         self.quitAction.triggered.connect(self._close)

@@ -78,8 +78,7 @@ class DocxConverter(converter_base.AbstractConverter):
             self._isProcessingFootnotes = True
             self._processFootnotes()
 
-        logMessages = []
-        return self._ebookData, logMessages
+        return self._ebookData
 
     def getRawText(self):
         docText = "".join(xml_utils.xpath(self._documentXml, "//w:t/text()", namespaces=utils.NAMESPACES))
