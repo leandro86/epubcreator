@@ -48,8 +48,30 @@ class Utilities:
         msgBox.setDetailedText(exceptionMessage)
         msgBox.exec()
 
+    @staticmethod
+    def insertNewLines(text, every):
+        """
+        Inserta saltos de línea en un texto cada cierta cantidad de caracteres.
+        Los saltos de línea se insertan luego de algún espacio, de manera tal de no cortar
+        una palabra a la mitad.
 
+        @param text: un string con el texto.
+        @param every: un int que indica cada cuántos caracteres se inserta un salto de línea.
 
+        @return: un string con el texto con los saltos de línea.
+        """
+        lines = []
+        previousNewLinePos = 0
+        spacePos = text.find(" ")
 
+        while spacePos != -1:
+            if spacePos - previousNewLinePos >= every:
+                # El espacio lo dejo al final de la línea, en lugar de copiarlo a la línea de abajo.
+                lines.append(text[previousNewLinePos:spacePos + 1])
+                previousNewLinePos = spacePos + 1
 
+            spacePos = text.find(" ", spacePos + 1)
 
+        lines.append(text[previousNewLinePos:])
+
+        return "\n".join(lines)

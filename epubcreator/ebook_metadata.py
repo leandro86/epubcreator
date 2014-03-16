@@ -34,9 +34,8 @@ class Metadata:
     # Las modificaciones posibles que pueden hacerse a la cubierta.
     COVER_MODIFICATION_OPTIONS = (("Diseño", "Elija esta opción si se conserva la cubierta original aun con algún ajuste menor de "
                                              "contraste y color (de la que, eso sí, es obligatorio quitar el logo o cualquier referencia "
-                                             "a la editorial). Debe introducirse el nombre del diseñador de la cubierta. \n"
-                                             "Si la cubierta es una creación original, debe introducirse el alias (o, si él quiere, "
-                                             "el nombre) del creador."),
+                                             "a la editorial). Debe introducirse el nombre del diseñador de la cubierta. Si la cubierta es "
+                                             "una creación original, debe introducirse el alias (o, si él quiere, el nombre) del creador."),
                                   ("Retoque", "Elija esta opción si la cubierta original se ha modificado significativamente. Deben "
                                               "introducirse los nombres del diseñador original y el alias de quien la haya retocado."))
 
@@ -78,11 +77,11 @@ class Metadata:
                                "del arte en la vida humana y el rol de la experiencia o la razón en el desarrollo del "
                                "conocimiento). Incluye Novela de ideas."),
                 ("Histórico", "Ofrece una visión verosímil de una época histórica (preferiblemente lejana). Suele utilizar "
-                              "acontecimientos verídicos aunque los personajes principales \nsean inventados."),
+                              "acontecimientos verídicos aunque los personajes principales sean inventados."),
                 ("Humor", "Usa el absurdo, en personajes o situaciones, para provocar la hilaridad. Incluye Comedia."),
                 ("Infantil", "Dirigido a los niños. Incluye Cuentos de hadas."),
                 ("Interactivo", "Exige una participación más activa del lector, que puede escoger varios «caminos» argumentales."),
-                ("Intriga", "Las acciones se ejecutan con inteligencia y astucia, y ocultan acontecimientos \nimportantes "
+                ("Intriga", "Las acciones se ejecutan con inteligencia y astucia, y ocultan acontecimientos importantes "
                             "para suscitar interés y tensión en el lector. Incluye Misterio, Suspenso."),
                 ("Juvenil", "Dirigido a adolescentes y jóvenes."),
                 ("Policial", "Su móvil principal es la resolución de un enigma, generalmente criminal, mediante procesos "
