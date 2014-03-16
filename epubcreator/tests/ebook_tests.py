@@ -275,7 +275,6 @@ class EbookTests(unittest.TestCase):
 
         info = self._getInfoFile()
 
-        # El título en el campo "Título original" se encuentra dentro de un tag "em".
         self.assertFalse(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[starts-with(text(), 'Título original')]"))
 
     def test_default_author_in_info_file(self):
