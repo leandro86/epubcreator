@@ -110,6 +110,9 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
             item.setData(QtCore.Qt.UserRole, ebook_metadata.Person(name, fileAs))
             self.authorsList.addItem(item)
 
+            self.authorInput.clear()
+            self.authorFileAsInput.clear()
+
     def _removeSelectedAuthorFromList(self):
         if self.authorsList.currentItem() is not None:
             self.authorsList.takeItem(self.authorsList.row(self.authorsList.currentItem()))
@@ -262,6 +265,9 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
         if name:
             self._addPersonToList(self.translatorsList, name, fileAs)
 
+            self.translatorInput.clear()
+            self.translatorFileAsInput.clear()
+
     def _removeCurrentItemFromList(self):
         listWidget = self.sender()
         if listWidget.currentItem() is not None:
@@ -284,6 +290,9 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
 
         if name:
             self._addPersonToList(self.ilustratorsList, name, fileAs)
+
+            self.ilustratorInput.clear()
+            self.ilustratorFileAsInput.clear()
 
     def _populateCurrentIlustratorData(self, selectedIlustrator):
         if selectedIlustrator is None:
