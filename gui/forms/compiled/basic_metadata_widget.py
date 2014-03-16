@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'basic_metadata_widget.ui'
 #
-# Created: Sun Mar 16 11:54:52 2014
+# Created: Sun Mar 16 17:19:42 2014
 #      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -133,6 +133,7 @@ class Ui_BasicMetadata(object):
         sizePolicy.setHeightForWidth(self.authorsList.sizePolicy().hasHeightForWidth())
         self.authorsList.setSizePolicy(sizePolicy)
         self.authorsList.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.authorsList.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.authorsList.setObjectName(_fromUtf8("authorsList"))
         self.gridLayout_3.addWidget(self.authorsList, 0, 2, 3, 1)
         self.gridLayout_2.addWidget(self.groupBox, 3, 1, 1, 3)
@@ -265,5 +266,5 @@ class Ui_BasicMetadata(object):
         self.label_7.setText(_translate("BasicMetadata", "Idioma", None))
         self.label_8.setText(_translate("BasicMetadata", "ID", None))
 
-from gui.custom_widgets import ExtendedQLabel, ExtendedQListWidget
+from gui.custom_widgets import ExtendedQListWidget, ExtendedQLabel
 from . import basic_metadata_widget_rc

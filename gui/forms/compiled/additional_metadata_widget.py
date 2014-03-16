@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'additional_metadata_widget.ui'
 #
-# Created: Sat Mar 15 22:27:08 2014
+# Created: Sun Mar 16 17:21:04 2014
 #      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -130,6 +130,7 @@ class Ui_AdditionalMetadata(object):
         self.translatorsList.setSizePolicy(sizePolicy)
         self.translatorsList.setMinimumSize(QtCore.QSize(0, 0))
         self.translatorsList.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.translatorsList.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.translatorsList.setObjectName(_fromUtf8("translatorsList"))
         self.gridLayout_2.addWidget(self.translatorsList, 0, 2, 3, 1)
         self.label_7 = QtGui.QLabel(self.groupBox)
@@ -174,6 +175,7 @@ class Ui_AdditionalMetadata(object):
         sizePolicy.setHeightForWidth(self.ilustratorsList.sizePolicy().hasHeightForWidth())
         self.ilustratorsList.setSizePolicy(sizePolicy)
         self.ilustratorsList.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.ilustratorsList.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.ilustratorsList.setObjectName(_fromUtf8("ilustratorsList"))
         self.gridLayout_3.addWidget(self.ilustratorsList, 0, 2, 3, 1)
         self.label_10 = QtGui.QLabel(self.groupBox_2)
@@ -216,6 +218,7 @@ class Ui_AdditionalMetadata(object):
         sizePolicy.setHeightForWidth(self.genresList.sizePolicy().hasHeightForWidth())
         self.genresList.setSizePolicy(sizePolicy)
         self.genresList.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.genresList.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.genresList.setObjectName(_fromUtf8("genresList"))
         self.gridLayout_4.addWidget(self.genresList, 0, 2, 4, 1)
         self.label_14 = QtGui.QLabel(self.groupBox_3)
