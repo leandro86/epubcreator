@@ -6,7 +6,7 @@ import mako.template
 from pyepub.pyepubwriter import epub
 
 from epubcreator import ebook_metadata, ebook_data, epubbase_names
-from misc import utils
+from epubcreator.misc import utils
 import config
 
 
@@ -291,7 +291,7 @@ class Ebook:
         fileName.append(self._metadata.title)
         fileName.append(" [{0}] (r1.0 {1})".format(self._metadata.bookId, self._metadata.editor))
 
-        return utils.Utilities.purgeString("{0}.epub".format("".join(fileName)))
+        return utils.removeSpecialCharacters("{0}.epub".format("".join(fileName)))
 
     def _purgeStringForMetadata(self, s):
         """
