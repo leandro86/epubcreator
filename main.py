@@ -13,7 +13,7 @@ import version
 
 def handleUnknownException(exc_type, exc_value, exc_traceback):
     exceptionMessage = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
-    utils.Utilities.displayExceptionErrorDialog(exceptionMessage)
+    utils.displayExceptionErrorDialog(exceptionMessage)
 
 
 if __name__ == "__main__":

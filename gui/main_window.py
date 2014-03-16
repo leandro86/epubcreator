@@ -84,7 +84,7 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
 
                     self._showMessageOnStatusBar(statusBarMsg, 5000)
                 except IOError as e:
-                    utils.Utilities.displayStdErrorDialog("Ocurrió un error al intentar guardar el epub.", str(e))
+                    utils.displayStdErrorDialog("Ocurrió un error al intentar guardar el epub.", str(e))
                     self._showMessageOnStatusBar("No se pudo generar el ePub.")
 
     def _openInSigil(self, sigilPath, fileName):
@@ -105,7 +105,7 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
                 subprocess.Popen([sigilPath, fileName])
             return True
         except Exception as e:
-            utils.Utilities.displayStdErrorDialog("Sigil no pudo abrirse. Compruebe que la ruta sea correcta.", str(e))
+            utils.displayStdErrorDialog("Sigil no pudo abrirse. Compruebe que la ruta sea correcta.", str(e))
             return False
 
     def _showMessageOnStatusBar(self, message, duration=0):
@@ -171,8 +171,8 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
         isTextMissing = re.sub(r"\s+", "", rawText) != re.sub(r"\s+", "", sectionsText)
 
         if isTextMissing:
-            utils.Utilities.displayStdErrorDialog("Se ha perdido texto en la conversión. Por favor, repórtalo a los "
-                                                  "desarrolladores y adjunta el documento fuente.")
+            utils.displayStdErrorDialog("Se ha perdido texto en la conversión. Por favor, repórtalo a los "
+                                        "desarrolladores y adjunta el documento fuente.")
 
     def _close(self):
         QtGui.qApp.closeAllWindows()

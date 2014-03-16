@@ -79,7 +79,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
     def _populateCoverModificationOptions(self):
         for i, option in enumerate(ebook_metadata.Metadata.COVER_MODIFICATION_OPTIONS):
             self.coverModificationInput.addItem(option[0])
-            self.coverModificationInput.setItemData(i, utils.Utilities.insertNewLines(option[1], 100), QtCore.Qt.ToolTipRole)
+            self.coverModificationInput.setItemData(i, utils.insertNewLines(option[1], 100), QtCore.Qt.ToolTipRole)
 
     def _populateLanguages(self):
         for languageName in language.Language.getSortedLanguagesNames():
@@ -253,11 +253,11 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
 
         for i, genre in enumerate(genres):
             self.genreGenreInput.addItem(genre[0])
-            self.genreGenreInput.setItemData(i, utils.Utilities.insertNewLines(genre[1], 100), QtCore.Qt.ToolTipRole)
+            self.genreGenreInput.setItemData(i, utils.insertNewLines(genre[1], 100), QtCore.Qt.ToolTipRole)
 
         for i, subGenre in enumerate(subGenres):
             self.genreSubGenreInput.addItem(subGenre[0])
-            self.genreSubGenreInput.setItemData(i, utils.Utilities.insertNewLines(subGenre[1], 100), QtCore.Qt.ToolTipRole)
+            self.genreSubGenreInput.setItemData(i, utils.insertNewLines(subGenre[1], 100), QtCore.Qt.ToolTipRole)
 
     def _addTranslatorToList(self):
         name = self.translatorInput.text().strip()
