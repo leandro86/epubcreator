@@ -209,7 +209,12 @@ class Ebook:
         outputEpub.addTitle(self._metadata.title)
         outputEpub.addAuthor(authors[0], authors[1])
         outputEpub.addLanguage(self._metadata.language)
-        outputEpub.addDescription(self._purgeStringForMetadata(self._metadata.synopsis))
+
+        # En la sinopsis (el campo description) en los metadatos, no puedo tener saltos de línea. Podría directamente
+        # eliminarlos, pero entonces el texto del párrafo B quedaría pegado al del párrafo A. Por eso es que reemplazo
+        # los saltos de línea por un espacio.
+        outputEpub.addDescription(utils.removeTags(self._metadata.synopsis.replace("\n", " ")))
+
         outputEpub.addPublisher("ePubLibre")
         outputEpub.addSubject(", ".join(genres))
 
@@ -292,17 +297,6 @@ class Ebook:
         fileName.append(" [{0}] (r1.0 {1})".format(self._metadata.bookId, self._metadata.editor))
 
         return utils.removeSpecialCharacters("{0}.epub".format("".join(fileName)))
-
-    def _purgeStringForMetadata(self, s):
-        """
-        Elimina tags de un string y convierte los saltos de línea por un espacio, de
-        manera tal de que sea válido para agregarlo a los metadatos del epub.
-
-        @param s: el string a convertir.
-
-        @return: el string convertido.
-        """
-        return re.sub("<[^>]*>", "", s.replace("\n", " "))
 
     def _setDefaultMetadata(self):
         if not self._metadata.synopsis:

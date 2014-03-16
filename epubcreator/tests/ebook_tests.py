@@ -7,6 +7,7 @@ from lxml import etree
 from pyepub.pyepubreader import epub
 
 from epubcreator import ebook, ebook_data, ebook_metadata, epubbase_names
+from epubcreator.misc import utils
 
 
 class EbookTests(unittest.TestCase):
@@ -60,7 +61,7 @@ class EbookTests(unittest.TestCase):
         gotSynopsis = "".join(self._xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[1][@class = 'salto10']//text()"))
         gotSynopsis += "".join(self._xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[2]//text()"))
 
-        wantSynopsis = self._removeTags(ebook_metadata.Metadata.DEFAULT_SYNOPSIS)
+        wantSynopsis = utils.removeTags(ebook_metadata.Metadata.DEFAULT_SYNOPSIS)
 
         self.assertEqual(gotSynopsis, wantSynopsis.replace("\n", ""))
 
@@ -537,7 +538,7 @@ class EbookTests(unittest.TestCase):
         gotDedication = "".join(self._xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[1]//text()"))
         gotDedication += "".join(self._xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[2][@class = 'salto05']//text()"))
 
-        wantDedication = self._removeTags(ebook_metadata.Metadata.DEFAULT_DEDICATION)
+        wantDedication = utils.removeTags(ebook_metadata.Metadata.DEFAULT_DEDICATION)
 
         self.assertEqual(gotDedication, wantDedication.replace("\n", ""))
 
@@ -579,7 +580,7 @@ class EbookTests(unittest.TestCase):
         gotAuthorBiography = "".join(self._xpath(author, "x:body/x:div[@class = 'autor']/x:p[1]//text()"))
         gotAuthorBiography += "".join(self._xpath(author, "x:body/x:div[@class = 'autor']/x:p[2]//text()"))
 
-        wantAuthorBiography = self._removeTags(ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY)
+        wantAuthorBiography = utils.removeTags(ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY)
 
         self.assertEqual(gotAuthorBiography, wantAuthorBiography.replace("\n", ""))
 
@@ -918,9 +919,6 @@ class EbookTests(unittest.TestCase):
 
     def _xpath(self, element, xpath):
         return element.xpath(xpath, namespaces=EbookTests._NAMESPACES)
-
-    def _removeTags(self, s):
-        return re.sub("<[^>]*>", "", s)
 
 
 if __name__ == "__main__":
