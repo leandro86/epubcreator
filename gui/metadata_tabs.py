@@ -136,6 +136,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
         self.authorsList.currentItemChanged.connect(self._populateCurrentAuthorData)
         self.authorInput.textChanged.connect(self._updateAuthorFileAs)
         self.authorInput.returnPressed.connect(self._addAuthorToList)
+        self.authorFileAsInput.returnPressed.connect(self._addAuthorToList)
 
 
 class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_AdditionalMetadata):
@@ -346,12 +347,14 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
         self.translatorsList.currentItemChanged.connect(self._populateCurrentTranslatorData)
         self.translatorInput.textChanged.connect(self._updateTranslatorFileAs)
         self.translatorInput.returnPressed.connect(self._addTranslatorToList)
+        self.translatorFileAsInput.returnPressed.connect(self._addTranslatorToList)
 
         self.addIlustratorButton.clicked.connect(self._addIlustratorToList)
         self.ilustratorsList.deleteKeyPressed.connect(self._removeCurrentItemFromList)
         self.ilustratorsList.currentItemChanged.connect(self._populateCurrentIlustratorData)
         self.ilustratorInput.textChanged.connect(self._updateIlustratorFileAs)
         self.ilustratorInput.returnPressed.connect(self._addIlustratorToList)
+        self.ilustratorFileAsInput.returnPressed.connect(self._addIlustratorToList)
 
 
 class AuthorMetadata(QtGui.QWidget, author_metadata_widget.Ui_AuthorMetadata):
