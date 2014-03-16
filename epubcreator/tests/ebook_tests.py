@@ -681,96 +681,169 @@ class EbookTests(unittest.TestCase):
         calibreSerie = self._outputEpub.getCalibreSerie()
         self.assertEqual(calibreSerie, ("Esta es la saga", "7"))
 
+    def test_epub_file_name_default_metadata(self):
+        fileName = self._generateEbook()
+
+        defaultAuthor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_AUTHOR)
+        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
+        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
+        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
+
+        self.assertEqual(fileName, "{0} - {1} [{2}] (r1.0 {3}).epub".format(defaultAuthor, defaultTitle, defaultBookId, defaultEditor))
+
     def test_epub_file_name_when_one_author_and_no_collection(self):
-        self._metadata.title = "Titulo"
-        self._metadata.editor = "Editor"
-        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+        self._metadata.authors.append(ebook_metadata.Person("bla", "Borges, Jorge Luis"))
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "Borges, Jorge Luis - Titulo [0000] (r1.0 Editor).epub")
+        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
+        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
+        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
+
+        self.assertEqual(fileName, "Borges, Jorge Luis - {0} [{1}] (r1.0 {2}).epub".format(defaultTitle, defaultBookId, defaultEditor))
 
     def test_epub_file_name_when_two_authors_and_no_collection(self):
-        self._metadata.title = "Titulo"
-        self._metadata.editor = "Editor"
-        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
-        self._metadata.authors.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
+        self._metadata.authors.append(ebook_metadata.Person("bla", "Borges, Jorge Luis"))
+        self._metadata.authors.append(ebook_metadata.Person("bla", "Shakespeare, William"))
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "Borges, Jorge Luis & Shakespeare, William - Titulo [0000] (r1.0 Editor).epub")
+        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
+        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
+        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
+
+        self.assertEqual(fileName, "Borges, Jorge Luis & Shakespeare, William - {0} [{1}] (r1.0 {2}).epub".format(defaultTitle,
+                                                                                                                  defaultBookId,
+                                                                                                                  defaultEditor))
 
     def test_epub_file_name_when_three_authors_and_no_collection(self):
-        self._metadata.title = "Titulo"
-        self._metadata.editor = "Editor"
-        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
-        self._metadata.authors.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
-        self._metadata.authors.append(ebook_metadata.Person("H. P. Lovecraft", "Lovecraft, H. P."))
+        self._metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._metadata.authors.append(ebook_metadata.Person("bla", "bla"))
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "AA. VV. - Titulo [0000] (r1.0 Editor).epub")
+        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
+        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
+        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
+
+        self.assertEqual(fileName, "AA. VV. - {0} [{1}] (r1.0 {2}).epub".format(defaultTitle, defaultBookId, defaultEditor))
 
     def test_epub_file_name_when_one_author_and_simple_collection(self):
-        self._metadata.title = "Titulo"
-        self._metadata.editor = "Editor"
-        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+        self._metadata.authors.append(ebook_metadata.Person("bla", "Borges, Jorge Luis"))
         self._metadata.subCollectionName = "Esta es la serie"
         self._metadata.collectionVolume = "10"
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "Borges, Jorge Luis - [Esta es la serie 10] Titulo [0000] (r1.0 Editor).epub")
+        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
+        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
+        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
+
+        self.assertEqual(fileName, "Borges, Jorge Luis - [Esta es la serie 10] {0} [{1}] (r1.0 {2}).epub".format(defaultTitle,
+                                                                                                                 defaultBookId,
+                                                                                                                 defaultEditor))
 
     def test_epub_file_name_when_one_author_and_subcollection(self):
-        self._metadata.title = "Titulo"
-        self._metadata.editor = "Editor"
-        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+        self._metadata.authors.append(ebook_metadata.Person("bla", "Borges, Jorge Luis"))
         self._metadata.collectionName = "Esta es la saga"
         self._metadata.subCollectionName = "Esta es la serie"
         self._metadata.collectionVolume = "10"
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] Borges, Jorge Luis - Titulo [0000] (r1.0 Editor).epub")
+        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
+        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
+        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
+
+        self.assertEqual(fileName,
+                         "[Esta es la saga] [Esta es la serie 10] Borges, Jorge Luis - {0} [{1}] (r1.0 {2}).epub".format(defaultTitle,
+                                                                                                                         defaultBookId,
+                                                                                                                         defaultEditor))
 
     def test_epub_file_name_when_two_authors_and_subcollection(self):
-        self._metadata.title = "Titulo"
-        self._metadata.editor = "Editor"
-        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
-        self._metadata.authors.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
+        self._metadata.authors.append(ebook_metadata.Person("bla", "Borges, Jorge Luis"))
+        self._metadata.authors.append(ebook_metadata.Person("bla", "Shakespeare, William"))
         self._metadata.collectionName = "Esta es la saga"
         self._metadata.subCollectionName = "Esta es la serie"
         self._metadata.collectionVolume = "10"
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] Borges, Jorge Luis & Shakespeare, William - "
-                                   "Titulo [0000] (r1.0 Editor).epub")
+        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
+        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
+        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
+
+        self.assertEqual(fileName,
+                         "[Esta es la saga] [Esta es la serie 10] Borges, Jorge Luis & "
+                         "Shakespeare, William - {0} [{1}] (r1.0 {2}).epub".format(defaultTitle, defaultBookId, defaultEditor))
 
     def test_epub_file_name_when_three_authors_and_subcollection(self):
-        self._metadata.title = "Titulo"
-        self._metadata.editor = "Editor"
-        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
-        self._metadata.authors.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
-        self._metadata.authors.append(ebook_metadata.Person("H. P. Lovecraft", "Lovecraft, H. P."))
+        self._metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._metadata.authors.append(ebook_metadata.Person("bla", "bla"))
         self._metadata.collectionName = "Esta es la saga"
         self._metadata.subCollectionName = "Esta es la serie"
         self._metadata.collectionVolume = "10"
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] AA. VV. - Titulo [0000] (r1.0 Editor).epub")
+        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
+        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
+        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
+
+        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] AA. VV. - {0} [{1}] (r1.0 {2}).epub".format(defaultTitle,
+                                                                                                                        defaultBookId,
+                                                                                                                        defaultEditor))
 
     def test_epub_file_name_bookid(self):
-        self._metadata.title = "Titulo"
-        self._metadata.editor = "Editor"
         self._metadata.authors.append(ebook_metadata.Person("Autor", "Autor"))
         self._metadata.bookId = "1234"
 
         fileName = self._generateEbook()
 
-        self.assertEqual(fileName, "Autor - Titulo [1234] (r1.0 Editor).epub")
+        defaultAuthor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_AUTHOR)
+        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
+        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
+
+        self.assertEqual(fileName, "{0} - {1} [{2}] (r1.0 {3}).epub".format(defaultAuthor, defaultTitle, "1234", defaultEditor))
+
+    def test_epub_file_name_title(self):
+        self._metadata.title = "Este es el título"
+
+        fileName = self._generateEbook()
+
+        defaultAuthor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_AUTHOR)
+        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
+        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
+
+        self.assertEqual(fileName, "{0} - Este es el titulo [{1}] (r1.0 {2}).epub".format(defaultAuthor, defaultBookId, defaultEditor))
+
+    def test_epub_file_name_editor(self):
+        self._metadata.editor = "Este es el editor"
+
+        fileName = self._generateEbook()
+
+        defaultAuthor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_AUTHOR)
+        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
+        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
+
+        self.assertEqual(fileName, "{0} - {1} [{2}] (r1.0 Este es el editor).epub".format(defaultAuthor, defaultTitle, defaultBookId))
+
+    def test_epub_file_name_when_special_characters(self):
+        self._metadata.title = "Títúló dél libro"
+        self._metadata.authors.append(ebook_metadata.Person("bla", "Éste es el áutór"))
+        self._metadata.editor = "Esté es él edítór"
+        self._metadata.collectionName = "Esta es la ságá"
+        self._metadata.subCollectionName = "Éstá es la série"
+        self._metadata.collectionVolume = "10"
+
+        fileName = self._generateEbook()
+
+        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
+
+        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] Este es el autor - "
+                                   "Titulo del libro [{0}] (r1.0 Este es el editor).epub".format(defaultBookId))
 
     def test_cover_image(self):
         self._metadata.coverImage = "cover image"
