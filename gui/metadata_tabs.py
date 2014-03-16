@@ -78,7 +78,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
         return self._coverImageBytes
 
     def _populateCoverModificationOptions(self):
-        for i, option in enumerate(epub_base_misc.CoverModification.getOptions()):
+        for i, option in enumerate(ebook_metadata.Metadata.COVER_MODIFICATION_OPTIONS):
             self.coverModificationInput.addItem(option[0])
             self.coverModificationInput.setItemData(i, option[1], QtCore.Qt.ToolTipRole)
 

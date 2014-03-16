@@ -37,7 +37,7 @@ class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget.Ui_MetadataT
         metadata.bookId = self.basicMetadata.getBookId()
         metadata.subtitle = self.basicMetadata.getSubtitle()
         metadata.synopsis = self.basicMetadata.getSynopsis()
-        metadata.coverDesignOrTweak = self.basicMetadata.getCoverModification()
+        metadata.coverModification = self.basicMetadata.getCoverModification()
         metadata.coverDesigner = self.basicMetadata.getCoverDesigner()
 
         for author in self.basicMetadata.getAuthors():

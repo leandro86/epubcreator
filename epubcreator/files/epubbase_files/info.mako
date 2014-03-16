@@ -27,7 +27,7 @@
               <p>Ilustraciones: ${ilustrator | h}</p>
         % endif
 
-        <p>${coverDesignOrTweak} de cubierta: ${coverDesigner}</p><!-- usar «Diseño» si la cubierta fue creada especialmente para esta edición; «Retoque» si es una adaptación de otra existente -->
+        <p>${coverModification} de cubierta: ${coverDesigner}</p><!-- usar «Diseño» si la cubierta fue creada especialmente para esta edición; «Retoque» si es una adaptación de otra existente -->
 
         <p class="salto10">Editor digital: ${editor}</p><!--<p>Primer editor: Editor1 (r1.0 a 1.x)</p>-->
         <!--<p>Segundo editor: Editor2 (r2.0 a 2.x)</p>-->

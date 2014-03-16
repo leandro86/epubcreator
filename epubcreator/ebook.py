@@ -28,12 +28,12 @@ class _EpubBase:
         template = _EpubBase._files[epubbase_names.TITLE_FILENAME]
         return template.render(author=author, title=title, subtitle=subtitle, editor=editor)
 
-    def getInfo(self, originalTitle, author, publicationYear, translator, ilustrator, coverDesigner, coverDesignOrTweak,
+    def getInfo(self, originalTitle, author, publicationYear, translator, ilustrator, coverDesigner, coverModification,
                 editor):
         template = _EpubBase._files[epubbase_names.INFO_FILENAME]
         return template.render(originalTitle=originalTitle, author=author, publicationYear=publicationYear,
                                translator=translator, ilustrator=ilustrator, coverDesigner=coverDesigner,
-                               coverDesignOrTweak=coverDesignOrTweak, editor=editor)
+                               coverModification=coverModification, editor=editor)
 
     def getDedication(self, dedication):
         template = _EpubBase._files[epubbase_names.DEDICATION_FILENAME]
@@ -156,7 +156,7 @@ class Ebook:
                                                                                      self._metadata.getTranslatorsAsText()[0],
                                                                                      self._metadata.getIlustratorsAsText()[0],
                                                                                      self._metadata.coverDesigner,
-                                                                                     self._metadata.coverDesignOrTweak,
+                                                                                     self._metadata.coverModification,
                                                                                      self._metadata.editor))
         outputEpub.addHtmlData(epubbase_names.DEDICATION_FILENAME, Ebook._epubBase.getDedication(self._metadata.dedication))
 
@@ -317,8 +317,8 @@ class Ebook:
         if not self._metadata.language:
             self._metadata.language = ebook_metadata.Metadata.DEFAULT_LANGUAGE
 
-        if not self._metadata.coverDesignOrTweak:
-            self._metadata.coverDesignOrTweak = "Diseño"
+        if not self._metadata.coverModification:
+            self._metadata.coverModification = ebook_metadata.Metadata.DEFAULT_COVER_MODIFICATION
 
         if not self._metadata.coverDesigner:
             self._metadata.coverDesigner = ebook_metadata.Metadata.DEFAULT_EDITOR

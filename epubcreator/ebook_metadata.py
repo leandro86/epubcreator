@@ -29,6 +29,15 @@ class Metadata:
                                 "Integer eu leo justo, vel sodales arcu. Donec posuere nunc in lectus laoreet a rhoncus enim fermentum. "
                                 "Nunc luctus accumsan ligula eu molestie.")
 
+    DEFAULT_COVER_MODIFICATION = "Diseño"
+    COVER_MODIFICATION_OPTIONS = (("Diseño", "Elija esta opción si se conserva la cubierta original aun con algún ajuste menor de "
+                                             "contraste y color (de la que, eso sí, es obligatorio quitar el logo o cualquier referencia "
+                                             "a la editorial). Debe introducirse el nombre del diseñador de la cubierta. \n"
+                                             "Si la cubierta es una creación original, debe introducirse el alias (o, si él quiere, "
+                                             "el nombre) del creador."),
+                                  ("Retoque", "Elija esta opción si la cubierta original se ha modificado significativamente. Deben "
+                                              "introducirse los nombres del diseñador original y el alias de quien la haya retocado."))
+
     def __init__(self):
         self._publicationDate = None
 
@@ -60,7 +69,7 @@ class Metadata:
         # Una lista de Genre con los géneros
         self.genres = []
 
-        self.coverDesignOrTweak = ""
+        self.coverModification = ""
         self.coverDesigner = ""
         self.language = ""
         self.dedication = ""

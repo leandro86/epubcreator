@@ -464,14 +464,15 @@ class EbookTests(unittest.TestCase):
 
         self.assertFalse(self._outputEpub.getIlustrators())
 
-    def test_default_cover_design_or_tweak_in_info_file(self):
-        self._metadata.coverDesignOrTweak = ""
+    def test_default_cover_modification_in_info_file(self):
+        self._metadata.coverModification = ""
 
         self._generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertTrue(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[2][starts-with(text(), 'Diseño de cubierta')]"))
+        self.assertTrue(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0].
+                        startswith("{0} de cubierta: ".format(ebook_metadata.Metadata.DEFAULT_COVER_MODIFICATION)))
 
     def test_default_cover_designer_in_info_file(self):
         self._metadata.coverDesigner = ""
@@ -482,14 +483,14 @@ class EbookTests(unittest.TestCase):
 
         self.assertTrue(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0].endswith(ebook_metadata.Metadata.DEFAULT_EDITOR))
 
-    def test_cover_design_or_tweak_in_info_file(self):
-        self._metadata.coverDesignOrTweak = "Retoque"
+    def test_cover_modification_in_info_file(self):
+        self._metadata.coverModification = "Retoque"
 
         self._generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertTrue(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[2][starts-with(text(), 'Retoque de cubierta')]"))
+        self.assertTrue(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0].startswith("Retoque de cubierta: "))
 
     def test_cover_designer_in_info_file(self):
         self._metadata.coverDesigner = "Jorge Luis Borges"

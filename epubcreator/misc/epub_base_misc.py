@@ -107,17 +107,3 @@ class Genre:
     @staticmethod
     def getSubGenres(genreType):
         return Genre._TYPES[genreType][1]
-
-
-class CoverModification:
-    _OPTIONS = (("Diseño", "Si se conserva la cubierta original aun con algún ajuste menor de contraste y color \n"
-                           "(de la que, eso sí, es obligatorio quitar el logo o cualquier referencia a la \n"
-                           "editorial). Debe introducirse el nombre del diseñador de la cubierta. \n"
-                           "Si la cubierta es una creación original, debe introducirse el alias \n"
-                           "(o, si él quiere, el nombre) del creador."),
-                ("Retoque", "Si la cubierta original se ha modificado significativamente. Deben introducirse los \n"
-                            "nombres del diseñador original y el alias de quien la haya retocado."))
-
-    @staticmethod
-    def getOptions():
-        return CoverModification._OPTIONS
