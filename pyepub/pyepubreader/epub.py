@@ -20,7 +20,7 @@ class EpubReader:
 
         pathToOpf = self._getPathToOpf()
         # En el directorio donde esté ubicado content.opf, es donde se encuentran
-        # el resto de los archivos
+        # el resto de los archivos.
         self._rootDir = os.path.split(pathToOpf)[0]
         self._opf = opf.Opf(self._epub.read(pathToOpf))
 

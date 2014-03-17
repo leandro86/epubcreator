@@ -90,8 +90,7 @@ class Opf:
         return subject[0] if subject else None
 
     def getPathToToc(self):
-        return self._xpath(self._opf, "/opf:package/opf:manifest/opf:item[@media-type = 'application/x-dtbncx+xml']"
-                                      "/@href")[0]
+        return self._xpath(self._opf, "/opf:package/opf:manifest/opf:item[@media-type = 'application/x-dtbncx+xml']/@href")[0]
 
     def _xpath(self, element, xpath):
         return element.xpath(xpath, namespaces={"opf": Opf.OPF_NS, "dc": Opf.DC_NS})

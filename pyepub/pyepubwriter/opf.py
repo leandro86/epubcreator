@@ -15,8 +15,7 @@ class Opf:
         return etree.tostring(self._generateOpf(), encoding="utf-8", xml_declaration=True, pretty_print=True)
 
     def _generateOpf(self):
-        opf = etree.Element("{{{0}}}package".format(Opf.OPF_NS),
-                            {"unique-identifier": "BookId", "version": "2.0"}, nsmap={None: Opf.OPF_NS})
+        opf = etree.Element("{{{0}}}package".format(Opf.OPF_NS), {"unique-identifier": "BookId", "version": "2.0"}, nsmap={None: Opf.OPF_NS})
 
         opf.append(self.metadata.toElement())
         opf.append(self.manifest.toElement())

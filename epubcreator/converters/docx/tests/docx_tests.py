@@ -100,9 +100,8 @@ class DocxConverterTests(unittest.TestCase):
         self.assertEqual(data.toc.titles[0].text, "Capítulo 1 subrayado.")
         self.assertEqual(data.toc.titles[1].text, "Capítulo 2 en itálica.")
         self.assertEqual(data.toc.titles[2].text, "Capítulo 3 subrayado y en itálica.")
-        self.assertEqual(data.toc.titles[3].text, "Capítulo 4 que combina diferentes estilos. Esta parte está en "
-                                                  "itálica, y esta otra subrayada. Esta parte está en itálica y "
-                                                  "subrayada.")
+        self.assertEqual(data.toc.titles[3].text, "Capítulo 4 que combina diferentes estilos. Esta parte está en itálica, y esta otra "
+                                                  "subrayada. Esta parte está en itálica y subrayada.")
 
     def test_heading_with_footnote(self):
         data = self._getOutput("heading_with_footnote.docx")
@@ -214,8 +213,7 @@ class DocxConverterTests(unittest.TestCase):
 
     def _readExpectedOutput(self, docxTestFileName, fileName):
         testName = os.path.splitext(docxTestFileName)[0]
-        with open(os.path.join(self._pathToTestDataFolder, "{0}_output".format(testName), fileName),
-                  encoding="utf-8") as file:
+        with open(os.path.join(self._pathToTestDataFolder, "{0}_output".format(testName), fileName), encoding="utf-8") as file:
             return file.read()
 
     def _getOutput(self, docxTestFileName, ignoreEmptyParagraphs=True):

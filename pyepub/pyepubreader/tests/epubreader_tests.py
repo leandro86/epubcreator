@@ -14,8 +14,8 @@ class EpubReaderTests(unittest.TestCase):
 
     def test_html_files_play_order(self):
         htmlFileNames = self._epub.getHtmlFileNamesReadingOrder()
-        self.assertEqual(htmlFileNames, ["cubierta.xhtml", "sinopsis.xhtml", "titulo.xhtml", "info.xhtml",
-                                         "dedicatoria.xhtml", "Section0001.xhtml", "autor.xhtml", "notas.xhtml"])
+        self.assertEqual(htmlFileNames, ["cubierta.xhtml", "sinopsis.xhtml", "titulo.xhtml", "info.xhtml", "dedicatoria.xhtml",
+                                         "Section0001.xhtml", "autor.xhtml", "notas.xhtml"])
 
     def test_container_content_read(self):
         self.assertIsNotNone(self._epub.read("META-INF/container.xml"))

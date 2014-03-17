@@ -136,10 +136,8 @@ class EpubWriter:
 
         @return: un string con el contenido de container.xml.
         """
-        container = etree.Element("container",
-                                  {"version": "1.0", "xmlns": "urn:oasis:names:tc:opendocument:xmlns:container"})
+        container = etree.Element("container", {"version": "1.0", "xmlns": "urn:oasis:names:tc:opendocument:xmlns:container"})
         rootFiles = etree.SubElement(container, "rootfiles")
-        etree.SubElement(rootFiles, "rootfile",
-                         {"full-path": "OEBPS/content.opf", "media-type": "application/oebps-package+xml"})
+        etree.SubElement(rootFiles, "rootfile", {"full-path": "OEBPS/content.opf", "media-type": "application/oebps-package+xml"})
 
         return etree.tostring(container, encoding="UTF-8", xml_declaration=True, pretty_print=True)

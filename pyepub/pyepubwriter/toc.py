@@ -24,7 +24,7 @@ class Toc:
     def toXml(self):
         toc = etree.Element("{{{0}}}ncx".format(Toc.TOC_NS), {"version": "2005-1"}, nsmap={None: Toc.TOC_NS})
 
-        # Agrego todos los playorders e ids de los navpoints
+        # Agrego todos los playorders e ids de los navpoints.
         playOrder = 1
         for navPoint in self._navPoints:
             playOrder = self._appendNavPointsPlayOrderAndId(navPoint, playOrder)
@@ -41,10 +41,8 @@ class Toc:
         for navPoint in self._navPoints:
             navMap.append(navPoint.toElement())
 
-        doctypeText = ('<!DOCTYPE ncx PUBLIC "-//NISO//DTD ncx 2005-1//EN" '
-                       '"http://www.daisy.org/z3986/2005/ncx-2005-1.dtd">')
-        return etree.tostring(toc, encoding="utf-8", xml_declaration=True, doctype=doctypeText,
-                              pretty_print=True)
+        doctypeText = '<!DOCTYPE ncx PUBLIC "-//NISO//DTD ncx 2005-1//EN" "http://www.daisy.org/z3986/2005/ncx-2005-1.dtd">'
+        return etree.tostring(toc, encoding="utf-8", xml_declaration=True, doctype=doctypeText, pretty_print=True)
 
     def _appendNavPointsPlayOrderAndId(self, navPoint, startPlayOrder):
         """
@@ -73,7 +71,7 @@ class Toc:
 
 class NavPoint:
     def __init__(self, ref, title):
-        # Una lista de NavPoint con los navpoints hijos
+        # Una lista de NavPoint con los navpoints hijos.
         self.navPoints = []
 
         self.ref = "Text/{0}".format(ref)

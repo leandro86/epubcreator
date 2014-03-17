@@ -14,8 +14,7 @@ class Styles:
 
     def hasParagraphHeadingStyle(self, paragraph):
         styleId = self.getParagraphStyleId(paragraph)
-        return styleId and (self._stylesIdToName[styleId][0].startswith("heading") or
-                            self._stylesIdToName[styleId][0].startswith("Encabezado"))
+        return styleId and (self._stylesIdToName[styleId][0].startswith("heading") or self._stylesIdToName[styleId][0].startswith("Encabezado"))
 
     def getParagraphStyleId(self, paragraph):
         styleId = xml_utils.xpath(paragraph, "w:pPr/w:pStyle/@w:val", utils.NAMESPACES)

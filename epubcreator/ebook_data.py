@@ -5,13 +5,13 @@ from epubcreator import epubbase_names
 
 class EbookData:
     def __init__(self):
-        # Lista de Section
+        # Lista de Section.
         self.sections = []
 
-        # Lista de Image
+        # Lista de Image.
         self.images = []
 
-        # Un objeto Toc
+        # Un objeto Toc.
         self.toc = Toc()
 
     def addSection(self, section):

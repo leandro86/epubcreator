@@ -69,14 +69,11 @@ class EpubWriterTests(unittest.TestCase):
 
         self.assertEqual(len(self._xpath(opf, "/opf:package[@unique-identifier = 'BookId' and @version = '2.0']")), 1)
         self.assertEqual(len(self._xpath(opf, "/opf:package/opf:manifest/opf:item[@href = 'toc.ncx' and "
-                                              "@id = 'ncx' and @media-type = 'application/x-dtbncx+xml']")),
-                         1)
+                                              "@id = 'ncx' and @media-type = 'application/x-dtbncx+xml']")), 1)
         self.assertEqual(len(self._xpath(opf, "/opf:package/opf:manifest/opf:item[@href = 'Text/Section0000.xhtml' and "
-                                              "@id = 'Section0000.xhtml' and @media-type = 'application/xhtml+xml']")),
-                         1)
+                                              "@id = 'Section0000.xhtml' and @media-type = 'application/xhtml+xml']")), 1)
         self.assertEqual(len(self._xpath(opf, "/opf:package/opf:manifest/opf:item[@href = 'Text/Section0001.xhtml' and "
-                                              "@id = 'Section0001.xhtml' and @media-type = 'application/xhtml+xml']")),
-                         1)
+                                              "@id = 'Section0001.xhtml' and @media-type = 'application/xhtml+xml']")), 1)
 
         self.assertEqual(len(self._xpath(opf, "/opf:package/opf:spine[@toc = 'ncx']")), 1)
         self.assertEqual(len(self._xpath(opf, "/opf:package/opf:spine/opf:itemref[@idref = 'Section0000.xhtml']")), 1)
@@ -98,28 +95,21 @@ class EpubWriterTests(unittest.TestCase):
 
         opf = self._getOpf()
 
-        self.assertEqual(
-            len(self._xpath(opf, "/opf:package/opf:metadata/dc:identifier[@id = 'BookId' and @opf:scheme]")), 1)
-        self.assertEqual(self._xpath(opf, "/opf:package/opf:metadata/dc:date[@opf:event = 'modification']/text()"),
-                         [datetime.datetime.now().strftime("%Y-%m-%d")])
-        self.assertEqual(self._xpath(opf, "/opf:package/opf:metadata/dc:date[@opf:event = 'publication']/text()"),
-                         ["2013-05-09"])
-        self.assertEqual(self._xpath(opf, "/opf:package/opf:metadata/dc:title/text()"), ["Título del libro"])
-        self.assertEqual(self._xpath(opf, "/opf:package/opf:metadata/dc:language/text()"), ["es"])
-        self.assertEqual(self._xpath(opf, "/opf:package/opf:metadata/dc:publisher/text()"), ["La editorial"])
-        self.assertEqual(self._xpath(opf, "/opf:package/opf:metadata/dc:description/text()"),
-                         ["Esta es la descripción del ebook."])
+        self.assertEqual(len(self._xpath(opf, "/opf:package/opf:metadata/dc:identifier[@id = 'BookId' and @opf:scheme]")), 1)
+        self.assertEqual(self._xpath(opf, "/opf:package/opf:metadata/dc:date[@opf:event = 'modification']/text()")[0],
+                         datetime.datetime.now().strftime("%Y-%m-%d"))
+        self.assertEqual(self._xpath(opf, "/opf:package/opf:metadata/dc:date[@opf:event = 'publication']/text()")[0], "2013-05-09")
+        self.assertEqual(self._xpath(opf, "/opf:package/opf:metadata/dc:title/text()")[0], "Título del libro")
+        self.assertEqual(self._xpath(opf, "/opf:package/opf:metadata/dc:language/text()")[0], "es")
+        self.assertEqual(self._xpath(opf, "/opf:package/opf:metadata/dc:publisher/text()")[0], "La editorial")
+        self.assertEqual(self._xpath(opf, "/opf:package/opf:metadata/dc:description/text()")[0], "Esta es la descripción del ebook.")
         self.assertEqual(self._xpath(opf, "/opf:package/opf:metadata/dc:contributor[@opf:role = 'trl' and "
-                                          "@opf:file-as = 'Poe, Edgar Allan']/text()"),
-                         ["Edgar Allan Poe"])
+                                          "@opf:file-as = 'Poe, Edgar Allan']/text()")[0], "Edgar Allan Poe")
         self.assertEqual(self._xpath(opf, "/opf:package/opf:metadata/dc:creator[@opf:role = 'aut' and "
-                                          "@opf:file-as = 'Borges, Jorge Luis']/text()"),
-                         ["Jorge Luis Borges"])
+                                          "@opf:file-as = 'Borges, Jorge Luis']/text()")[0], "Jorge Luis Borges")
         self.assertEqual(self._xpath(opf, "/opf:package/opf:metadata/dc:contributor[@opf:role = 'ill' and "
-                                          "@opf:file-as = 'Van Gogh, Vincent']/text()"),
-                         ["Vincent Van Gogh"])
-        self.assertEqual(len(self._xpath(opf, "/opf:package/opf:metadata/opf:meta[@name = 'cover' and "
-                                              "@content = 'cover.jpg']")), 1)
+                                          "@opf:file-as = 'Van Gogh, Vincent']/text()")[0], "Vincent Van Gogh")
+        self.assertEqual(len(self._xpath(opf, "/opf:package/opf:metadata/opf:meta[@name = 'cover' and @content = 'cover.jpg']")), 1)
 
     def test_toc_head_and_metadata(self):
         self._epub.addTitle("Título del libro")
@@ -131,14 +121,12 @@ class EpubWriterTests(unittest.TestCase):
 
         self.assertEqual(len(self._xpath(toc, "/toc:ncx[@version = '2005-1']")), 1)
 
-        opfUid = self._xpath(opf, "/opf:package/opf:metadata/dc:identifier/text()")
-        self.assertEqual(self._xpath(toc, "/toc:ncx/toc:head/toc:meta[@name = 'dtb:uid']/@content"), opfUid)
+        opfUid = self._xpath(opf, "/opf:package/opf:metadata/dc:identifier/text()")[0]
+        self.assertEqual(self._xpath(toc, "/toc:ncx/toc:head/toc:meta[@name = 'dtb:uid']/@content")[0], opfUid)
 
         self.assertEqual(len(self._xpath(toc, "/toc:ncx/toc:head/toc:meta[@name = 'dtb:depth' and @content = '1']")), 1)
-        self.assertEqual(
-            len(self._xpath(toc, "/toc:ncx/toc:head/toc:meta[@name = 'dtb:totalPageCount' and @content = '0']")), 1)
-        self.assertEqual(
-            len(self._xpath(toc, "/toc:ncx/toc:head/toc:meta[@name = 'dtb:maxPageNumber' and @content = '0']")), 1)
+        self.assertEqual(len(self._xpath(toc, "/toc:ncx/toc:head/toc:meta[@name = 'dtb:totalPageCount' and @content = '0']")), 1)
+        self.assertEqual(len(self._xpath(toc, "/toc:ncx/toc:head/toc:meta[@name = 'dtb:maxPageNumber' and @content = '0']")), 1)
 
     def test_toc_nav_points_nested(self):
         nv1 = self._epub.addNavPoint("s1", "t1")
@@ -158,22 +146,19 @@ class EpubWriterTests(unittest.TestCase):
 
         toc = self._getToc()
 
-        self.assertEqual(len(self._xpath(toc, "/toc:ncx/toc:navMap/toc:navPoint[@id = 'navPoint-1' and "
-                                              "@playOrder = '1']")), 1)
+        self.assertEqual(len(self._xpath(toc, "/toc:ncx/toc:navMap/toc:navPoint[@id = 'navPoint-1' and @playOrder = '1']")), 1)
         self.assertEqual(len(self._xpath(toc, "/toc:ncx/toc:navMap/toc:navPoint[@id = 'navPoint-1']"
                                               "/toc:navPoint[@id = 'navPoint-2' and @playOrder = '2']")), 1)
         self.assertEqual(len(self._xpath(toc, "/toc:ncx/toc:navMap/toc:navPoint[@id = 'navPoint-1']"
                                               "/toc:navPoint[@id = 'navPoint-3' and @playOrder = '3']")), 1)
-        self.assertEqual(len(self._xpath(toc, "/toc:ncx/toc:navMap/toc:navPoint[@id = 'navPoint-4' and "
-                                              "@playOrder = '4']")), 1)
+        self.assertEqual(len(self._xpath(toc, "/toc:ncx/toc:navMap/toc:navPoint[@id = 'navPoint-4' and @playOrder = '4']")), 1)
         self.assertEqual(len(self._xpath(toc, "/toc:ncx/toc:navMap/toc:navPoint[@id = 'navPoint-4']"
                                               "/toc:navPoint[@id = 'navPoint-5' and @playOrder = '5']")), 1)
         self.assertEqual(len(self._xpath(toc, "/toc:ncx/toc:navMap//toc:navPoint[@id = 'navPoint-5']"
                                               "/toc:navPoint[@id = 'navPoint-6' and @playOrder = '6']")), 1)
         self.assertEqual(len(self._xpath(toc, "/toc:ncx//toc:navPoint[@id = 'navPoint-6']"
                                               "/toc:navPoint[@id = 'navPoint-7' and @playOrder = '7']")), 1)
-        self.assertEqual(len(self._xpath(toc, "/toc:ncx/toc:navMap/toc:navPoint[@id = 'navPoint-8' and "
-                                              "@playOrder = '8']")), 1)
+        self.assertEqual(len(self._xpath(toc, "/toc:ncx/toc:navMap/toc:navPoint[@id = 'navPoint-8' and @playOrder = '8']")), 1)
         self.assertEqual(len(self._xpath(toc, "/toc:ncx/toc:navMap/toc:navPoint[@id = 'navPoint-8']"
                                               "/toc:navPoint[@id = 'navPoint-9' and @playOrder = '9']")), 1)
         self.assertEqual(len(self._xpath(toc, "/toc:ncx/toc:navMap//toc:navPoint[@id = 'navPoint-9']"
@@ -189,8 +174,8 @@ class EpubWriterTests(unittest.TestCase):
         self._generateEpub()
         opf = self._getOpf()
 
-        self.assertEqual(len(self._xpath(opf, "/opf:package/opf:manifest/opf:item[@href = 'Images/image1.jpg' and"
-                                              " @id = 'image1.jpg' and @media-type = 'image/jpeg']")), 1)
+        self.assertEqual(len(self._xpath(opf, "/opf:package/opf:manifest/opf:item[@href = 'Images/image1.jpg' and "
+                                              "@id = 'image1.jpg' and @media-type = 'image/jpeg']")), 1)
         self.assertEqual(len(self._xpath(opf, "/opf:package/opf:manifest/opf:item[@href = 'Images/image2.jpg' and "
                                               "@id = 'image2.jpg' and @media-type = 'image/jpeg']")), 1)
         self.assertEqual(len(self._xpath(opf, "/opf:package/opf:manifest/opf:item[@href = 'Images/image3.png' and "
@@ -216,8 +201,8 @@ class EpubWriterTests(unittest.TestCase):
         self._generateEpub()
         opf = self._getOpf()
 
-        self.assertEqual(len(self._xpath(opf, "/opf:package/opf:guide/opf:reference[@href = 'Text/cubierta.xhtml' and"
-                                              " @title = 'Cover' and @type = 'cover']")), 1)
+        self.assertEqual(len(self._xpath(opf, "/opf:package/opf:guide/opf:reference[@href = 'Text/cubierta.xhtml' and "
+                                              "@title = 'Cover' and @type = 'cover']")), 1)
 
     def _printToc(self):
         print(self._resultingEpub.read("OEBPS/toc.ncx").decode("utf-8"))

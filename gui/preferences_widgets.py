@@ -63,5 +63,4 @@ class DocxPreferences(PreferencesAbstract, preferences_docx_widget.Ui_DocxPrefer
     def _loadSettings(self):
         settings = settings_store.SettingsStore()
 
-        self.ignoreEmptyParagraphsInput.setCheckState(QtCore.Qt.Checked if settings.docxIgnoreEmptyParagraphs else
-                                                      QtCore.Qt.Unchecked)
+        self.ignoreEmptyParagraphsInput.setCheckState(QtCore.Qt.Checked if settings.docxIgnoreEmptyParagraphs else QtCore.Qt.Unchecked)

@@ -25,7 +25,7 @@ def displayExceptionErrorDialog(exceptionMessage):
     msgBox.setIcon(QtGui.QMessageBox.Critical)
     msgBox.setWindowTitle(version.APP_NAME)
 
-    # Agrego algunos espacios porque sino el diálogo es muy chico...
+    # Agrego algunos espacios porque sino el diálogo es muy chico.
     msgBox.setText("Se ha encontrado un problema desconocido.{0}".format(" " * 30))
 
     msgBox.setInformativeText("Por favor, repórtalo a los desarrolladores.")

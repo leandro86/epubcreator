@@ -25,7 +25,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
         self._populateCoverModificationOptions()
         self._populateLanguages()
 
-        # Por defecto, el combobox del lenguaje muestra "español"
+        # Por defecto, el combobox del lenguaje muestra "español".
         self.languageInput.setCurrentIndex(self.languageInput.findText(language.Language.getLanguageName("es")))
 
         # En el campo id del libro solo pueden ingresar números.
@@ -86,8 +86,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
             self.languageInput.addItem(languageName)
 
     def _changeCoverImage(self):
-        imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen",
-                                                      "L:\\libros\\epubcreator_tests", "Imágenes (*.jpg)")
+        imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen", filter="Imágenes (*.jpg)")
         if imageName:
             with open(imageName, "rb") as file:
                 self._coverImageBytes = file.read()
@@ -101,7 +100,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
         fileAs = self.authorFileAsInput.text().strip()
 
         if name and fileAs:
-            # Compruebo que el nombre del autor no haya sido agregado ya a la lista
+            # Compruebo que el nombre del autor no haya sido agregado ya a la lista.
             for i in range(self.authorsList.count()):
                 if self.authorsList.item(i).data(QtCore.Qt.UserRole).name == name:
                     return
@@ -166,9 +165,9 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
             try:
                 return datetime.datetime.strptime(self.publicationDateInput.text().strip(), "%d-%m-%Y").date()
             except ValueError:
-                raise ValidationException("Fecha de publicación no válida", "El formato de la fecha de publicación "
-                                                                            "debe ser: dd-mm-aaaa. Si no conoce el "
-                                                                            "día o mes exacto, coloque el 1 de enero.",
+                raise ValidationException("Fecha de publicación no válida",
+                                          "El formato de la fecha de publicación debe ser: dd-mm-aaaa. Si no conoce el día o mes exacto, "
+                                          "coloque el 1 de enero.",
                                           self, self.publicationDateInput)
 
     def getTranslators(self):
@@ -313,7 +312,7 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
 
         item = QtGui.QListWidgetItem("{0}, {1}, {2}".format(genreType, genreGenre, genreSubGenre))
 
-        # Compruebo que el género no haya sido agregado ya a la lista
+        # Compruebo que el género no haya sido agregado ya a la lista.
         for i in range(self.genresList.count()):
             if self.genresList.item(i).text() == item.text():
                 return
@@ -326,7 +325,7 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
     def _addPersonToList(self, listWidget, name, fileAs):
         item = QtGui.QListWidgetItem("{0} --> {1}".format(name, fileAs))
 
-        # Compruebo que el nombre de la persona no haya sido agregado ya a la lista
+        # Compruebo que el nombre de la persona no haya sido agregado ya a la lista.
         for i in range(listWidget.count()):
             if listWidget.item(i).data(QtCore.Qt.UserRole).name == name:
                 return
@@ -363,7 +362,7 @@ class AuthorMetadata(QtGui.QWidget, author_metadata_widget.Ui_AuthorMetadata):
         self.setupUi(self)
 
         # Debo guardarme aparte los bytes de la imagen, ya no me sirve a mí obtenerlos desde el QLabel
-        # directamente (mismo problema que con la imagen de portada...)
+        # directamente (mismo problema que con la imagen de portada...).
         self._authorImageBytes = None
 
         self.authorImage.clicked.connect(self._changeAuthorImage)
@@ -383,8 +382,7 @@ class AuthorMetadata(QtGui.QWidget, author_metadata_widget.Ui_AuthorMetadata):
         return self.authorBiographyInput.toPlainText().strip()
 
     def _changeAuthorImage(self):
-        imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen",
-                                                      "L:\\libros\\epubcreator_tests", "Imágenes (*.jpg)")
+        imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen", filter="Imágenes (*.jpg)")
         if imageName:
             with open(imageName, "rb") as file:
                 self._authorImageBytes = file.read()

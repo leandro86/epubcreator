@@ -2,7 +2,6 @@ class Language:
     _languageNameMap = {}
     _languageCodeMap = {}
 
-
     @staticmethod
     def getSortedLanguagesNames():
         Language._loadLanguages()
@@ -11,18 +10,15 @@ class Language:
 
         return languages
 
-
     @staticmethod
     def getLanguageName(code):
         Language._loadLanguages()
         return Language._languageCodeMap[code]
 
-
     @staticmethod
     def getLanguageCode(name):
         Language._loadLanguages()
         return Language._languageNameMap[name]
-
 
     @staticmethod
     def _loadLanguages():

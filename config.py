@@ -3,9 +3,8 @@ import sys
 
 from PyQt4 import QtGui
 
-# Necesito este import para obtener el ícono de la aplicación
+# Necesito este import para obtener el ícono de la aplicación.
 from gui.forms.compiled import epubcreator_rc
-
 
 _isFrozen = getattr(sys, "frozen", False)
 

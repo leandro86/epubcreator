@@ -2,7 +2,7 @@ import os
 import subprocess
 import re
 
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 
 from epubcreator import ebook
 from epubcreator.converters.docx import docx_converter
@@ -171,8 +171,8 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
         isTextMissing = re.sub(r"\s+", "", rawText) != re.sub(r"\s+", "", sectionsText)
 
         if isTextMissing:
-            utils.displayStdErrorDialog("Se ha perdido texto en la conversión. Por favor, repórtalo a los "
-                                        "desarrolladores y adjunta el documento fuente.")
+            utils.displayStdErrorDialog("Se ha perdido texto en la conversión. Por favor, repórtalo a los desarrolladores y adjunta "
+                                        "el documento fuente.")
 
     def _close(self):
         QtGui.qApp.closeAllWindows()

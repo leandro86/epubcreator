@@ -150,23 +150,23 @@ class Metadata:
         self.editor = ""
         self.originalTitle = ""
 
-        # Saga
+        # Saga.
         self.collectionName = ""
-        # Serie
+        # Serie.
         self.subCollectionName = ""
-        # Volumen
+        # Volumen.
         self.collectionVolume = ""
 
-        # Una lista de Person con los autores
+        # Una lista de Person con los autores.
         self.authors = []
 
-        # Una lista de Person con los traductores
+        # Una lista de Person con los traductores.
         self.translators = []
 
-        # Una lista de Person con los ilustradores
+        # Una lista de Person con los ilustradores.
         self.ilustrators = []
 
-        # Una lista de Genre con los géneros
+        # Una lista de Genre con los géneros.
         self.genres = []
 
         self.coverModification = ""

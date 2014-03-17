@@ -1,6 +1,5 @@
 import sys
 import traceback
-import os
 
 from PyQt4 import QtGui, QtCore
 import sip
@@ -17,8 +16,8 @@ def handleUnknownException(exc_type, exc_value, exc_traceback):
 
 
 if __name__ == "__main__":
-    # Cualquier excepción no controlada que ocurra la redirijo a un método propio para manejarla
-    #sys.excepthook = handleUnknownException
+    # Cualquier excepción no controlada que ocurra la redirijo a un método propio para manejarla.
+    sys.excepthook = handleUnknownException
 
     # Necesito llamar a este método porque sino pyqt crashea cuando se cierra python (al menos en windows).
     # No crashea siempre, sino que lo hace bajo alguna circunstancias. Por ejemplo, a mi me crasheaba cuando el form
@@ -35,7 +34,7 @@ if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     app.setWindowIcon(config.getAppIcon())
 
-    # Intento cargar las traducciones a español para todos los diálogos, botones, etc., estándares de Qt
+    # Intento cargar las traducciones a español para todos los diálogos, botones, etc., estándares de Qt.
     locale = QtCore.QLocale.system().name()
     qtTranslator = QtCore.QTranslator()
     if qtTranslator.load(config.QT_SP_TRANSLATION_PATH):

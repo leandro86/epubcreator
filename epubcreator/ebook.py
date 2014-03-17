@@ -1,6 +1,4 @@
 import os
-import datetime
-import re
 
 import mako.template
 from pyepub.pyepubwriter import epub
@@ -22,35 +20,35 @@ class _EpubBase:
 
     def getSynopsis(self, synopsis):
         params = locals()
-        del(params["self"])
+        del (params["self"])
 
         template = _EpubBase._files[epubbase_names.SYNOPSIS_FILENAME]
         return template.render(**params)
 
     def getTitle(self, author, title, subtitle, editor):
         params = locals()
-        del(params["self"])
+        del (params["self"])
 
         template = _EpubBase._files[epubbase_names.TITLE_FILENAME]
         return template.render(**params)
 
     def getInfo(self, originalTitle, author, publicationYear, translator, ilustrator, coverDesigner, coverModification, editor):
         params = locals()
-        del(params["self"])
+        del (params["self"])
 
         template = _EpubBase._files[epubbase_names.INFO_FILENAME]
         return template.render(**params)
 
     def getDedication(self, dedication):
         params = locals()
-        del(params["self"])
+        del (params["self"])
 
         template = _EpubBase._files[epubbase_names.DEDICATION_FILENAME]
         return template.render(**params)
 
     def getAuthor(self, authorBiography):
         params = locals()
-        del(params["self"])
+        del (params["self"])
 
         template = _EpubBase._files[epubbase_names.AUTHOR_FILENAME]
         return template.render(**params)
@@ -105,9 +103,7 @@ class _EpubBase:
                     _EpubBase._files[fileName] = file.read()
             else:
                 newFilePath = filePath.replace(".xhtml", ".mako")
-                _EpubBase._files[fileName] = mako.template.Template(filename=newFilePath,
-                                                                    input_encoding="utf-8",
-                                                                    output_encoding="utf-8")
+                _EpubBase._files[fileName] = mako.template.Template(filename=newFilePath, input_encoding="utf-8", output_encoding="utf-8")
 
 
 class Ebook:
@@ -142,7 +138,7 @@ class Ebook:
 
         epubName = self._getOutputFileName()
 
-        # Compruebo si estoy ante un string (o sea, un directorio) o un objeto file-like
+        # Compruebo si estoy ante un string (o sea, un directorio) o un objeto file-like.
         if isinstance(file, str):
             fileName = os.path.join(file, epubName)
             outputEpub.generate(fileName)
@@ -158,7 +154,7 @@ class Ebook:
         translator = self._getPersonsListAsText(self._metadata.translators)[0]
         ilustrator = self._getPersonsListAsText(self._metadata.ilustrators)[0]
 
-        # Agrego los xhtml requeridos
+        # Agrego los xhtml requeridos.
         outputEpub.addHtmlData(epubbase_names.COVER_FILENAME, Ebook._epubBase.getCover())
         outputEpub.addHtmlData(epubbase_names.SYNOPSIS_FILENAME, Ebook._epubBase.getSynopsis(self._metadata.synopsis))
         outputEpub.addHtmlData(epubbase_names.TITLE_FILENAME, Ebook._epubBase.getTitle(author,
@@ -178,7 +174,7 @@ class Ebook:
         outputEpub.addImageData(epubbase_names.COVER_IMAGE_FILENAME, self._metadata.coverImage)
         outputEpub.addImageData(epubbase_names.AUTHOR_IMAGE_FILENAME, self._metadata.authorImage)
 
-        # Agrego el resto de los archivos del epubbase
+        # Agrego el resto de los archivos del epubbase.
         outputEpub.addImageData(epubbase_names.EPL_LOGO_FILENAME, Ebook._epubBase.getEplLogoImage())
         outputEpub.addImageData(epubbase_names.EX_LIBRIS_FILENAME, Ebook._epubBase.getExLibrisImage())
         outputEpub.addStyleData(epubbase_names.STYLE_FILENAME, Ebook._epubBase.getCss())
@@ -204,10 +200,10 @@ class Ebook:
     def _addMetadata(self, outputEpub):
         author = self._getPersonsListAsText(self._metadata.authors)
 
-        # Agrego semántica a cubierta.xhtml
+        # Agrego semántica a cubierta.xhtml.
         outputEpub.addReference(epubbase_names.COVER_FILENAME, "Cover", "cover")
 
-        # Es necesario agregarle semántica a cover.jpg, sino algunos ereaders no la reconocen como imagen de portada
+        # Es necesario agregarle semántica a cover.jpg, sino algunos ereaders no la reconocen como imagen de portada.
         outputEpub.addCustomMetadata("cover", epubbase_names.COVER_IMAGE_FILENAME)
 
         outputEpub.addTitle(self._metadata.title)
@@ -222,7 +218,7 @@ class Ebook:
         outputEpub.addPublisher("ePubLibre")
 
         if self._metadata.genres:
-            # Ordeno los géneros alfabéticamente...
+            # Ordeno los géneros alfabéticamente.
             sortedGenres = sorted(self._metadata.genres, key=lambda x: (x.genreType, x.genre, x.subGenre))
 
             genres = []
@@ -254,7 +250,7 @@ class Ebook:
             calibreSeries += self._metadata.subCollectionName
 
             try:
-                # Elimino los ceros a la izquierda si se trata de un número
+                # Elimino los ceros a la izquierda si se trata de un número.
                 series_index = str(int(self._metadata.collectionVolume))
             except ValueError:
                 series_index = self._metadata.collectionVolume
@@ -268,10 +264,10 @@ class Ebook:
         
         @param outputEpub: el epub donde está la toc.
         """
-        # La cubierta debe ser la primera entrada en la toc
+        # La cubierta debe ser la primera entrada en la toc.
         outputEpub.addNavPoint(epubbase_names.COVER_FILENAME, "Cubierta")
 
-        # El título del libro debe ser la segunda entrada en la toc
+        # El título del libro debe ser la segunda entrada en la toc.
         outputEpub.addNavPoint(epubbase_names.TITLE_FILENAME, self._metadata.title)
 
         self._ebookData.toc.addFirstLevelTitle(epubbase_names.AUTHOR_FILENAME, "Autor", False)

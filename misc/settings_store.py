@@ -36,6 +36,5 @@ class SettingsStore(QtCore.QSettings):
         self.setValue(SettingsStore._DOCX_IGNORE_EMPTY_PARAGRAPHS_SETTING, value)
 
     def __init__(self):
-        iniPath = os.path.join(QtGui.QDesktopServices.storageLocation(QtGui.QDesktopServices.DataLocation),
-                               "epubcreator.ini")
+        iniPath = os.path.join(QtGui.QDesktopServices.storageLocation(QtGui.QDesktopServices.DataLocation), "epubcreator.ini")
         super().__init__(iniPath, QtCore.QSettings.IniFormat)

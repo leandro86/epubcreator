@@ -10,7 +10,7 @@ class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget.Ui_MetadataT
         super().__init__(parent)
         self.setupUi(self)
 
-        # Contiene un tag 'img' cuyo atributo 'src' es una imagen de un ícono de error
+        # Contiene un tag 'img' cuyo atributo 'src' es una imagen de un ícono de error.
         self._errorImgTag = self._getErrorImgTag()
 
     def getEbookMetadata(self):
@@ -21,9 +21,7 @@ class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget.Ui_MetadataT
         """
         metadata = ebook_metadata.Metadata()
 
-        if (self._populateBasicMetadata(metadata) and
-                self._populateAdditionalMetadata(metadata) and
-                self._populateAuthorMetadata(metadata)):
+        if self._populateBasicMetadata(metadata) and self._populateAdditionalMetadata(metadata) and self._populateAuthorMetadata(metadata):
             return metadata
         else:
             return None
@@ -86,8 +84,7 @@ class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget.Ui_MetadataT
         return isValid
 
     def _showError(self, error, description, tab, widget):
-        toolTipMsg = ('<p>{0} <b> {1}</b></p>'
-                      '<p style="margin-left: 0.5em;">{2}</p>'.format(self._errorImgTag, error, description))
+        toolTipMsg = ('<p>{0} <b> {1}</b></p><p style="margin-left: 0.5em;">{2}</p>'.format(self._errorImgTag, error, description))
         toolTipPos = widget.mapToGlobal(QtCore.QPoint(0, 0))
 
         self.metadataTabManager.setCurrentWidget(tab)

@@ -15,7 +15,7 @@ class DocxConverter(converter_base.AbstractConverter):
     _STYLES_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"
     _FOOTNOTES_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml"
 
-    # De haber imágenes, deben estar en este directorio dentro del docx
+    # De haber imágenes, deben estar en este directorio dentro del docx.
     _MEDIA_FILES_PATH = "word/media"
 
     def __init__(self, inputFile, ignoreEmptyParagraphs=True):
@@ -215,9 +215,7 @@ class DocxConverter(converter_base.AbstractConverter):
                     elif headingLevel == self._titles[-1][1]:
                         self._titles.pop()
 
-                    title, titleId = self._ebookData.toc.addTitleToParent(self._titles[-1][0],
-                                                                          self._currentSection.name,
-                                                                          titleText)
+                    title, titleId = self._ebookData.toc.addTitleToParent(self._titles[-1][0], self._currentSection.name, titleText)
 
                 self._titles.append((title, headingLevel))
 
@@ -386,7 +384,7 @@ class DocxConverter(converter_base.AbstractConverter):
             # Para saber cuántos anidamientos cerrar, solamente tengo que restarle al nivel actual el
             # siguiente (claro que supongo que los anidamientos son válidos...).
             # Si no hay próximo nivel (es decir, se termina la lista), entonces simplemente el nivel
-            # actual me dice cuántos anidamientos debo cerrar
+            # actual me dice cuántos anidamientos debo cerrar.
             iterations = (listLevel - (nextParagraphListLevel if nextParagraphListLevel != -1 else 0))
 
             for i in range(iterations):

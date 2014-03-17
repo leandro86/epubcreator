@@ -1,6 +1,3 @@
-from misc import utils
-
-
 class AbstractConverter:
     def __init__(self, inputFile):
         self._inputFile = inputFile
