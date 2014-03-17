@@ -188,15 +188,6 @@ class Metadata:
         else:
             raise ValueError("Date expected.")
 
-    def getAuthorsAsText(self):
-        return self._getPersonsListAsText(self.authors)
-
-    def getIlustratorsAsText(self):
-        return self._getPersonsListAsText(self.ilustrators)
-
-    def getTranslatorsAsText(self):
-        return self._getPersonsListAsText(self.translators)
-
     @staticmethod
     def convertNameToFileAsFormat(name):
         """
@@ -223,17 +214,6 @@ class Metadata:
             return " ".join(orderedName)
         else:
             return name
-
-    def _getPersonsListAsText(self, persons):
-        """
-        Convierte una lista de Person a texto. Cada Person se concatena con un & (ampersand).
-
-        @param persons: una lista de Person.
-
-        @return: una tupla cuyo primer elemento es un string concatenado con todos los nombres, y el
-                 segundo un string concatenado con todos los file-as.
-        """
-        return " & ".join((p.name for p in persons)), " & ".join((p.fileAs for p in persons))
 
 
 class Person:

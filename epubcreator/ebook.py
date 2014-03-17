@@ -141,20 +141,23 @@ class Ebook:
 
     def _addEpubBaseFiles(self, outputEpub):
         publicationYear = self._metadata.publicationDate.year if self._metadata.publicationDate else ""
-        authors = self._metadata.getAuthorsAsText()[0]
+
+        author = self._getPersonsListAsText(self._metadata.authors)[0]
+        translator = self._getPersonsListAsText(self._metadata.translators)[0]
+        ilustrator = self._getPersonsListAsText(self._metadata.ilustrators)[0]
 
         # Agrego los xhtml requeridos
         outputEpub.addHtmlData(epubbase_names.COVER_FILENAME, Ebook._epubBase.getCover())
         outputEpub.addHtmlData(epubbase_names.SYNOPSIS_FILENAME, Ebook._epubBase.getSynopsis(self._metadata.synopsis))
-        outputEpub.addHtmlData(epubbase_names.TITLE_FILENAME, Ebook._epubBase.getTitle(authors,
+        outputEpub.addHtmlData(epubbase_names.TITLE_FILENAME, Ebook._epubBase.getTitle(author,
                                                                                        self._metadata.title,
                                                                                        self._metadata.subtitle,
                                                                                        self._metadata.editor))
         outputEpub.addHtmlData(epubbase_names.INFO_FILENAME, Ebook._epubBase.getInfo(self._metadata.originalTitle,
-                                                                                     authors,
+                                                                                     author,
                                                                                      publicationYear,
-                                                                                     self._metadata.getTranslatorsAsText()[0],
-                                                                                     self._metadata.getIlustratorsAsText()[0],
+                                                                                     translator,
+                                                                                     ilustrator,
                                                                                      self._metadata.coverDesigner,
                                                                                      self._metadata.coverModification,
                                                                                      self._metadata.editor))
@@ -187,7 +190,7 @@ class Ebook:
             outputEpub.addImageData(image.name, image.content)
 
     def _addMetadata(self, outputEpub):
-        authors = self._metadata.getAuthorsAsText()
+        author = self._getPersonsListAsText(self._metadata.authors)
 
         # Agrego semántica a cubierta.xhtml
         outputEpub.addReference(epubbase_names.COVER_FILENAME, "Cover", "cover")
@@ -196,7 +199,7 @@ class Ebook:
         outputEpub.addCustomMetadata("cover", epubbase_names.COVER_IMAGE_FILENAME)
 
         outputEpub.addTitle(self._metadata.title)
-        outputEpub.addAuthor(authors[0], authors[1])
+        outputEpub.addAuthor(author[0], author[1])
         outputEpub.addLanguage(self._metadata.language)
 
         # En la sinopsis (el campo description) en los metadatos, no puedo tener saltos de línea. Podría directamente
@@ -221,12 +224,12 @@ class Ebook:
             outputEpub.addSubject(", ".join(genres))
 
         if self._metadata.translators:
-            translators = self._metadata.getTranslatorsAsText()
-            outputEpub.addTranslator(translators[0], translators[1])
+            translator = self._getPersonsListAsText(self._metadata.translators)
+            outputEpub.addTranslator(translator[0], translator[1])
 
         if self._metadata.ilustrators:
-            ilustrators = self._metadata.getIlustratorsAsText()
-            outputEpub.addIlustrator(ilustrators[0], ilustrators[1])
+            ilustrator = self._getPersonsListAsText(self._metadata.ilustrators)
+            outputEpub.addIlustrator(ilustrator[0], ilustrator[1])
 
         if self._metadata.publicationDate is not None:
             outputEpub.addPublicationDate(self._metadata.publicationDate)
@@ -336,3 +339,14 @@ class Ebook:
 
         if self._metadata.authorImage is None:
             self._metadata.authorImage = Ebook._epubBase.getAuthorImage()
+
+    def _getPersonsListAsText(self, persons):
+        """
+        Convierte una lista de Person a texto. Cada Person se concatena con un & (ampersand).
+
+        @param persons: una lista de Person.
+
+        @return: una tupla cuyo primer elemento es un string concatenado con todos los nombres, y el
+                 segundo un string concatenado con todos los file-as.
+        """
+        return " & ".join((p.name for p in persons)), " & ".join((p.fileAs for p in persons))
