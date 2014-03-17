@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'additional_metadata_widget.ui'
 #
-# Created: Sun Mar 16 17:21:04 2014
+# Created: Mon Mar 17 15:22:51 2014
 #      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -33,7 +33,19 @@ class Ui_AdditionalMetadata(object):
 "    border-radius: 5px; \n"
 "}"))
         self.gridLayout = QtGui.QGridLayout(AdditionalMetadata)
+        self.gridLayout.setVerticalSpacing(10)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
+        self.label_12 = QtGui.QLabel(AdditionalMetadata)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_12.sizePolicy().hasHeightForWidth())
+        self.label_12.setSizePolicy(sizePolicy)
+        self.label_12.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.label_12.setObjectName(_fromUtf8("label_12"))
+        self.gridLayout.addWidget(self.label_12, 5, 0, 1, 1)
+        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.gridLayout.addItem(spacerItem, 6, 0, 1, 1)
         self.publicationDateInput = QtGui.QLineEdit(AdditionalMetadata)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -51,7 +63,7 @@ class Ui_AdditionalMetadata(object):
         sizePolicy.setHeightForWidth(self.label_6.sizePolicy().hasHeightForWidth())
         self.label_6.setSizePolicy(sizePolicy)
         self.label_6.setObjectName(_fromUtf8("label_6"))
-        self.gridLayout.addWidget(self.label_6, 3, 0, 1, 1)
+        self.gridLayout.addWidget(self.label_6, 4, 0, 1, 1)
         self.label_4 = QtGui.QLabel(AdditionalMetadata)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -60,7 +72,7 @@ class Ui_AdditionalMetadata(object):
         self.label_4.setSizePolicy(sizePolicy)
         self.label_4.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.label_4.setObjectName(_fromUtf8("label_4"))
-        self.gridLayout.addWidget(self.label_4, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.label_4, 2, 0, 1, 1)
         self.label_2 = QtGui.QLabel(AdditionalMetadata)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -92,18 +104,7 @@ class Ui_AdditionalMetadata(object):
         self.label_5.setSizePolicy(sizePolicy)
         self.label_5.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.label_5.setObjectName(_fromUtf8("label_5"))
-        self.gridLayout.addWidget(self.label_5, 2, 0, 1, 1)
-        self.label_12 = QtGui.QLabel(AdditionalMetadata)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.label_12.sizePolicy().hasHeightForWidth())
-        self.label_12.setSizePolicy(sizePolicy)
-        self.label_12.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
-        self.label_12.setObjectName(_fromUtf8("label_12"))
-        self.gridLayout.addWidget(self.label_12, 4, 0, 1, 1)
-        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.gridLayout.addItem(spacerItem, 5, 0, 1, 1)
+        self.gridLayout.addWidget(self.label_5, 3, 0, 1, 1)
         self.groupBox = QtGui.QGroupBox(AdditionalMetadata)
         self.groupBox.setStyleSheet(_fromUtf8(""))
         self.groupBox.setTitle(_fromUtf8(""))
@@ -156,7 +157,7 @@ class Ui_AdditionalMetadata(object):
         self.addTranslatorButton.setIconSize(QtCore.QSize(16, 16))
         self.addTranslatorButton.setObjectName(_fromUtf8("addTranslatorButton"))
         self.gridLayout_2.addWidget(self.addTranslatorButton, 2, 0, 1, 2)
-        self.gridLayout.addWidget(self.groupBox, 1, 1, 1, 3)
+        self.gridLayout.addWidget(self.groupBox, 2, 1, 1, 3)
         self.groupBox_2 = QtGui.QGroupBox(AdditionalMetadata)
         self.groupBox_2.setTitle(_fromUtf8(""))
         self.groupBox_2.setObjectName(_fromUtf8("groupBox_2"))
@@ -194,7 +195,7 @@ class Ui_AdditionalMetadata(object):
         self.addIlustratorButton.setIconSize(QtCore.QSize(16, 16))
         self.addIlustratorButton.setObjectName(_fromUtf8("addIlustratorButton"))
         self.gridLayout_3.addWidget(self.addIlustratorButton, 2, 0, 1, 2)
-        self.gridLayout.addWidget(self.groupBox_2, 2, 1, 1, 3)
+        self.gridLayout.addWidget(self.groupBox_2, 3, 1, 1, 3)
         self.groupBox_3 = QtGui.QGroupBox(AdditionalMetadata)
         self.groupBox_3.setTitle(_fromUtf8(""))
         self.groupBox_3.setObjectName(_fromUtf8("groupBox_3"))
@@ -263,7 +264,7 @@ class Ui_AdditionalMetadata(object):
         self.addGenreButton.setIconSize(QtCore.QSize(16, 16))
         self.addGenreButton.setObjectName(_fromUtf8("addGenreButton"))
         self.gridLayout_4.addWidget(self.addGenreButton, 3, 0, 1, 2)
-        self.gridLayout.addWidget(self.groupBox_3, 3, 1, 1, 3)
+        self.gridLayout.addWidget(self.groupBox_3, 4, 1, 1, 3)
         self.groupBox_4 = QtGui.QGroupBox(AdditionalMetadata)
         self.groupBox_4.setTitle(_fromUtf8(""))
         self.groupBox_4.setObjectName(_fromUtf8("groupBox_4"))
@@ -309,7 +310,14 @@ class Ui_AdditionalMetadata(object):
         self.collectionNameInput = QtGui.QLineEdit(self.groupBox_4)
         self.collectionNameInput.setObjectName(_fromUtf8("collectionNameInput"))
         self.gridLayout_5.addWidget(self.collectionNameInput, 0, 1, 1, 1)
-        self.gridLayout.addWidget(self.groupBox_4, 4, 1, 1, 3)
+        self.gridLayout.addWidget(self.groupBox_4, 5, 1, 1, 3)
+        self.label = QtGui.QLabel(AdditionalMetadata)
+        self.label.setObjectName(_fromUtf8("label"))
+        self.gridLayout.addWidget(self.label, 1, 0, 1, 1)
+        self.dedicationInput = QtGui.QPlainTextEdit(AdditionalMetadata)
+        self.dedicationInput.setMaximumSize(QtCore.QSize(16777215, 80))
+        self.dedicationInput.setObjectName(_fromUtf8("dedicationInput"))
+        self.gridLayout.addWidget(self.dedicationInput, 1, 1, 1, 3)
 
         self.retranslateUi(AdditionalMetadata)
         QtCore.QMetaObject.connectSlotsByName(AdditionalMetadata)
@@ -333,13 +341,13 @@ class Ui_AdditionalMetadata(object):
 
     def retranslateUi(self, AdditionalMetadata):
         AdditionalMetadata.setWindowTitle(_translate("AdditionalMetadata", "Form", None))
+        self.label_12.setText(_translate("AdditionalMetadata", "Colección", None))
         self.publicationDateInput.setInputMask(_translate("AdditionalMetadata", "00-00-0000; ", None))
         self.label_6.setText(_translate("AdditionalMetadata", "Géneros", None))
         self.label_4.setText(_translate("AdditionalMetadata", "Traductores", None))
         self.label_2.setText(_translate("AdditionalMetadata", "Título original", None))
         self.label_3.setText(_translate("AdditionalMetadata", "Fecha de publicación", None))
         self.label_5.setText(_translate("AdditionalMetadata", "Ilustradores", None))
-        self.label_12.setText(_translate("AdditionalMetadata", "Colección", None))
         self.label_8.setText(_translate("AdditionalMetadata", "Nombre", None))
         self.label_7.setText(_translate("AdditionalMetadata", "Mostrar como", None))
         self.addTranslatorButton.setText(_translate("AdditionalMetadata", "Agregar Traductor", None))
@@ -353,6 +361,7 @@ class Ui_AdditionalMetadata(object):
         self.label_13.setText(_translate("AdditionalMetadata", "Serie", None))
         self.label_16.setText(_translate("AdditionalMetadata", "Volumen", None))
         self.label_18.setText(_translate("AdditionalMetadata", "Saga", None))
+        self.label.setText(_translate("AdditionalMetadata", "Dedicatoria", None))
 
 from gui.custom_widgets import ExtendedQListWidget
 from . import additional_metadata_widget_rc

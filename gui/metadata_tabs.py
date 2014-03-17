@@ -170,6 +170,9 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
                                           "coloque el 1 de enero.",
                                           self, self.publicationDateInput)
 
+    def getDedication(self):
+        return self.dedicationInput.toPlainText().strip()
+
     def getTranslators(self):
         """
         Retorna los traductores ingresados por el usuario.
@@ -366,9 +369,6 @@ class AuthorMetadata(QtGui.QWidget, author_metadata_widget.Ui_AuthorMetadata):
         self._authorImageBytes = None
 
         self.authorImage.clicked.connect(self._changeAuthorImage)
-
-    def getDedication(self):
-        return self.authorDedicationInput.toPlainText().strip()
 
     def getImage(self):
         """

@@ -46,6 +46,7 @@ class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget.Ui_MetadataT
     def _populateAdditionalMetadata(self, metadata):
         isValid = True
 
+        metadata.dedication = self.additionalMetadata.getDedication()
         metadata.originalTitle = self.additionalMetadata.getOriginalTitle()
 
         try:
@@ -77,7 +78,6 @@ class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget.Ui_MetadataT
     def _populateAuthorMetadata(self, metadata):
         isValid = True
 
-        metadata.dedication = self.authorMetadata.getDedication()
         metadata.authorImage = self.authorMetadata.getImage()
         metadata.authorBiography = self.authorMetadata.getBiography()
 
