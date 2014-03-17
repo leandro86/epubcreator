@@ -10,7 +10,7 @@ AUTHOR_IMAGE_FILENAME = "autor.jpg"
 EPL_LOGO_FILENAME = "EPL_logo.png"
 EX_LIBRIS_FILENAME = "ex_libris.png"
 STYLE_FILENAME = "style.css"
-IBOOKS_EMBEDDED_FONTS_FILENAME = "com.apple.ibooks.display-options.xml"
+IBOOKS_DISPLAY_OPTIONS_FILE_NAME = "com.apple.ibooks.display-options.xml"
 
 
 def generateTextSectionName(sectionNumber):

@@ -70,8 +70,8 @@ class _EpubBase:
     def getAuthorImage(self):
         return _EpubBase._files[epubbase_names.AUTHOR_IMAGE_FILENAME]
 
-    def getIBooksEmbeddedFontsFile(self):
-        return _EpubBase._files[epubbase_names.IBOOKS_EMBEDDED_FONTS_FILENAME]
+    def getIBooksDisplayOptionsFile(self):
+        return _EpubBase._files[epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME]
 
     @staticmethod
     def _loadEpubBaseFiles(epubBaseFilesDirPath):
@@ -86,7 +86,7 @@ class _EpubBase:
                      epubbase_names.STYLE_FILENAME,
                      epubbase_names.SYNOPSIS_FILENAME,
                      epubbase_names.TITLE_FILENAME,
-                     epubbase_names.IBOOKS_EMBEDDED_FONTS_FILENAME)
+                     epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME)
 
         for fileName in fileNames:
             filePath = os.path.join(epubBaseFilesDirPath, fileName)
@@ -95,7 +95,7 @@ class _EpubBase:
             # para abrirlos.
             textFiles = (epubbase_names.COVER_FILENAME,
                          epubbase_names.STYLE_FILENAME,
-                         epubbase_names.IBOOKS_EMBEDDED_FONTS_FILENAME)
+                         epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME)
 
             if fileName.endswith(".png") or fileName.endswith(".jpg"):
                 with open(filePath, "rb") as file:
@@ -182,7 +182,7 @@ class Ebook:
         outputEpub.addImageData(epubbase_names.EPL_LOGO_FILENAME, Ebook._epubBase.getEplLogoImage())
         outputEpub.addImageData(epubbase_names.EX_LIBRIS_FILENAME, Ebook._epubBase.getExLibrisImage())
         outputEpub.addStyleData(epubbase_names.STYLE_FILENAME, Ebook._epubBase.getCss())
-        outputEpub.addMetaFile(epubbase_names.IBOOKS_EMBEDDED_FONTS_FILENAME, Ebook._epubBase.getIBooksEmbeddedFontsFile())
+        outputEpub.addMetaFile(epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME, Ebook._epubBase.getIBooksDisplayOptionsFile())
 
     def _addSections(self, outputEpub):
         for section in self._ebookData.sections[:-1] if self._hasEbookNotes else self._ebookData.sections:

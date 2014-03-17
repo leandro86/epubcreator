@@ -44,10 +44,10 @@ class EbookTests(unittest.TestCase):
 
         self.assertTrue(self._outputEpub.hasFile(epubbase_names.STYLE_FILENAME))
 
-    def test_ibooks_fonts_file_exists(self):
+    def test_ibooks_display_options_file_exists(self):
         self._generateEbook()
 
-        self.assertTrue(self._outputEpub.hasFile(epubbase_names.IBOOKS_EMBEDDED_FONTS_FILENAME))
+        self.assertTrue(self._outputEpub.hasFile(epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME))
 
     def test_default_synopsis_text_in_synopsis_file(self):
         self._metadata.synopsis = ""
