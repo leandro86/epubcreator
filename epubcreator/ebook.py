@@ -187,17 +187,6 @@ class Ebook:
             outputEpub.addImageData(image.name, image.content)
 
     def _addMetadata(self, outputEpub):
-        # Ordeno los géneros alfabéticamente...
-        self._metadata.genres.sort(key=lambda x: (x.genreType, x.genre, x.subGenre))
-
-        genres = []
-        previousGenre = ""
-        for genre in self._metadata.genres:
-            if genre.genre != previousGenre:
-                genres.append(genre.genre)
-                previousGenre = genre.genre
-            genres.append(genre.subGenre)
-
         authors = self._metadata.getAuthorsAsText()
 
         # Agrego semántica a cubierta.xhtml
@@ -216,7 +205,20 @@ class Ebook:
         outputEpub.addDescription(utils.removeTags(self._metadata.synopsis.replace("\n", " ")))
 
         outputEpub.addPublisher("ePubLibre")
-        outputEpub.addSubject(", ".join(genres))
+
+        if self._metadata.genres:
+            # Ordeno los géneros alfabéticamente...
+            sortedGenres = sorted(self._metadata.genres, key=lambda x: (x.genreType, x.genre, x.subGenre))
+
+            genres = []
+            previousGenre = ""
+            for genre in sortedGenres:
+                if genre.genre != previousGenre:
+                    genres.append(genre.genre)
+                    previousGenre = genre.genre
+                genres.append(genre.subGenre)
+
+            outputEpub.addSubject(", ".join(genres))
 
         if self._metadata.translators:
             translators = self._metadata.getTranslatorsAsText()
