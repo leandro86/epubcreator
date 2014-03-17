@@ -21,27 +21,39 @@ class _EpubBase:
         return _EpubBase._files[epubbase_names.COVER_FILENAME]
 
     def getSynopsis(self, synopsis):
+        params = locals()
+        del(params["self"])
+
         template = _EpubBase._files[epubbase_names.SYNOPSIS_FILENAME]
-        return template.render(synopsis=synopsis)
+        return template.render(**params)
 
     def getTitle(self, author, title, subtitle, editor):
-        template = _EpubBase._files[epubbase_names.TITLE_FILENAME]
-        return template.render(author=author, title=title, subtitle=subtitle, editor=editor)
+        params = locals()
+        del(params["self"])
 
-    def getInfo(self, originalTitle, author, publicationYear, translator, ilustrator, coverDesigner, coverModification,
-                editor):
+        template = _EpubBase._files[epubbase_names.TITLE_FILENAME]
+        return template.render(**params)
+
+    def getInfo(self, originalTitle, author, publicationYear, translator, ilustrator, coverDesigner, coverModification, editor):
+        params = locals()
+        del(params["self"])
+
         template = _EpubBase._files[epubbase_names.INFO_FILENAME]
-        return template.render(originalTitle=originalTitle, author=author, publicationYear=publicationYear,
-                               translator=translator, ilustrator=ilustrator, coverDesigner=coverDesigner,
-                               coverModification=coverModification, editor=editor)
+        return template.render(**params)
 
     def getDedication(self, dedication):
+        params = locals()
+        del(params["self"])
+
         template = _EpubBase._files[epubbase_names.DEDICATION_FILENAME]
-        return template.render(dedication=dedication)
+        return template.render(**params)
 
     def getAuthor(self, authorBiography):
+        params = locals()
+        del(params["self"])
+
         template = _EpubBase._files[epubbase_names.AUTHOR_FILENAME]
-        return template.render(authorBiography=authorBiography)
+        return template.render(**params)
 
     def getEplLogoImage(self):
         return _EpubBase._files[epubbase_names.EPL_LOGO_FILENAME]
