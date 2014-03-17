@@ -47,7 +47,7 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
             self._workingFilePath = fileName
             self.setWindowTitle("{0} - {1}".format(os.path.split(fileName)[-1], version.APP_NAME))
             self._lastFolderOpen = os.path.dirname(fileName)
-            self._showMessageOnStatusBar("Trabajando con: {0}.".format(fileName), 5000)
+            self._showMessageOnStatusBar("Archivo abierto.", 5000)
 
     def _generateEpub(self):
         self._showMessageOnStatusBar("Generando ePub...")
