@@ -242,13 +242,19 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="2">
+      <item row="2" column="0" colspan="2" alignment="Qt::AlignHCenter">
        <widget class="QPushButton" name="addTranslatorButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>0</height>
+         </size>
         </property>
         <property name="text">
          <string>Agregar Traductor</string>
@@ -313,13 +319,19 @@
       <item row="1" column="1">
        <widget class="QLineEdit" name="ilustratorFileAsInput"/>
       </item>
-      <item row="2" column="0" colspan="2">
+      <item row="2" column="0" colspan="2" alignment="Qt::AlignHCenter">
        <widget class="QPushButton" name="addIlustratorButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>0</height>
+         </size>
         </property>
         <property name="text">
          <string>Agregar Ilustrador</string>
@@ -427,13 +439,19 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="2">
+      <item row="3" column="0" colspan="2" alignment="Qt::AlignHCenter">
        <widget class="QPushButton" name="addGenreButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>0</height>
+         </size>
         </property>
         <property name="text">
          <string>Agregar Género</string>
@@ -559,19 +577,17 @@
  <tabstops>
   <tabstop>originalTitleInput</tabstop>
   <tabstop>publicationDateInput</tabstop>
+  <tabstop>dedicationInput</tabstop>
   <tabstop>translatorInput</tabstop>
   <tabstop>translatorFileAsInput</tabstop>
   <tabstop>addTranslatorButton</tabstop>
-  <tabstop>translatorsList</tabstop>
   <tabstop>ilustratorInput</tabstop>
   <tabstop>ilustratorFileAsInput</tabstop>
   <tabstop>addIlustratorButton</tabstop>
-  <tabstop>ilustratorsList</tabstop>
   <tabstop>genreTypeInput</tabstop>
   <tabstop>genreGenreInput</tabstop>
   <tabstop>genreSubGenreInput</tabstop>
   <tabstop>addGenreButton</tabstop>
-  <tabstop>genresList</tabstop>
   <tabstop>collectionNameInput</tabstop>
   <tabstop>subCollectionNameInput</tabstop>
   <tabstop>collectionVolumeInput</tabstop>

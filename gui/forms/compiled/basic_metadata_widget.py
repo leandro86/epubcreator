@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'basic_metadata_widget.ui'
 #
-# Created: Sun Mar 16 17:19:42 2014
+# Created: Mon Mar 17 16:13:46 2014
 #      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -120,12 +120,13 @@ class Ui_BasicMetadata(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.addAuthorButton.sizePolicy().hasHeightForWidth())
         self.addAuthorButton.setSizePolicy(sizePolicy)
+        self.addAuthorButton.setMinimumSize(QtCore.QSize(150, 0))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/basic_metadata_widget/resources/images/add_16x16.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.addAuthorButton.setIcon(icon)
         self.addAuthorButton.setIconSize(QtCore.QSize(16, 16))
         self.addAuthorButton.setObjectName(_fromUtf8("addAuthorButton"))
-        self.gridLayout_3.addWidget(self.addAuthorButton, 2, 0, 1, 2)
+        self.gridLayout_3.addWidget(self.addAuthorButton, 2, 0, 1, 2, QtCore.Qt.AlignHCenter)
         self.authorsList = ExtendedQListWidget(self.groupBox)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -266,5 +267,5 @@ class Ui_BasicMetadata(object):
         self.label_7.setText(_translate("BasicMetadata", "Idioma", None))
         self.label_8.setText(_translate("BasicMetadata", "ID", None))
 
-from gui.custom_widgets import ExtendedQListWidget, ExtendedQLabel
+from gui.custom_widgets import ExtendedQLabel, ExtendedQListWidget
 from . import basic_metadata_widget_rc
