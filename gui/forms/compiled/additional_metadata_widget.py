@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'additional_metadata_widget.ui'
 #
-# Created: Mon Mar 17 16:16:29 2014
+# Created: Mon Mar 17 16:20:15 2014
 #      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -33,7 +33,6 @@ class Ui_AdditionalMetadata(object):
 "    border-radius: 5px; \n"
 "}"))
         self.gridLayout = QtGui.QGridLayout(AdditionalMetadata)
-        self.gridLayout.setVerticalSpacing(10)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.label_12 = QtGui.QLabel(AdditionalMetadata)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
