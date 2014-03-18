@@ -9,7 +9,9 @@
 </head><!-- este documento es opcional, debe eliminarse de ser innecesario junto con el documento autor.jpg de la carpeta de imágenes -->
 
 <body>
-    <h1 class="oculto" title="Autor"></h1><!-- puede cambiarse a «Autora» o «Autores» de ser necesario -->
+    % if title:
+          <h1 class="oculto" title="${title}"></h1><!-- puede cambiarse a «Autora» o «Autores» de ser necesario -->
+    % endif
 
     <div class="vineta"><img alt="" height="40%" src="../Images/autor.jpg" /></div><!-- atención: por compatibilidad, este archivo de imagen no debe exceder los 600px de ancho ni haber sido guardado como jpeg «progresivo» -->
 

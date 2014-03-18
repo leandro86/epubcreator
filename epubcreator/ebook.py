@@ -46,7 +46,7 @@ class _EpubBase:
         template = _EpubBase._files[epubbase_names.DEDICATION_FILENAME]
         return template.render(**params)
 
-    def getAuthor(self, authorBiography):
+    def getAuthor(self, authorBiography, title):
         params = locals()
         del (params["self"])
 
@@ -112,7 +112,10 @@ class Ebook:
     def __init__(self, ebookData, metadata=None):
         self._ebookData = ebookData or ebook_data.EbookData()
         self._metadata = metadata or ebook_metadata.Metadata()
-        self._hasEbookNotes = self._ebookData.sections and type(self._ebookData.sections[-1]) == ebook_data.NotesSection
+
+        # Guardo una referencia a la sección de notas, si la hay, para facilitarme luego alguas comprobaciones.
+        self._notesSection = self._ebookData.sections[-1] if (self._ebookData.sections and
+                                                              type(self._ebookData.sections[-1]) == ebook_data.NotesSection) else None
 
         # Hay algunos datos que indefectiblemente deben estar en el epub, por más
         # que el usuario no los haya especificado.
@@ -154,7 +157,7 @@ class Ebook:
         translator = self._getPersonsListAsText(self._metadata.translators)[0]
         ilustrator = self._getPersonsListAsText(self._metadata.ilustrators)[0]
 
-        # Agrego los xhtml requeridos.
+        # Agrego los xhtml requeridos, excepto autor.xhtml, que debe ir despúes de las secciones.
         outputEpub.addHtmlData(epubbase_names.COVER_FILENAME, Ebook._epubBase.getCover())
         outputEpub.addHtmlData(epubbase_names.SYNOPSIS_FILENAME, Ebook._epubBase.getSynopsis(self._metadata.synopsis))
         outputEpub.addHtmlData(epubbase_names.TITLE_FILENAME, Ebook._epubBase.getTitle(author,
@@ -172,7 +175,10 @@ class Ebook:
         outputEpub.addHtmlData(epubbase_names.DEDICATION_FILENAME, Ebook._epubBase.getDedication(self._metadata.dedication))
 
         outputEpub.addImageData(epubbase_names.COVER_IMAGE_FILENAME, self._metadata.coverImage)
-        outputEpub.addImageData(epubbase_names.AUTHOR_IMAGE_FILENAME, self._metadata.authorImage)
+
+        authorsWithBiographyOrImage = (a for a in self._metadata.authors if a.biography or a.image)
+        for i, author in enumerate(authorsWithBiographyOrImage):
+            outputEpub.addImageData(epubbase_names.generateAuthorImageFileName(i), author.image)
 
         # Agrego el resto de los archivos del epubbase.
         outputEpub.addImageData(epubbase_names.EPL_LOGO_FILENAME, Ebook._epubBase.getEplLogoImage())
@@ -181,17 +187,17 @@ class Ebook:
         outputEpub.addMetaFile(epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME, Ebook._epubBase.getIBooksDisplayOptionsFile())
 
     def _addSections(self, outputEpub):
-        for section in self._ebookData.sections[:-1] if self._hasEbookNotes else self._ebookData.sections:
+        for section in self._ebookData.sections[:-1] if self._notesSection else self._ebookData.sections:
             outputEpub.addHtmlData(section.name, section.toHtml())
 
-        authorContent = Ebook._epubBase.getAuthor(self._metadata.authorBiography)
+        authorsWithBiographyOrImage = (a for a in self._metadata.authors if a.biography or a.image)
+        for i, author in enumerate(authorsWithBiographyOrImage):
+            title = self._getTocTitleForAuthorFile() if i == 0 else None
+            authorContent = Ebook._epubBase.getAuthor(author.biography, title)
+            outputEpub.addHtmlData(epubbase_names.generateAuthorFileName(i), authorContent)
 
-        if self._hasEbookNotes:
-            notesSection = self._ebookData.sections[-1]
-            outputEpub.addHtmlData(epubbase_names.AUTHOR_FILENAME, authorContent)
-            outputEpub.addHtmlData(notesSection.name, notesSection.toHtml())
-        else:
-            outputEpub.addHtmlData(epubbase_names.AUTHOR_FILENAME, authorContent)
+        if self._notesSection:
+            outputEpub.addHtmlData(self._notesSection.name, self._notesSection.toHtml())
 
     def _addImages(self, outputEpub):
         for image in self._ebookData.images:
@@ -270,9 +276,9 @@ class Ebook:
         # El título del libro debe ser la segunda entrada en la toc.
         outputEpub.addNavPoint(epubbase_names.TITLE_FILENAME, self._metadata.title)
 
-        self._ebookData.toc.addFirstLevelTitle(epubbase_names.AUTHOR_FILENAME, "Autor", False)
+        self._ebookData.toc.addFirstLevelTitle(epubbase_names.AUTHOR_FILENAME, self._getTocTitleForAuthorFile(), False)
 
-        if self._hasEbookNotes:
+        if self._notesSection:
             self._ebookData.toc.addFirstLevelTitle(epubbase_names.NOTES_FILENAME, "Notas", False)
 
         def addTitlesToToc(navPoint, titles):
@@ -339,14 +345,34 @@ class Ebook:
         if not self._metadata.dedication:
             self._metadata.dedication = ebook_metadata.Metadata.DEFAULT_DEDICATION
 
-        if not self._metadata.authorBiography:
-            self._metadata.authorBiography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
-
-        if self._metadata.coverImage is None:
+        if not self._metadata.coverImage:
             self._metadata.coverImage = Ebook._epubBase.getCoverImage()
 
-        if self._metadata.authorImage is None:
-            self._metadata.authorImage = Ebook._epubBase.getAuthorImage()
+        # Por ahora siempre dejo un autor por defecto, a pesar de que en los metadatos no se haya especificado
+        # ninguno.
+        if not self._metadata.authors:
+            self._metadata.authors.append(ebook_metadata.Person(ebook_metadata.Metadata.DEFAULT_AUTHOR,
+                                                                ebook_metadata.Metadata.DEFAULT_AUTHOR,
+                                                                Ebook._epubBase.getAuthorImage(),
+                                                                ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY))
+        else:
+            # El primer autor siempre tiene su correspondiente xhtml e imagen.
+            firstAuthor = self._metadata.authors[0]
+
+            if not firstAuthor.biography:
+                firstAuthor.biography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
+
+            if not firstAuthor.image:
+                firstAuthor.image = Ebook._epubBase.getAuthorImage()
+
+            # Para el resto de los autores, solo les genero xhtml e imagen si en los metadatos
+            # viene especificado alguno de esos dos campos.
+            for author in self._metadata.authors[1:]:
+                if author.biography and not author.image:
+                    author.image = Ebook._epubBase.getAuthorImage()
+
+                if author.image and not author.biography:
+                    author.biography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
 
     def _getPersonsListAsText(self, persons):
         """
@@ -358,3 +384,11 @@ class Ebook:
                  segundo un string concatenado con todos los file-as.
         """
         return " & ".join((p.name for p in persons)), " & ".join((p.fileAs for p in persons))
+
+    def _getTocTitleForAuthorFile(self):
+        authors = self._metadata.authors
+
+        if not authors or (len(authors) == 1 and authors[0].gender == ebook_metadata.Person.MALE_GENDER):
+            return "Autor"
+        else:
+            return "Autores" if len(authors) > 1 else "Autora"

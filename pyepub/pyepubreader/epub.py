@@ -36,8 +36,11 @@ class EpubReader:
         """
         return self._opf.getSpineItems()
 
+    def getNamelist(self):
+        return [os.path.split(f)[1] for f in self._epub.namelist()]
+
     def hasFile(self, fileName):
-        return any("/" + fileName in x for x in self._epub.namelist())
+        return any(fileName in x for x in self.getNamelist())
 
     def getFullPathToFile(self, fileName):
         return next((f for f in self._epub.namelist() if f.endswith("/" + fileName)), None)

@@ -146,7 +146,6 @@ class Metadata:
         self.bookId = ""
 
         self.subtitle = ""
-        self.authorBiography = ""
         self.editor = ""
         self.originalTitle = ""
 
@@ -174,7 +173,6 @@ class Metadata:
         self.language = ""
         self.dedication = ""
         self.coverImage = None
-        self.authorImage = None
 
     # Un date con la fecha de publicación en el idioma original.
     @property
@@ -217,9 +215,15 @@ class Metadata:
 
 
 class Person:
-    def __init__(self, name, fileAs):
+    MALE_GENDER = 0
+    FEMALE_GENDER = 1
+
+    def __init__(self, name, fileAs, gender=MALE_GENDER, image=None, biography=None):
         self.name = name
         self.fileAs = fileAs
+        self.gender = gender
+        self.image = image
+        self.biography = biography
 
 
 class Genre:

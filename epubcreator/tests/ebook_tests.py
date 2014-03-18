@@ -1,997 +1,1215 @@
 import unittest
 import tempfile
 import datetime
-import re
 
 from lxml import etree
 from pyepub.pyepubreader import epub
 
-from epubcreator import ebook, ebook_data, ebook_metadata, epubbase_names
-from epubcreator.misc import utils
+from epubcreator import ebook, ebook_data, ebook_metadata
 
 
-class EbookTests(unittest.TestCase):
-    _NAMESPACES = {"x": "http://www.w3.org/1999/xhtml"}
+class SynopsisTests(unittest.TestCase):
+    _DEFAULT_SYNOPSIS = ("Yo por bien tengo que cosas tan señaladas, y por ventura nunca oídas ni vistas, vengan a noticia de muchos y no se "
+                         "entierren en la sepultura del olvido, pues podría ser que alguno que las lea halle algo que le agrade, y a los que "
+                         "no ahondaren tanto los deleite."
+                         "Y a este propósito dice Plinio que no hay libro, por malo que sea, que no tenga alguna cosa buena; mayormente que "
+                         "los gustos no son todos unos, mas lo que uno no come, otro se pierde por ello. LÁZARO DE TORMES.")
 
     def setUp(self):
-        self._outputFile = tempfile.TemporaryFile()
-        self._metadata = ebook_metadata.Metadata()
-        self._outputEpub = None
+        self._common = Common()
 
     def tearDown(self):
-        self._outputFile.close()
+        self._common.release()
 
-        if self._outputEpub:
-            self._outputEpub.close()
+    def test_synopsis_file_exists(self):
+        self._common.metadata.synopsis = ""
 
-    def test_required_xhtml_files_exist(self):
-        self._generateEbook()
+        self._common.generateEbook()
 
-        self.assertTrue(self._outputEpub.hasFile(epubbase_names.COVER_FILENAME))
-        self.assertTrue(self._outputEpub.hasFile(epubbase_names.SYNOPSIS_FILENAME))
-        self.assertTrue(self._outputEpub.hasFile(epubbase_names.TITLE_FILENAME))
-        self.assertTrue(self._outputEpub.hasFile(epubbase_names.INFO_FILENAME))
-
-    def test_required_images_exist(self):
-        self._generateEbook()
-
-        self.assertTrue(self._outputEpub.hasFile(epubbase_names.COVER_FILENAME))
-        self.assertTrue(self._outputEpub.hasFile(epubbase_names.EPL_LOGO_FILENAME))
-        self.assertTrue(self._outputEpub.hasFile(epubbase_names.EX_LIBRIS_FILENAME))
-
-    def test_css_file_exists(self):
-        self._generateEbook()
-
-        self.assertTrue(self._outputEpub.hasFile(epubbase_names.STYLE_FILENAME))
-
-    def test_ibooks_display_options_file_exists(self):
-        self._generateEbook()
-
-        self.assertTrue(self._outputEpub.hasFile(epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME))
+        self.assertTrue(self._common.outputEpub.hasFile("sinopsis.xhtml"))
 
     def test_default_synopsis_text_in_synopsis_file(self):
-        self._metadata.synopsis = ""
+        self._common.metadata.synopsis = ""
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         synopsis = self._getSynopsisFile()
 
-        self.assertEqual(self._xpath(synopsis, "count(//x:p)"), 2)
+        self.assertEqual(self._common.xpath(synopsis, "count(//x:p)"), 2)
 
-        gotSynopsis = "".join(self._xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[1][@class = 'salto10']//text()"))
-        gotSynopsis += "".join(self._xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[2]//text()"))
+        gotSynopsis = "".join(self._common.xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[1][@class = 'salto10']//text()"))
+        gotSynopsis += "".join(self._common.xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[2]//text()"))
 
-        wantSynopsis = utils.removeTags(ebook_metadata.Metadata.DEFAULT_SYNOPSIS)
-
-        self.assertEqual(gotSynopsis, wantSynopsis.replace("\n", ""))
+        self.assertEqual(gotSynopsis, SynopsisTests._DEFAULT_SYNOPSIS)
 
     def test_synopsis_text_in_synopsis_file(self):
-        self._metadata.synopsis = "Párrafo 1.\nPárrafo 2.\nPárrafo 3."
+        self._common.metadata.synopsis = "Párrafo 1.\nPárrafo 2.\nPárrafo 3."
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         synopsis = self._getSynopsisFile()
 
-        self.assertEqual(self._xpath(synopsis, "count(//x:p)"), 3)
+        self.assertEqual(self._common.xpath(synopsis, "count(//x:p)"), 3)
 
-        self.assertEqual(self._xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[1][@class = 'salto10']/text()")[0], "Párrafo 1.")
-        self.assertEqual(self._xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[2]/text()")[0], "Párrafo 2.")
-        self.assertEqual(self._xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[3]/text()")[0], "Párrafo 3.")
+        self.assertEqual(self._common.xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[1][@class = 'salto10']/text()")[0], "Párrafo 1.")
+        self.assertEqual(self._common.xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[2]/text()")[0], "Párrafo 2.")
+        self.assertEqual(self._common.xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[3]/text()")[0], "Párrafo 3.")
 
     def test_synopsis_text_with_tags_are_preserved_in_synopsis_file(self):
-        self._metadata.synopsis = "Párrafo 1.\n<strong>Párrafo <em>2</em></strong>.\n<span>Párrafo 3.</span>"
+        self._common.metadata.synopsis = "Párrafo 1.\n<strong>Párrafo <em>2</em></strong>.\n<span>Párrafo 3.</span>"
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         synopsis = self._getSynopsisFile()
 
-        self.assertEqual(self._xpath(synopsis, "count(//x:p)"), 3)
+        self.assertEqual(self._common.xpath(synopsis, "count(//x:p)"), 3)
 
-        self.assertEqual(self._xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[1][@class = 'salto10']/text()")[0], "Párrafo 1.")
-        self.assertEqual(self._xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[2]//text()"), ["Párrafo ", "2", "."])
-        self.assertEqual(self._xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[3]//text()"), ["Párrafo 3."])
+        self.assertEqual(self._common.xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[1][@class = 'salto10']/text()")[0], "Párrafo 1.")
+        self.assertEqual(self._common.xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[2]//text()"), ["Párrafo ", "2", "."])
+        self.assertEqual(self._common.xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[3]//text()"), ["Párrafo 3."])
 
     def test_synopsis_text_in_metadata(self):
-        self._metadata.synopsis = "Párrafo 1.\nPárrafo 2.\nPárrafo 3."
+        self._common.metadata.synopsis = "Párrafo 1.\nPárrafo 2.\nPárrafo 3."
 
-        self._generateEbook()
+        self._common.generateEbook()
 
-        self.assertEqual(self._outputEpub.getDescription(), "Párrafo 1. Párrafo 2. Párrafo 3.")
+        self.assertEqual(self._common.outputEpub.getDescription(), "Párrafo 1. Párrafo 2. Párrafo 3.")
 
     def test_synopsis_text_with_tags_are_stripped_in_metadata(self):
-        self._metadata.synopsis = "Párrafo 1.\n<strong>Párrafo <em>2</em></strong>.\n<span>Párrafo 3.</span>"
+        self._common.metadata.synopsis = "Párrafo 1.\n<strong>Párrafo <em>2</em></strong>.\n<span>Párrafo 3.</span>"
 
-        self._generateEbook()
+        self._common.generateEbook()
 
-        self.assertEqual(self._outputEpub.getDescription(), "Párrafo 1. Párrafo 2. Párrafo 3.")
+        self.assertEqual(self._common.outputEpub.getDescription(), "Párrafo 1. Párrafo 2. Párrafo 3.")
+
+    def _getSynopsisFile(self):
+        return etree.XML(self._common.outputEpub.read("OEBPS/Text/{0}".format("sinopsis.xhtml")))
+
+
+class TitleTests(unittest.TestCase):
+    def setUp(self):
+        self._common = Common()
+
+    def tearDown(self):
+        self._common.release()
+
+    def test_title_file_exists(self):
+        self._common.generateEbook()
+
+        self.assertTrue(self._common.outputEpub.hasFile("titulo.xhtml"))
 
     def test_default_author_in_title_file(self):
-        self._metadata.authors.clear()
+        self._common.metadata.authors.clear()
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         title = self._getTitleFile()
 
-        self.assertEqual(self._xpath(title, "x:body/x:p[@class = 'tautor']/text()")[0], ebook_metadata.Metadata.DEFAULT_AUTHOR)
+        self.assertEqual(self._common.xpath(title, "x:body/x:p[@class = 'tautor']/text()")[0], "Autor")
 
     def test_single_author_in_title_file(self):
-        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         title = self._getTitleFile()
 
-        self.assertEqual(self._xpath(title, "x:body/x:p[@class = 'tautor']/text()")[0], "Jorge Luis Borges")
+        self.assertEqual(self._common.xpath(title, "x:body/x:p[@class = 'tautor']/text()")[0], "Jorge Luis Borges")
 
     def test_multiple_authors_in_title_file(self):
-        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
-        self._metadata.authors.append(ebook_metadata.Person("Edgar Allan Poe", "bla"))
-        self._metadata.authors.append(ebook_metadata.Person("William Shakespeare", "bla"))
-        self._metadata.authors.append(ebook_metadata.Person("H. P. Lovecraft", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("Edgar Allan Poe", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("William Shakespeare", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("H. P. Lovecraft", "bla"))
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         title = self._getTitleFile()
 
-        self.assertEqual(self._xpath(title, "x:body/x:p[@class = 'tautor']/text()")[0],
+        self.assertEqual(self._common.xpath(title, "x:body/x:p[@class = 'tautor']/text()")[0],
                          "Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & H. P. Lovecraft")
 
-    def test_default_author_in_metadata(self):
-        self._metadata.authors.clear()
-
-        self._generateEbook()
-
-        authors = self._outputEpub.getAuthors()
-        self.assertEqual(len(authors), 1)
-        self.assertEqual(authors[0], (ebook_metadata.Metadata.DEFAULT_AUTHOR, ebook_metadata.Metadata.DEFAULT_AUTHOR))
-
-    def test_single_author_in_metadata(self):
-        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
-
-        self._generateEbook()
-
-        authors = self._outputEpub.getAuthors()
-        self.assertEqual(len(authors), 1)
-        self.assertEqual(authors[0], ("Jorge Luis Borges", "Borges, Jorge Luis"))
-
-    def test_multiple_authors_in_metadata(self):
-        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
-        self._metadata.authors.append(ebook_metadata.Person("Edgar Allan Poe", "Poe, Edgar Allan"))
-        self._metadata.authors.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
-        self._metadata.authors.append(ebook_metadata.Person("H. P. Lovecraft", "Lovecraft, H. P."))
-
-        self._generateEbook()
-
-        authors = self._outputEpub.getAuthors()
-        self.assertEqual(len(authors), 1)
-        self.assertEqual(authors[0], ("Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & H. P. Lovecraft",
-                                      "Borges, Jorge Luis & Poe, Edgar Allan & Shakespeare, William & Lovecraft, H. P."))
-
     def test_default_title_in_title_file(self):
-        self._metadata.title = ""
+        self._common.metadata.title = ""
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         title = self._getTitleFile()
 
-        self.assertEqual(self._xpath(title, "x:body/x:h1[@class = 'ttitulo']/text()")[0], ebook_metadata.Metadata.DEFAULT_TITLE)
+        self.assertEqual(self._common.xpath(title, "x:body/x:h1[@class = 'ttitulo']/text()")[0], "Título")
 
     def test_title_in_title_file(self):
-        self._metadata.title = "Título del libro"
+        self._common.metadata.title = "Título del libro"
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         title = self._getTitleFile()
 
-        self.assertEqual(self._xpath(title, "x:body/x:h1[@class = 'ttitulo']/text()")[0], "Título del libro")
-
-    def test_default_title_in_title_metadata(self):
-        self._metadata.title = ""
-
-        self._generateEbook()
-
-        self.assertEqual(self._outputEpub.getTitle(), ebook_metadata.Metadata.DEFAULT_TITLE)
-
-    def test_title_in_title_metadata(self):
-        self._metadata.title = "Título del libro"
-
-        self._generateEbook()
-
-        self.assertEqual(self._outputEpub.getTitle(), "Título del libro")
+        self.assertEqual(self._common.xpath(title, "x:body/x:h1[@class = 'ttitulo']/text()")[0], "Título del libro")
 
     def test_subtitle_in_title_file(self):
-        self._metadata.subtitle = "Subtítulo del libro"
+        self._common.metadata.subtitle = "Subtítulo del libro"
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         title = self._getTitleFile()
 
-        self.assertEqual(self._xpath(title, "x:body/x:p[@class = 'tsubtitulo']/text()")[0], "Subtítulo del libro")
+        self.assertEqual(self._common.xpath(title, "x:body/x:p[@class = 'tsubtitulo']/text()")[0], "Subtítulo del libro")
 
     def test_not_subtitle_in_title_file(self):
-        self._metadata.subtitle = ""
+        self._common.metadata.subtitle = ""
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         title = self._getTitleFile()
 
-        self.assertFalse(self._xpath(title, "x:body/x:p[@class = 'tsubtitulo']/text()"))
+        self.assertFalse(self._common.xpath(title, "x:body/x:p[@class = 'tsubtitulo']/text()"))
         # En titulo.xhtml hay un comentario indicando en el campo de subtítulo que es opcional, por eso debo verificar
         # que también ese comentario se haya borrado.
-        self.assertFalse(self._xpath(title, "x:body/comment()"))
+        self.assertFalse(self._common.xpath(title, "x:body/comment()"))
 
     def test_revision_in_title_file(self):
-        self._generateEbook()
+        self._common.generateEbook()
 
         title = self._getTitleFile()
 
-        self.assertEqual(self._xpath(title, "x:body/x:p[@class = 'trevision']/text()")[0], "ePub r1.0")
+        self.assertEqual(self._common.xpath(title, "x:body/x:p[@class = 'trevision']/text()")[0], "ePub r1.0")
 
     def test_default_editor_in_title_file(self):
-        self._metadata.editor = ""
+        self._common.metadata.editor = ""
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         title = self._getTitleFile()
 
-        self.assertEqual(self._xpath(title, "x:body/x:p[@class = 'tfirma']/text()")[0], ebook_metadata.Metadata.DEFAULT_EDITOR + " ")
+        self.assertEqual(self._common.xpath(title, "x:body/x:p[@class = 'tfirma']/text()")[0], "Editor ")
 
     def test_editor_in_title_file(self):
-        self._metadata.editor = "El editor"
+        self._common.metadata.editor = "El editor"
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         title = self._getTitleFile()
 
-        self.assertEqual(self._xpath(title, "x:body/x:p[@class = 'tfirma']/text()")[0], "El editor ")
+        self.assertEqual(self._common.xpath(title, "x:body/x:p[@class = 'tfirma']/text()")[0], "El editor ")
 
     def test_modification_date_in_title_file(self):
-        self._generateEbook()
+        self._common.generateEbook()
 
         title = self._getTitleFile()
 
-        self.assertEqual(self._xpath(title, "x:body/x:p[@class = 'tfirma']/x:span[@class = 'tfecha']/text()")[0],
+        self.assertEqual(self._common.xpath(title, "x:body/x:p[@class = 'tfirma']/x:span[@class = 'tfecha']/text()")[0],
                          datetime.datetime.now().strftime("%d.%m.%y"))
 
-    def test_modification_date_in_metadata(self):
-        self._generateEbook()
+    def _getTitleFile(self):
+        return etree.XML(self._common.outputEpub.read("OEBPS/Text/{0}".format("titulo.xhtml")))
 
-        self.assertEqual(self._outputEpub.getModificationDate(), datetime.datetime.now().strftime("%Y-%m-%d"))
+
+class InfoTests(unittest.TestCase):
+    def setUp(self):
+        self._common = Common()
+
+    def tearDown(self):
+        self._common.release()
+
+    def test_info_file_exists(self):
+        self._common.generateEbook()
+
+        self.assertTrue(self._common.outputEpub.hasFile("info.xhtml"))
 
     def test_original_title_in_info_file(self):
-        self._metadata.originalTitle = "El título original"
+        self._common.metadata.originalTitle = "El título original"
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
         # El título en el campo "Título original" se encuentra dentro de un tag "em".
-        self.assertEqual(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[1]//text()"), ["Título original: ", "El título original"])
+        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[1]//text()"), ["Título original: ", "El título original"])
 
     def test_not_original_title_in_info_file(self):
-        self._metadata.originalTitle = ""
+        self._common.metadata.originalTitle = ""
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertFalse(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[starts-with(text(), 'Título original')]"))
+        self.assertFalse(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[starts-with(text(), 'Título original')]"))
 
     def test_default_author_in_info_file(self):
-        self._metadata.authors.clear()
+        self._common.metadata.authors.clear()
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertEqual(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[1]/text()")[0], ebook_metadata.Metadata.DEFAULT_AUTHOR)
+        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[1]/text()")[0], "Autor")
 
     def test_single_author_in_info_file(self):
-        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertEqual(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[1]/text()")[0], "Jorge Luis Borges")
+        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[1]/text()")[0], "Jorge Luis Borges")
 
     def test_multiple_authors_in_info_file(self):
-        self._metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
-        self._metadata.authors.append(ebook_metadata.Person("Edgar Allan Poe", "bla"))
-        self._metadata.authors.append(ebook_metadata.Person("William Shakespeare", "bla"))
-        self._metadata.authors.append(ebook_metadata.Person("H. P. Lovecraft", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("Edgar Allan Poe", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("William Shakespeare", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("H. P. Lovecraft", "bla"))
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertEqual(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[1]/text()")[0],
+        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[1]/text()")[0],
                          "Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & H. P. Lovecraft")
 
     def test_publication_date_in_info_file(self):
-        self._metadata.publicationDate = datetime.date(1756, 5, 9)
+        self._common.metadata.publicationDate = datetime.date(1756, 5, 9)
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
         # Antes de la coma viene el nombre del autor, que siempre va a estar.
-        self.assertTrue(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[1]/text()")[0].endswith(", 1756"))
+        self.assertTrue(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[1]/text()")[0].endswith(", 1756"))
 
     def test_not_publication_date_in_info_file(self):
-        self._metadata.publicationDate = None
+        self._common.metadata.publicationDate = None
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
         # La fecha de publicación en el idioma original se coloca en el mismo párrafo, junto con el
         # autor, y separada por una coma.
-        self.assertFalse("," in self._xpath(info, "x:body/x:div[@class = 'info']/x:p[1]/text()")[0])
-
-    def test_publication_date_in_metadata(self):
-        self._metadata.publicationDate = datetime.date(1756, 5, 9)
-
-        self._generateEbook()
-
-        self.assertEqual(self._outputEpub.getPublicationDate(), "1756-05-09")
-
-    def test_not_publication_date_in_metadata(self):
-        self._metadata.publicationDate = None
-
-        self._generateEbook()
-
-        self.assertIsNone(self._outputEpub.getPublicationDate())
+        self.assertFalse("," in self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[1]/text()")[0])
 
     def test_single_translator_in_info_file(self):
-        self._metadata.translators.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
+        self._common.metadata.translators.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertEqual(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0], "Traducción: Jorge Luis Borges")
+        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0], "Traducción: Jorge Luis Borges")
 
     def test_multiple_translators_in_info_file(self):
-        self._metadata.translators.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
-        self._metadata.translators.append(ebook_metadata.Person("Edgar Allan Poe", "bla"))
-        self._metadata.translators.append(ebook_metadata.Person("William Shakespeare", "bla"))
-        self._metadata.translators.append(ebook_metadata.Person("H. P. Lovecraft", "bla"))
+        self._common.metadata.translators.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
+        self._common.metadata.translators.append(ebook_metadata.Person("Edgar Allan Poe", "bla"))
+        self._common.metadata.translators.append(ebook_metadata.Person("William Shakespeare", "bla"))
+        self._common.metadata.translators.append(ebook_metadata.Person("H. P. Lovecraft", "bla"))
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertEqual(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0],
+        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0],
                          "Traducción: Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & H. P. Lovecraft")
 
     def test_not_translator_in_info_file(self):
-        self._metadata.translators.clear()
+        self._common.metadata.translators.clear()
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertFalse(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[starts-with(text(), 'Traducción')]"))
-
-    def test_single_translator_in_metadata(self):
-        self._metadata.translators.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
-
-        self._generateEbook()
-
-        translators = self._outputEpub.getTranslators()
-        self.assertEqual(len(translators), 1)
-        self.assertEqual(translators[0], ("Jorge Luis Borges", "Borges, Jorge Luis"))
-
-    def test_multiple_translators_in_metadata(self):
-        self._metadata.translators.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
-        self._metadata.translators.append(ebook_metadata.Person("Edgar Allan Poe", "Poe, Edgar Allan"))
-        self._metadata.translators.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
-        self._metadata.translators.append(ebook_metadata.Person("H. P. Lovecraft", "Lovecraft, H. P."))
-
-        self._generateEbook()
-
-        translators = self._outputEpub.getTranslators()
-        self.assertEqual(len(translators), 1)
-        self.assertEqual(translators[0], ("Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & H. P. Lovecraft",
-                                          "Borges, Jorge Luis & Poe, Edgar Allan & Shakespeare, William & Lovecraft, H. P."))
-
-    def test_not_translator_in_metadata(self):
-        self._metadata.translators.clear()
-
-        self._generateEbook()
-
-        self.assertFalse(self._outputEpub.getTranslators())
+        self.assertFalse(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[starts-with(text(), 'Traducción')]"))
 
     def test_single_ilustrator_in_info_file(self):
-        self._metadata.ilustrators.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
+        self._common.metadata.ilustrators.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertEqual(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0], "Ilustraciones: Jorge Luis Borges")
+        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0], "Ilustraciones: Jorge Luis Borges")
 
     def test_multiple_ilustrators_in_info_file(self):
-        self._metadata.ilustrators.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
-        self._metadata.ilustrators.append(ebook_metadata.Person("Edgar Allan Poe", "bla"))
-        self._metadata.ilustrators.append(ebook_metadata.Person("William Shakespeare", "bla"))
-        self._metadata.ilustrators.append(ebook_metadata.Person("H. P. Lovecraft", "bla"))
+        self._common.metadata.ilustrators.append(ebook_metadata.Person("Jorge Luis Borges", "bla"))
+        self._common.metadata.ilustrators.append(ebook_metadata.Person("Edgar Allan Poe", "bla"))
+        self._common.metadata.ilustrators.append(ebook_metadata.Person("William Shakespeare", "bla"))
+        self._common.metadata.ilustrators.append(ebook_metadata.Person("H. P. Lovecraft", "bla"))
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertEqual(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0],
+        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0],
                          "Ilustraciones: Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & H. P. Lovecraft")
 
     def test_not_ilustrator_in_info_file(self):
-        self._metadata.ilustrators.clear()
+        self._common.metadata.ilustrators.clear()
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertFalse(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[starts-with(text(), 'Ilustraciones')]"))
-
-    def test_single_ilustrator_in_metadata(self):
-        self._metadata.ilustrators.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
-
-        self._generateEbook()
-
-        ilustrators = self._outputEpub.getIlustrators()
-        self.assertEqual(len(ilustrators), 1)
-        self.assertEqual(ilustrators[0], ("Jorge Luis Borges", "Borges, Jorge Luis"))
-
-    def test_multiple_ilustrators_in_metadata(self):
-        self._metadata.ilustrators.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
-        self._metadata.ilustrators.append(ebook_metadata.Person("Edgar Allan Poe", "Poe, Edgar Allan"))
-        self._metadata.ilustrators.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
-        self._metadata.ilustrators.append(ebook_metadata.Person("H. P. Lovecraft", "Lovecraft, H. P."))
-
-        self._generateEbook()
-
-        ilustrators = self._outputEpub.getIlustrators()
-        self.assertEqual(len(ilustrators), 1)
-        self.assertEqual(ilustrators[0], ("Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & H. P. Lovecraft",
-                                          "Borges, Jorge Luis & Poe, Edgar Allan & Shakespeare, William & Lovecraft, H. P."))
-
-    def test_not_ilustrator_in_metadata(self):
-        self._metadata.ilustrators.clear()
-
-        self._generateEbook()
-
-        self.assertFalse(self._outputEpub.getIlustrators())
+        self.assertFalse(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[starts-with(text(), 'Ilustraciones')]"))
 
     def test_default_cover_modification_in_info_file(self):
-        self._metadata.coverModification = ""
+        self._common.metadata.coverModification = ""
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertTrue(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0].
-                        startswith("{0} de cubierta: ".format(ebook_metadata.Metadata.DEFAULT_COVER_MODIFICATION)))
+        self.assertTrue(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0].startswith("Diseño de cubierta: "))
 
     def test_default_cover_designer_in_info_file(self):
-        self._metadata.coverDesigner = ""
+        self._common.metadata.coverDesigner = ""
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertTrue(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0].endswith(ebook_metadata.Metadata.DEFAULT_EDITOR))
+        self.assertTrue(
+            self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0].endswith("Editor"))
 
     def test_cover_modification_in_info_file(self):
-        self._metadata.coverModification = "Retoque"
+        self._common.metadata.coverModification = "Retoque"
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertTrue(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0].startswith("Retoque de cubierta: "))
+        self.assertTrue(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0].startswith("Retoque de cubierta: "))
 
     def test_cover_designer_in_info_file(self):
-        self._metadata.coverDesigner = "Jorge Luis Borges"
+        self._common.metadata.coverDesigner = "Jorge Luis Borges"
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertTrue(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0].endswith("Jorge Luis Borges"))
+        self.assertTrue(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0].endswith("Jorge Luis Borges"))
 
     def test_default_editor_in_info_file(self):
-        self._metadata.editor = ""
+        self._common.metadata.editor = ""
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertEqual(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[3]/text()")[0],
-                         "Editor digital: {0}".format(ebook_metadata.Metadata.DEFAULT_EDITOR))
+        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[3]/text()")[0], "Editor digital: Editor")
 
     def test_editor_in_info_file(self):
-        self._metadata.editor = "El editor"
+        self._common.metadata.editor = "El editor"
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertEqual(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[3]/text()")[0], "Editor digital: El editor")
+        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[3]/text()")[0], "Editor digital: El editor")
 
     def test_epub_base_revision_in_info_file(self):
-        self._generateEbook()
+        self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertEqual(self._xpath(info, "x:body/x:div[@class = 'info']/x:p[4]/text()")[0], "ePub base r1.1")
+        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[4]/text()")[0], "ePub base r1.1")
+
+    def _getInfoFile(self):
+        return etree.XML(self._common.outputEpub.read("OEBPS/Text/{0}".format("info.xhtml")))
+
+
+class DedicationTests(unittest.TestCase):
+    _DEDICATION = ("Suspiró entonces mío Cid, de pesadumbre cargado, y comenzó a hablar así, justamente mesurado: «¡Loado seas, Señor, Padre "
+                   "que estás en lo alto! Todo esto me han urdido mis enemigos malvados».ANÓNIMO")
+
+    def setUp(self):
+        self._common = Common()
+
+    def tearDown(self):
+        self._common.release()
+
+    def test_dedication_file_exists(self):
+        self._common.generateEbook()
+
+        self.assertTrue(self._common.outputEpub.hasFile("dedicatoria.xhtml"))
 
     def test_default_dedication_text_in_dedication_file(self):
-        self._metadata.dedication = ""
+        self._common.metadata.dedication = ""
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         dedication = self._getDedicationFile()
 
-        self.assertEqual(self._xpath(dedication, "count(//x:p)"), 2)
+        self.assertEqual(self._common.xpath(dedication, "count(//x:p)"), 2)
 
-        gotDedication = "".join(self._xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[1]//text()"))
-        gotDedication += "".join(self._xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[2][@class = 'salto05']//text()"))
+        gotDedication = "".join(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[1]//text()"))
+        gotDedication += "".join(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[2][@class = 'salto05']//text()"))
 
-        wantDedication = utils.removeTags(ebook_metadata.Metadata.DEFAULT_DEDICATION)
-
-        self.assertEqual(gotDedication, wantDedication.replace("\n", ""))
+        self.assertEqual(gotDedication, DedicationTests._DEDICATION)
 
     def test_dedication_text_in_dedication_file(self):
-        self._metadata.dedication = "Párrafo 1.\nPárrafo 2.\nPárrafo 3."
+        self._common.metadata.dedication = "Párrafo 1.\nPárrafo 2.\nPárrafo 3."
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         dedication = self._getDedicationFile()
 
-        self.assertEqual(self._xpath(dedication, "count(//x:p)"), 3)
+        self.assertEqual(self._common.xpath(dedication, "count(//x:p)"), 3)
 
-        self.assertEqual(self._xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[1]/text()")[0], "Párrafo 1.")
-        self.assertEqual(self._xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[2]/text()")[0], "Párrafo 2.")
-        self.assertEqual(self._xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[3]/text()")[0], "Párrafo 3.")
+        self.assertEqual(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[1]/text()")[0], "Párrafo 1.")
+        self.assertEqual(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[2]/text()")[0], "Párrafo 2.")
+        self.assertEqual(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[3]/text()")[0], "Párrafo 3.")
 
     def test_dedication_text_with_tags_are_preserved_in_dedication_file(self):
-        self._metadata.dedication = "Párrafo 1.\n<strong>Párrafo <em>2</em></strong>.\n<span>Párrafo 3.</span>"
+        self._common.metadata.dedication = "Párrafo 1.\n<strong>Párrafo <em>2</em></strong>.\n<span>Párrafo 3.</span>"
 
-        self._generateEbook()
+        self._common.generateEbook()
 
         dedication = self._getDedicationFile()
 
-        self.assertEqual(self._xpath(dedication, "count(//x:p)"), 3)
+        self.assertEqual(self._common.xpath(dedication, "count(//x:p)"), 3)
 
-        self.assertEqual(self._xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[1]/text()")[0], "Párrafo 1.")
-        self.assertEqual(self._xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[2]//text()"), ["Párrafo ", "2", "."])
-        self.assertEqual(self._xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[3]//text()"), ["Párrafo 3."])
+        self.assertEqual(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[1]/text()")[0], "Párrafo 1.")
+        self.assertEqual(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[2]//text()"), ["Párrafo ", "2", "."])
+        self.assertEqual(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[3]//text()"), ["Párrafo 3."])
+
+    def _getDedicationFile(self):
+        return etree.XML(self._common.outputEpub.read("OEBPS/Text/{0}".format("dedicatoria.xhtml")))
+
+
+class AuthorTests(unittest.TestCase):
+    _AUTHOR_BIOGRAPHY = ("NOMBRE DEL AUTOR (Reikiavik, Islandia, 2013 - Terra III, 3096). Lorem ipsum dolor sit amet, consectetur "
+                         "adipiscing elit. Nunc vel libero sed est ultrices elementum at vel lacus. Sed laoreet, velit nec congue "
+                         "pellentesque, quam urna pretium nunc, et ultrices nulla lacus non libero."
+                         "Integer eu leo justo, vel sodales arcu. Donec posuere nunc in lectus laoreet a rhoncus enim fermentum. Nunc "
+                         "luctus accumsan ligula eu molestie.")
+
+    def setUp(self):
+        self._common = Common()
+
+    def tearDown(self):
+        self._common.release()
+
+    def test_only_one_author_file_exists_when_no_authors(self):
+        self._common.metadata.authors.clear()
+
+        self._common.generateEbook()
+
+        authors = self._getAuthorFiles()
+
+        self.assertEqual(len(authors), 1)
+        self.assertEqual(authors[0][0], "autor.xhtml")
+
+    def test_only_one_author_file_exists_when_two_authors_but_second_author_doesnt_have_biography_nor_image(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+
+        self._common.generateEbook()
+
+        authors = self._getAuthorFiles()
+
+        self.assertEqual(len(authors), 1)
+        self.assertEqual(authors[0][0], "autor.xhtml")
+
+    def test_two_author_files_exist_when_two_authors_and_second_author_has_image(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
+
+        self._common.generateEbook()
+
+        authors = [a[0] for a in self._getAuthorFiles()]
+
+        self.assertEqual(len(authors), 2)
+        self.assertTrue("autor.xhtml" in authors and "autor1.xhtml" in authors)
+
+    def test_two_author_files_exist_when_two_authors_and_second_author_has_biography(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="bla"))
+
+        self._common.generateEbook()
+
+        authors = [a[0] for a in self._getAuthorFiles()]
+
+        self.assertEqual(len(authors), 2)
+        self.assertTrue("autor.xhtml" in authors and "autor1.xhtml" in authors)
 
     def test_default_author_biography_text_in_author_file(self):
-        self._metadata.authorBiography = ""
+        self._common.metadata.authors.clear()
 
-        self._generateEbook()
+        self._common.generateEbook()
 
-        author = self._getAuthorFile()
+        author = self._getAuthorFiles()[0][1]
 
-        self.assertEqual(self._xpath(author, "count(//x:p)"), 2)
+        self.assertEqual(self._common.xpath(author, "count(//x:p)"), 2)
 
-        gotAuthorBiography = "".join(self._xpath(author, "x:body/x:div[@class = 'autor']/x:p[1]//text()"))
-        gotAuthorBiography += "".join(self._xpath(author, "x:body/x:div[@class = 'autor']/x:p[2]//text()"))
+        gotAuthorBiography = "".join(self._common.xpath(author, "x:body/x:div[@class = 'autor']/x:p[1]//text()"))
+        gotAuthorBiography += "".join(self._common.xpath(author, "x:body/x:div[@class = 'autor']/x:p[2]//text()"))
 
-        wantAuthorBiography = utils.removeTags(ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY)
+        wantAuthorBiography = AuthorTests._AUTHOR_BIOGRAPHY
 
         self.assertEqual(gotAuthorBiography, wantAuthorBiography.replace("\n", ""))
 
     def test_author_biography_text_in_author_file(self):
-        self._metadata.authorBiography = "Párrafo 1.\nPárrafo 2.\nPárrafo 3."
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="Párrafo 1.\nPárrafo 2.\nPárrafo 3."))
 
-        self._generateEbook()
+        self._common.generateEbook()
 
-        author = self._getAuthorFile()
+        author = self._getAuthorFiles()[0][1]
 
-        self.assertEqual(self._xpath(author, "/x:html/x:body/x:div[@class = 'autor']/x:p[position() = 1]/text()")[0], "Párrafo 1.")
-        self.assertEqual(self._xpath(author, "/x:html/x:body/x:div[@class = 'autor']/x:p[position() = 2]/text()")[0], "Párrafo 2.")
-        self.assertEqual(self._xpath(author, "/x:html/x:body/x:div[@class = 'autor']/x:p[position() = 3]/text()")[0], "Párrafo 3.")
+        self.assertEqual(self._common.xpath(author, "/x:html/x:body/x:div[@class = 'autor']/x:p[position() = 1]/text()")[0], "Párrafo 1.")
+        self.assertEqual(self._common.xpath(author, "/x:html/x:body/x:div[@class = 'autor']/x:p[position() = 2]/text()")[0], "Párrafo 2.")
+        self.assertEqual(self._common.xpath(author, "/x:html/x:body/x:div[@class = 'autor']/x:p[position() = 3]/text()")[0], "Párrafo 3.")
 
     def test_author_biography_text_with_tags_are_preserved_in_author_file(self):
-        self._metadata.authorBiography = "Párrafo 1.\n<strong>Párrafo <em>2</em></strong>.\n<span>Párrafo 3.</span>"
+        biography = "Párrafo 1.\n<strong>Párrafo <em>2</em></strong>.\n<span>Párrafo 3.</span>"
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography=biography))
 
-        self._generateEbook()
+        self._common.generateEbook()
 
-        author = self._getAuthorFile()
+        author = self._getAuthorFiles()[0][1]
 
-        self.assertEqual(self._xpath(author, "count(//x:p)"), 3)
+        self.assertEqual(self._common.xpath(author, "count(//x:p)"), 3)
 
-        self.assertEqual(self._xpath(author, "x:body/x:div[@class = 'autor']/x:p[1]/text()")[0], "Párrafo 1.")
-        self.assertEqual(self._xpath(author, "x:body/x:div[@class = 'autor']/x:p[2]//text()"), ["Párrafo ", "2", "."])
-        self.assertEqual(self._xpath(author, "x:body/x:div[@class = 'autor']/x:p[3]//text()"), ["Párrafo 3."])
+        self.assertEqual(self._common.xpath(author, "x:body/x:div[@class = 'autor']/x:p[1]/text()")[0], "Párrafo 1.")
+        self.assertEqual(self._common.xpath(author, "x:body/x:div[@class = 'autor']/x:p[2]//text()"), ["Párrafo ", "2", "."])
+        self.assertEqual(self._common.xpath(author, "x:body/x:div[@class = 'autor']/x:p[3]//text()"), ["Párrafo 3."])
 
-    def test_author_image_exists(self):
-        self._generateEbook()
+    def test_author_header_title_when_default_author_in_author_file(self):
+        self._common.metadata.authors.clear()
 
-        self.assertTrue(self._outputEpub.hasFile(epubbase_names.AUTHOR_IMAGE_FILENAME))
+        self._common.generateEbook()
 
-    def test_author_file_is_last_in_play_order_when_epub_not_has_notes(self):
-        self._generateEbook()
+        author = self._getAuthorFiles()[0][1]
 
-        htmlFiles = self._outputEpub.getHtmlFileNamesReadingOrder()
-        self.assertEqual(htmlFiles[-1], epubbase_names.AUTHOR_FILENAME)
+        self.assertEqual(len(self._common.xpath(author, "//x:h1")), 1)
+        self.assertEqual(self._common.xpath(author, "x:body/x:h1[@class = 'oculto']/@title")[0], "Autor")
+
+    def test_author_header_title_with_male_author_in_author_file(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+
+        self._common.generateEbook()
+
+        author = self._getAuthorFiles()[0][1]
+
+        self.assertEqual(len(self._common.xpath(author, "//x:h1")), 1)
+        self.assertEqual(self._common.xpath(author, "x:body/x:h1[@class = 'oculto']/@title")[0], "Autor")
+
+    def test_author_header_title_with_female_author_in_author_file(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", ebook_metadata.Person.FEMALE_GENDER))
+
+        self._common.generateEbook()
+
+        author = self._getAuthorFiles()[0][1]
+
+        self.assertEqual(len(self._common.xpath(author, "//x:h1")), 1)
+        self.assertEqual(self._common.xpath(author, "x:body/x:h1[@class = 'oculto']/@title")[0], "Autora")
+
+    def test_author_header_title_with_two_authors_in_author_file(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", ebook_metadata.Person.MALE_GENDER))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", ebook_metadata.Person.FEMALE_GENDER))
+
+        self._common.generateEbook()
+
+        author = self._getAuthorFiles()[0][1]
+
+        self.assertEqual(len(self._common.xpath(author, "//x:h1")), 1)
+        self.assertEqual(self._common.xpath(author, "x:body/x:h1[@class = 'oculto']/@title")[0], "Autores")
+
+    def test_only_first_author_file_has_header_when_two_authors(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
+
+        self._common.generateEbook()
+
+        authors = self._getAuthorFiles()
+        firstAuthor = next(a for a in authors if a[0] == "autor.xhtml")
+        secondAuthor = next(a for a in authors if a[0] == "autor1.xhtml")
+
+        self.assertEqual(len(self._common.xpath(firstAuthor[1], "//x:h1")), 1)
+        self.assertFalse(self._common.xpath(secondAuthor[1], "//x:h1"))
+
+    def test_author_file_is_last_in_play_order_when_epub_doesnt_have_notes(self):
+        self._common.generateEbook()
+
+        htmlFiles = self._common.outputEpub.getHtmlFileNamesReadingOrder()
+        self.assertEqual(htmlFiles[-1], "autor.xhtml")
 
     def test_author_file_is_second_to_last_in_play_order_when_epub_contains_notes(self):
-        self._generateEbook([ebook_data.NotesSection()])
+        self._common.generateEbook([ebook_data.NotesSection()])
 
-        htmlFiles = self._outputEpub.getHtmlFileNamesReadingOrder()
-        self.assertEqual(htmlFiles[-2], epubbase_names.AUTHOR_FILENAME)
+        htmlFiles = self._common.outputEpub.getHtmlFileNamesReadingOrder()
+        self.assertEqual(htmlFiles[-2], "autor.xhtml")
 
-    def test_required_entries_in_toc(self):
-        self._generateEbook()
+    def test_player_order_when_multiple_author_files(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
 
-        titles = self._outputEpub.getTitles()
+        self._common.generateEbook()
 
-        self.assertEqual([t[0] for t in titles], ["Cubierta", ebook_metadata.Metadata.DEFAULT_TITLE, "Autor"])
-        self.assertTrue(titles[0][1].endswith(epubbase_names.COVER_FILENAME))
-        self.assertTrue(titles[1][1].endswith(epubbase_names.TITLE_FILENAME))
-        self.assertTrue(titles[2][1].endswith(epubbase_names.AUTHOR_FILENAME))
+        htmlFiles = self._common.outputEpub.getHtmlFileNamesReadingOrder()
+        self.assertEqual(htmlFiles[-4:], ["autor.xhtml", "autor1.xhtml", "autor2.xhtml", "autor3.xhtml"])
 
-    def test_notes_entry_exists_in_toc_when_epub_contains_notes(self):
-        self._generateEbook([ebook_data.NotesSection()])
+    def _getAuthorFiles(self):
+        authorFiles = []
 
-        titles = self._outputEpub.getTitles()
+        for authorFileName in (f for f in self._common.outputEpub.getNamelist() if f.startswith("autor") and f.endswith(".xhtml")):
+            authorFiles.append((authorFileName, etree.XML(self._common.outputEpub.read("OEBPS/Text/{0}".format(authorFileName)))))
 
-        self.assertEqual(titles[-1][0], "Notas")
-        self.assertTrue(titles[-1][1].endswith(epubbase_names.NOTES_FILENAME))
+        return authorFiles
 
-    def test_title_entry_in_toc(self):
-        self._metadata.title = "El título del libro"
 
-        self._generateEbook()
+class MetadataTests(unittest.TestCase):
+    def setUp(self):
+        self._common = Common()
 
-        titles = self._outputEpub.getTitles()
+    def tearDown(self):
+        self._common.release()
 
-        self.assertEqual(titles[1][0], "El título del libro")
-        self.assertTrue(titles[1][1].endswith(epubbase_names.TITLE_FILENAME))
+    def test_default_author(self):
+        self._common.metadata.authors.clear()
+
+        self._common.generateEbook()
+
+        authors = self._common.outputEpub.getAuthors()
+        self.assertEqual(len(authors), 1)
+        self.assertEqual(authors[0], ("Autor", "Autor"))
+
+    def test_one_author(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+
+        self._common.generateEbook()
+
+        authors = self._common.outputEpub.getAuthors()
+        self.assertEqual(len(authors), 1)
+        self.assertEqual(authors[0], ("Jorge Luis Borges", "Borges, Jorge Luis"))
+
+    def test_multiple_authors(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+        self._common.metadata.authors.append(ebook_metadata.Person("Edgar Allan Poe", "Poe, Edgar Allan"))
+        self._common.metadata.authors.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
+        self._common.metadata.authors.append(ebook_metadata.Person("H. P. Lovecraft", "Lovecraft, H. P."))
+
+        self._common.generateEbook()
+
+        authors = self._common.outputEpub.getAuthors()
+        self.assertEqual(len(authors), 1)
+        self.assertEqual(authors[0], ("Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & H. P. Lovecraft",
+                                      "Borges, Jorge Luis & Poe, Edgar Allan & Shakespeare, William & Lovecraft, H. P."))
+
+    def test_default_title(self):
+        self._common.metadata.title = ""
+
+        self._common.generateEbook()
+
+        self.assertEqual(self._common.outputEpub.getTitle(), "Título")
+
+    def test_title(self):
+        self._common.metadata.title = "Título del libro"
+
+        self._common.generateEbook()
+
+        self.assertEqual(self._common.outputEpub.getTitle(), "Título del libro")
+
+    def test_modification_date(self):
+        self._common.generateEbook()
+
+        self.assertEqual(self._common.outputEpub.getModificationDate(), datetime.datetime.now().strftime("%Y-%m-%d"))
+
+    def test_publication_date(self):
+        self._common.metadata.publicationDate = datetime.date(1756, 5, 9)
+
+        self._common.generateEbook()
+
+        self.assertEqual(self._common.outputEpub.getPublicationDate(), "1756-05-09")
+
+    def test_not_publication_date(self):
+        self._common.metadata.publicationDate = None
+
+        self._common.generateEbook()
+
+        self.assertIsNone(self._common.outputEpub.getPublicationDate())
+
+    def test_one_translator(self):
+        self._common.metadata.translators.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+
+        self._common.generateEbook()
+
+        translators = self._common.outputEpub.getTranslators()
+        self.assertEqual(len(translators), 1)
+        self.assertEqual(translators[0], ("Jorge Luis Borges", "Borges, Jorge Luis"))
+
+    def test_multiple_translators(self):
+        self._common.metadata.translators.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+        self._common.metadata.translators.append(ebook_metadata.Person("Edgar Allan Poe", "Poe, Edgar Allan"))
+        self._common.metadata.translators.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
+        self._common.metadata.translators.append(ebook_metadata.Person("H. P. Lovecraft", "Lovecraft, H. P."))
+
+        self._common.generateEbook()
+
+        translators = self._common.outputEpub.getTranslators()
+        self.assertEqual(len(translators), 1)
+        self.assertEqual(translators[0], ("Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & H. P. Lovecraft",
+                                          "Borges, Jorge Luis & Poe, Edgar Allan & Shakespeare, William & Lovecraft, H. P."))
+
+    def test_not_translator(self):
+        self._common.metadata.translators.clear()
+
+        self._common.generateEbook()
+
+        self.assertFalse(self._common.outputEpub.getTranslators())
+
+    def test_one_ilustrator(self):
+        self._common.metadata.ilustrators.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+
+        self._common.generateEbook()
+
+        ilustrators = self._common.outputEpub.getIlustrators()
+        self.assertEqual(len(ilustrators), 1)
+        self.assertEqual(ilustrators[0], ("Jorge Luis Borges", "Borges, Jorge Luis"))
+
+    def test_multiple_ilustrators(self):
+        self._common.metadata.ilustrators.append(ebook_metadata.Person("Jorge Luis Borges", "Borges, Jorge Luis"))
+        self._common.metadata.ilustrators.append(ebook_metadata.Person("Edgar Allan Poe", "Poe, Edgar Allan"))
+        self._common.metadata.ilustrators.append(ebook_metadata.Person("William Shakespeare", "Shakespeare, William"))
+        self._common.metadata.ilustrators.append(ebook_metadata.Person("H. P. Lovecraft", "Lovecraft, H. P."))
+
+        self._common.generateEbook()
+
+        ilustrators = self._common.outputEpub.getIlustrators()
+        self.assertEqual(len(ilustrators), 1)
+        self.assertEqual(ilustrators[0], ("Jorge Luis Borges & Edgar Allan Poe & William Shakespeare & H. P. Lovecraft",
+                                          "Borges, Jorge Luis & Poe, Edgar Allan & Shakespeare, William & Lovecraft, H. P."))
+
+    def test_not_ilustrator(self):
+        self._common.metadata.ilustrators.clear()
+
+        self._common.generateEbook()
+
+        self.assertFalse(self._common.outputEpub.getIlustrators())
 
     def test_simple_collection(self):
-        self._metadata.subCollectionName = "Esta es la saga"
-        self._metadata.collectionVolume = "9"
+        self._common.metadata.subCollectionName = "Esta es la saga"
+        self._common.metadata.collectionVolume = "9"
 
-        self._generateEbook()
+        self._common.generateEbook()
 
-        calibreSerie = self._outputEpub.getCalibreSerie()
+        calibreSerie = self._common.outputEpub.getCalibreSerie()
         self.assertEqual(calibreSerie, ("Esta es la saga", "9"))
 
     def test_sub_collections(self):
-        self._metadata.collectionName = "Esta es la serie"
-        self._metadata.subCollectionName = "Esta es la saga"
-        self._metadata.collectionVolume = "9"
+        self._common.metadata.collectionName = "Esta es la serie"
+        self._common.metadata.subCollectionName = "Esta es la saga"
+        self._common.metadata.collectionVolume = "9"
 
-        self._generateEbook()
+        self._common.generateEbook()
 
-        calibreSerie = self._outputEpub.getCalibreSerie()
+        calibreSerie = self._common.outputEpub.getCalibreSerie()
         self.assertEqual(calibreSerie, ("Esta es la serie: Esta es la saga", "9"))
 
     def test_strip_zeros_from_collection_volume_for_calibre_metadata(self):
-        self._metadata.subCollectionName = "Esta es la saga"
-        self._metadata.collectionVolume = "007"
+        self._common.metadata.subCollectionName = "Esta es la saga"
+        self._common.metadata.collectionVolume = "007"
 
-        self._generateEbook()
+        self._common.generateEbook()
 
-        calibreSerie = self._outputEpub.getCalibreSerie()
+        calibreSerie = self._common.outputEpub.getCalibreSerie()
         self.assertEqual(calibreSerie, ("Esta es la saga", "7"))
 
+    def test_default_language(self):
+        self._common.metadata.language = ""
+
+        self._common.generateEbook()
+
+        self.assertTrue(self._common.outputEpub.getLanguage(), "es")
+
+    def test_language(self):
+        self._common.metadata.language = "en"
+
+        self._common.generateEbook()
+
+        self.assertTrue(self._common.outputEpub.getLanguage(), "en")
+
+    def test_one_genretype_one_genre_one_subgenre(self):
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
+
+        self._common.generateEbook()
+
+        self.assertEqual(self._common.outputEpub.getSubject(), "Genero1, Subgenero1")
+
+    def test_one_genretype_one_genre_two_subgenres(self):
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero2"))
+
+        self._common.generateEbook()
+
+        self.assertEqual(self._common.outputEpub.getSubject(), "Genero1, Subgenero1, Subgenero2")
+
+    def test_one_genretype_two_genres_one_subgenre(self):
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero2", "Subgenero1"))
+
+        self._common.generateEbook()
+
+        self.assertEqual(self._common.outputEpub.getSubject(), "Genero1, Subgenero1, Genero2, Subgenero1")
+
+    def test_one_genretype_two_genres_two_subgenres(self):
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero2"))
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero2", "Subgenero1"))
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero2", "Subgenero2"))
+
+        self._common.generateEbook()
+
+        self.assertEqual(self._common.outputEpub.getSubject(), "Genero1, Subgenero1, Subgenero2, Genero2, Subgenero1, Subgenero2")
+
+    def test_genretype_not_get_saved(self):
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero2"))
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo2", "Genero2", "Subgenero1"))
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo2", "Genero2", "Subgenero2"))
+
+        self._common.generateEbook()
+
+        self.assertEqual(self._common.outputEpub.getSubject(), "Genero1, Subgenero1, Subgenero2, Genero2, Subgenero1, Subgenero2")
+
+    def test_genres_are_sorted(self):
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "d", "f"))
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "k", "a"))
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "a", "b"))
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "u", "a"))
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "a", "a"))
+        self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "d", "e"))
+
+        self._common.generateEbook()
+
+        self.assertEqual(self._common.outputEpub.getSubject(), "a, a, b, d, e, f, k, a, u, a")
+
+    def test_not_genres(self):
+        self._common.metadata.genres.clear()
+
+        self._common.generateEbook()
+
+        self.assertIsNone(self._common.outputEpub.getSubject())
+
+    def test_default_publisher(self):
+        self._common.generateEbook()
+
+        self.assertEqual(self._common.outputEpub.getPublisher(), "ePubLibre")
+
+
+class TocTests(unittest.TestCase):
+    def setUp(self):
+        self._common = Common()
+
+    def tearDown(self):
+        self._common.release()
+
+    def test_author_entry_when_default_author(self):
+        self._common.metadata.authors.clear()
+
+        self._common.generateEbook()
+
+        titles = self._common.outputEpub.getTitles()
+
+        self.assertEqual(titles[-1][0], "Autor")
+
+    def test_author_entry_when_male_author(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+
+        self._common.generateEbook()
+
+        titles = self._common.outputEpub.getTitles()
+
+        self.assertEqual(titles[-1][0], "Autor")
+
+    def test_author_entry_when_female_author(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", ebook_metadata.Person.FEMALE_GENDER))
+
+        self._common.generateEbook()
+
+        titles = self._common.outputEpub.getTitles()
+
+        self.assertEqual(titles[-1][0], "Autora")
+
+    def test_author_entry_when_two_authors(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", ebook_metadata.Person.MALE_GENDER))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", ebook_metadata.Person.FEMALE_GENDER))
+
+        self._common.generateEbook()
+
+        titles = self._common.outputEpub.getTitles()
+
+        self.assertEqual(titles[-1][0], "Autores")
+
+    def test_required_entries(self):
+        self._common.generateEbook()
+
+        titles = self._common.outputEpub.getTitles()
+
+        self.assertEqual([t[0] for t in titles], ["Cubierta", "Título", "Autor"])
+        self.assertTrue(titles[0][1].endswith("cubierta.xhtml"))
+        self.assertTrue(titles[1][1].endswith("titulo.xhtml"))
+        self.assertTrue(titles[2][1].endswith("autor.xhtml"))
+
+    def test_notes_entry_existswhen_epub_contains_notes(self):
+        self._common.generateEbook([ebook_data.NotesSection()])
+
+        titles = self._common.outputEpub.getTitles()
+
+        self.assertEqual(titles[-1][0], "Notas")
+        self.assertTrue(titles[-1][1].endswith("notas.xhtml"))
+
+    def test_title_entry(self):
+        self._common.metadata.title = "El título del libro"
+
+        self._common.generateEbook()
+
+        titles = self._common.outputEpub.getTitles()
+
+        self.assertEqual(titles[1][0], "El título del libro")
+
+
+class EpubFileNameTests(unittest.TestCase):
+    def setUp(self):
+        self._common = Common()
+
+    def tearDown(self):
+        self._common.release()
+
     def test_epub_file_name_default_metadata(self):
-        fileName = self._generateEbook()
+        fileName = self._common.generateEbook()
 
-        defaultAuthor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_AUTHOR)
-        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
-        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
-        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
-
-        self.assertEqual(fileName, "{0} - {1} [{2}] (r1.0 {3}).epub".format(defaultAuthor, defaultTitle, defaultBookId, defaultEditor))
+        self.assertEqual(fileName, "Autor - Titulo [0000] (r1.0 Editor).epub")
 
     def test_epub_file_name_when_one_author_and_no_collection(self):
-        self._metadata.authors.append(ebook_metadata.Person("bla", "Borges, Jorge Luis"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "Borges, Jorge Luis"))
 
-        fileName = self._generateEbook()
+        fileName = self._common.generateEbook()
 
-        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
-        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
-        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
-
-        self.assertEqual(fileName, "Borges, Jorge Luis - {0} [{1}] (r1.0 {2}).epub".format(defaultTitle, defaultBookId, defaultEditor))
+        self.assertEqual(fileName, "Borges, Jorge Luis - Titulo [0000] (r1.0 Editor).epub")
 
     def test_epub_file_name_when_two_authors_and_no_collection(self):
-        self._metadata.authors.append(ebook_metadata.Person("bla", "Borges, Jorge Luis"))
-        self._metadata.authors.append(ebook_metadata.Person("bla", "Shakespeare, William"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "Borges, Jorge Luis"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "Shakespeare, William"))
 
-        fileName = self._generateEbook()
+        fileName = self._common.generateEbook()
 
-        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
-        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
-        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
-
-        self.assertEqual(fileName, "Borges, Jorge Luis & Shakespeare, William - {0} [{1}] (r1.0 {2}).epub".format(defaultTitle,
-                                                                                                                  defaultBookId,
-                                                                                                                  defaultEditor))
+        self.assertEqual(fileName, "Borges, Jorge Luis & Shakespeare, William - Titulo [0000] (r1.0 Editor).epub")
 
     def test_epub_file_name_when_three_authors_and_no_collection(self):
-        self._metadata.authors.append(ebook_metadata.Person("bla", "bla"))
-        self._metadata.authors.append(ebook_metadata.Person("bla", "bla"))
-        self._metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
 
-        fileName = self._generateEbook()
+        fileName = self._common.generateEbook()
 
-        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
-        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
-        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
-
-        self.assertEqual(fileName, "AA. VV. - {0} [{1}] (r1.0 {2}).epub".format(defaultTitle, defaultBookId, defaultEditor))
+        self.assertEqual(fileName, "AA. VV. - Titulo [0000] (r1.0 Editor).epub")
 
     def test_epub_file_name_when_one_author_and_simple_collection(self):
-        self._metadata.authors.append(ebook_metadata.Person("bla", "Borges, Jorge Luis"))
-        self._metadata.subCollectionName = "Esta es la serie"
-        self._metadata.collectionVolume = "10"
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "Borges, Jorge Luis"))
+        self._common.metadata.subCollectionName = "Esta es la serie"
+        self._common.metadata.collectionVolume = "10"
 
-        fileName = self._generateEbook()
+        fileName = self._common.generateEbook()
 
-        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
-        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
-        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
-
-        self.assertEqual(fileName, "Borges, Jorge Luis - [Esta es la serie 10] {0} [{1}] (r1.0 {2}).epub".format(defaultTitle,
-                                                                                                                 defaultBookId,
-                                                                                                                 defaultEditor))
+        self.assertEqual(fileName, "Borges, Jorge Luis - [Esta es la serie 10] Titulo [0000] (r1.0 Editor).epub")
 
     def test_epub_file_name_when_one_author_and_subcollection(self):
-        self._metadata.authors.append(ebook_metadata.Person("bla", "Borges, Jorge Luis"))
-        self._metadata.collectionName = "Esta es la saga"
-        self._metadata.subCollectionName = "Esta es la serie"
-        self._metadata.collectionVolume = "10"
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "Borges, Jorge Luis"))
+        self._common.metadata.collectionName = "Esta es la saga"
+        self._common.metadata.subCollectionName = "Esta es la serie"
+        self._common.metadata.collectionVolume = "10"
 
-        fileName = self._generateEbook()
+        fileName = self._common.generateEbook()
 
-        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
-        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
-        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
-
-        self.assertEqual(fileName,
-                         "[Esta es la saga] [Esta es la serie 10] Borges, Jorge Luis - {0} [{1}] (r1.0 {2}).epub".format(defaultTitle,
-                                                                                                                         defaultBookId,
-                                                                                                                         defaultEditor))
+        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] Borges, Jorge Luis - Titulo [0000] (r1.0 Editor).epub")
 
     def test_epub_file_name_when_two_authors_and_subcollection(self):
-        self._metadata.authors.append(ebook_metadata.Person("bla", "Borges, Jorge Luis"))
-        self._metadata.authors.append(ebook_metadata.Person("bla", "Shakespeare, William"))
-        self._metadata.collectionName = "Esta es la saga"
-        self._metadata.subCollectionName = "Esta es la serie"
-        self._metadata.collectionVolume = "10"
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "Borges, Jorge Luis"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "Shakespeare, William"))
+        self._common.metadata.collectionName = "Esta es la saga"
+        self._common.metadata.subCollectionName = "Esta es la serie"
+        self._common.metadata.collectionVolume = "10"
 
-        fileName = self._generateEbook()
+        fileName = self._common.generateEbook()
 
-        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
-        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
-        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
-
-        self.assertEqual(fileName,
-                         "[Esta es la saga] [Esta es la serie 10] Borges, Jorge Luis & "
-                         "Shakespeare, William - {0} [{1}] (r1.0 {2}).epub".format(defaultTitle, defaultBookId, defaultEditor))
+        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] Borges, Jorge Luis & "
+                                   "Shakespeare, William - Titulo [0000] (r1.0 Editor).epub")
 
     def test_epub_file_name_when_three_authors_and_subcollection(self):
-        self._metadata.authors.append(ebook_metadata.Person("bla", "bla"))
-        self._metadata.authors.append(ebook_metadata.Person("bla", "bla"))
-        self._metadata.authors.append(ebook_metadata.Person("bla", "bla"))
-        self._metadata.collectionName = "Esta es la saga"
-        self._metadata.subCollectionName = "Esta es la serie"
-        self._metadata.collectionVolume = "10"
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.collectionName = "Esta es la saga"
+        self._common.metadata.subCollectionName = "Esta es la serie"
+        self._common.metadata.collectionVolume = "10"
 
-        fileName = self._generateEbook()
+        fileName = self._common.generateEbook()
 
-        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
-        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
-        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
-
-        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] AA. VV. - {0} [{1}] (r1.0 {2}).epub".format(defaultTitle,
-                                                                                                                        defaultBookId,
-                                                                                                                        defaultEditor))
+        self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] AA. VV. - Titulo [0000] (r1.0 Editor).epub")
 
     def test_epub_file_name_bookid(self):
-        self._metadata.authors.append(ebook_metadata.Person("Autor", "Autor"))
-        self._metadata.bookId = "1234"
+        self._common.metadata.authors.append(ebook_metadata.Person("Autor", "Autor"))
+        self._common.metadata.bookId = "1234"
 
-        fileName = self._generateEbook()
+        fileName = self._common.generateEbook()
 
-        defaultAuthor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_AUTHOR)
-        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
-        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
-
-        self.assertEqual(fileName, "{0} - {1} [{2}] (r1.0 {3}).epub".format(defaultAuthor, defaultTitle, "1234", defaultEditor))
+        self.assertEqual(fileName, "Autor - Titulo [1234] (r1.0 Editor).epub")
 
     def test_epub_file_name_title(self):
-        self._metadata.title = "Este es el título"
+        self._common.metadata.title = "Este es el título"
 
-        fileName = self._generateEbook()
+        fileName = self._common.generateEbook()
 
-        defaultAuthor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_AUTHOR)
-        defaultEditor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_EDITOR)
-        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
-
-        self.assertEqual(fileName, "{0} - Este es el titulo [{1}] (r1.0 {2}).epub".format(defaultAuthor, defaultBookId, defaultEditor))
+        self.assertEqual(fileName, "Autor - Este es el titulo [0000] (r1.0 Editor).epub")
 
     def test_epub_file_name_editor(self):
-        self._metadata.editor = "Este es el editor"
+        self._common.metadata.editor = "Este es el editor"
 
-        fileName = self._generateEbook()
+        fileName = self._common.generateEbook()
 
-        defaultAuthor = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_AUTHOR)
-        defaultTitle = utils.removeSpecialCharacters(ebook_metadata.Metadata.DEFAULT_TITLE)
-        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
-
-        self.assertEqual(fileName, "{0} - {1} [{2}] (r1.0 Este es el editor).epub".format(defaultAuthor, defaultTitle, defaultBookId))
+        self.assertEqual(fileName, "Autor - Titulo [0000] (r1.0 Este es el editor).epub")
 
     def test_epub_file_name_when_special_characters(self):
-        self._metadata.title = "Títúló dél libro"
-        self._metadata.authors.append(ebook_metadata.Person("bla", "Éste es el áutór"))
-        self._metadata.editor = "Esté es él edítór"
-        self._metadata.collectionName = "Esta es la ságá"
-        self._metadata.subCollectionName = "Éstá es la série"
-        self._metadata.collectionVolume = "10"
+        self._common.metadata.title = "Títúló dél libro"
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "Éste es el áutór"))
+        self._common.metadata.editor = "Esté es él edítór"
+        self._common.metadata.collectionName = "Esta es la ságá"
+        self._common.metadata.subCollectionName = "Éstá es la série"
+        self._common.metadata.collectionVolume = "10"
 
-        fileName = self._generateEbook()
-
-        defaultBookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
+        fileName = self._common.generateEbook()
 
         self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] Este es el autor - "
-                                   "Titulo del libro [{0}] (r1.0 Este es el editor).epub".format(defaultBookId))
+                                   "Titulo del libro [0000] (r1.0 Este es el editor).epub")
 
-    def test_cover_image(self):
-        self._metadata.coverImage = "cover image"
 
-        self._generateEbook()
+class ImagesTests(unittest.TestCase):
+    def setUp(self):
+        self._common = Common()
 
-        coverImage = self._outputEpub.read(self._outputEpub.getFullPathToFile(epubbase_names.COVER_IMAGE_FILENAME))
+    def tearDown(self):
+        self._common.release()
+
+    def test_required_images_exist(self):
+        self._common.generateEbook()
+
+        self.assertTrue(self._common.outputEpub.hasFile("cover.jpg"))
+        self.assertTrue(self._common.outputEpub.hasFile("EPL_logo.png"))
+        self.assertTrue(self._common.outputEpub.hasFile("ex_libris.png"))
+
+    def test_cover_image_content(self):
+        self._common.metadata.coverImage = "cover image"
+
+        self._common.generateEbook()
+
+        coverImage = self._common.outputEpub.read(self._common.outputEpub.getFullPathToFile("cover.jpg"))
         self.assertEqual(coverImage.decode(), "cover image")
 
-    def test_author_image(self):
-        self._metadata.authorImage = "author image"
+    def test_only_one_author_image_exists_when_no_authors(self):
+        self._common.metadata.authors.clear()
 
-        self._generateEbook()
+        self._common.generateEbook()
 
-        authorImage = self._outputEpub.read(self._outputEpub.getFullPathToFile(epubbase_names.AUTHOR_IMAGE_FILENAME))
+        authorImages = [f for f in self._common.outputEpub.getNamelist() if f.startswith("autor") and f.endswith(".jpg")]
+        self.assertEqual(len(authorImages), 1)
+        self.assertEqual(authorImages[0], "autor.jpg")
+
+    def test_only_one_author_image_exists_when_one_author(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+
+        self._common.generateEbook()
+
+        authorImages = [f for f in self._common.outputEpub.getNamelist() if f.startswith("autor") and f.endswith(".jpg")]
+        self.assertEqual(len(authorImages), 1)
+        self.assertEqual(authorImages[0], "autor.jpg")
+
+    def test_only_one_author_image_exists_when_two_authors_but_second_author_doesnt_have_biography_nor_image(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+
+        self._common.generateEbook()
+
+        authorImages = [f for f in self._common.outputEpub.getNamelist() if f.startswith("autor") and f.endswith(".jpg")]
+        self.assertEqual(len(authorImages), 1)
+        self.assertEqual(authorImages[0], "autor.jpg")
+
+    def test_two_author_images_exist_when_two_authors_and_second_author_has_image(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
+
+        self._common.generateEbook()
+
+        authorImages = [f for f in self._common.outputEpub.getNamelist() if f.startswith("autor") and f.endswith(".jpg")]
+        self.assertEqual(len(authorImages), 2)
+        self.assertTrue("autor.jpg" in authorImages and "autor1.jpg" in authorImages)
+
+    def test_two_author_images_exist_when_two_authors_and_second_author_has_biography(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="bla"))
+
+        self._common.generateEbook()
+
+        authorImages = [f for f in self._common.outputEpub.getNamelist() if f.startswith("autor") and f.endswith(".jpg")]
+        self.assertEqual(len(authorImages), 2)
+        self.assertTrue("autor.jpg" in authorImages and "autor1.jpg" in authorImages)
+
+    def test_author_image_content(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="author image"))
+
+        self._common.generateEbook()
+
+        authorImage = self._common.outputEpub.read(self._common.outputEpub.getFullPathToFile("autor.jpg"))
         self.assertEqual(authorImage.decode(), "author image")
 
-    def test_default_language_in_metadata(self):
-        self._metadata.language = ""
 
-        self._generateEbook()
+class MiscTests(unittest.TestCase):
+    def setUp(self):
+        self._common = Common()
 
-        self.assertTrue(self._outputEpub.getLanguage(), "es")
+    def tearDown(self):
+        self._common.release()
 
-    def test_language_in_metadata(self):
-        self._metadata.language = "en"
+    def test_css_file_exists(self):
+        self._common.generateEbook()
 
-        self._generateEbook()
+        self.assertTrue(self._common.outputEpub.hasFile("style.css"))
 
-        self.assertTrue(self._outputEpub.getLanguage(), "en")
+    def test_ibooks_display_options_file_exists(self):
+        self._common.generateEbook()
 
-    def test_one_genretype_one_genre_one_subgenre_in_metadata(self):
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
+        self.assertTrue(self._common.outputEpub.hasFile("com.apple.ibooks.display-options.xml"))
 
-        self._generateEbook()
 
-        self.assertEqual(self._outputEpub.getSubject(), "Genero1, Subgenero1")
+class Common:
+    NAMESPACES = {"x": "http://www.w3.org/1999/xhtml"}
 
-    def test_one_genretype_one_genre_two_subgenres_in_metadata(self):
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero2"))
+    def __init__(self):
+        self._outputFile = tempfile.TemporaryFile()
 
-        self._generateEbook()
+        self.metadata = ebook_metadata.Metadata()
+        self.outputEpub = None
 
-        self.assertEqual(self._outputEpub.getSubject(), "Genero1, Subgenero1, Subgenero2")
+    def xpath(self, element, xpath):
+        return element.xpath(xpath, namespaces=Common.NAMESPACES)
 
-    def test_one_genretype_two_genres_one_subgenre_in_metadata(self):
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero2", "Subgenero1"))
-
-        self._generateEbook()
-
-        self.assertEqual(self._outputEpub.getSubject(), "Genero1, Subgenero1, Genero2, Subgenero1")
-
-    def test_one_genretype_two_genres_two_subgenres_in_metadata(self):
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero2"))
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero2", "Subgenero1"))
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero2", "Subgenero2"))
-
-        self._generateEbook()
-
-        self.assertEqual(self._outputEpub.getSubject(), "Genero1, Subgenero1, Subgenero2, Genero2, Subgenero1, Subgenero2")
-
-    def test_genretype_not_get_saved_in_metadata(self):
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero2"))
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo2", "Genero2", "Subgenero1"))
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo2", "Genero2", "Subgenero2"))
-
-        self._generateEbook()
-
-        self.assertEqual(self._outputEpub.getSubject(), "Genero1, Subgenero1, Subgenero2, Genero2, Subgenero1, Subgenero2")
-
-    def test_genres_are_sorted_in_metadata(self):
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "d", "f"))
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "k", "a"))
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "a", "b"))
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "u", "a"))
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "a", "a"))
-        self._metadata.genres.append(ebook_metadata.Genre("Tipo1", "d", "e"))
-
-        self._generateEbook()
-
-        self.assertEqual(self._outputEpub.getSubject(), "a, a, b, d, e, f, k, a, u, a")
-
-    def test_not_genres_in_metadata(self):
-        self._metadata.genres.clear()
-
-        self._generateEbook()
-
-        self.assertIsNone(self._outputEpub.getSubject())
-
-    def test_default_publisher_in_metadata(self):
-        self._generateEbook()
-
-        self.assertEqual(self._outputEpub.getPublisher(), "ePubLibre")
-
-    def _generateEbook(self, sections=None):
+    def generateEbook(self, sections=None):
         ebookData = ebook_data.EbookData()
 
         if sections:
             for section in sections:
                 ebookData.addSection(section)
 
-        eebook = ebook.Ebook(ebookData, self._metadata)
+        eebook = ebook.Ebook(ebookData, self.metadata)
         fileName = eebook.save(self._outputFile)
-        self._outputEpub = epub.EpubReader(self._outputFile)
+        self.outputEpub = epub.EpubReader(self._outputFile)
         return fileName
 
-    def _getInfoFile(self):
-        try:
-            return etree.XML(self._outputEpub.read("OEBPS/Text/{0}".format(epubbase_names.INFO_FILENAME)))
-        except KeyError as e:
-            self.fail(e)
+    def release(self):
+        self._outputFile.close()
 
-    def _getTitleFile(self):
-        try:
-            return etree.XML(self._outputEpub.read("OEBPS/Text/{0}".format(epubbase_names.TITLE_FILENAME)))
-        except KeyError as e:
-            self.fail(e)
-
-    def _getSynopsisFile(self):
-        try:
-            return etree.XML(self._outputEpub.read("OEBPS/Text/{0}".format(epubbase_names.SYNOPSIS_FILENAME)))
-        except KeyError as e:
-            self.fail(e)
-
-    def _getDedicationFile(self):
-        try:
-            return etree.XML(self._outputEpub.read("OEBPS/Text/{0}".format(epubbase_names.DEDICATION_FILENAME)))
-        except KeyError as e:
-            self.fail(e)
-
-    def _getAuthorFile(self):
-        try:
-            return etree.XML(self._outputEpub.read("OEBPS/Text/{0}".format(epubbase_names.AUTHOR_FILENAME)))
-        except KeyError as e:
-            self.fail(e)
-
-    def _getCoverFile(self):
-        try:
-            return etree.XML(self._outputEpub.read("OEBPS/Text/{0}".format(epubbase_names.COVER_FILENAME)))
-        except KeyError as e:
-            self.fail(e)
-
-    def _xpath(self, element, xpath):
-        return element.xpath(xpath, namespaces=EbookTests._NAMESPACES)
+        if self.outputEpub:
+            self.outputEpub.close()
 
 
 if __name__ == "__main__":

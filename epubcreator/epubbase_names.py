@@ -15,3 +15,11 @@ IBOOKS_DISPLAY_OPTIONS_FILE_NAME = "com.apple.ibooks.display-options.xml"
 
 def generateTextSectionName(sectionNumber):
     return "Section{0:04}.xhtml".format(sectionNumber)
+
+
+def generateAuthorImageFileName(imageNumber):
+    return AUTHOR_IMAGE_FILENAME if imageNumber == 0 else AUTHOR_IMAGE_FILENAME[:-4] + str(imageNumber) + AUTHOR_IMAGE_FILENAME[-4:]
+
+
+def generateAuthorFileName(authorNumber):
+    return AUTHOR_FILENAME if authorNumber == 0 else AUTHOR_FILENAME[:-6] + str(authorNumber) + AUTHOR_FILENAME[-6:]
