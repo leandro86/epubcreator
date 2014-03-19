@@ -13,6 +13,8 @@ class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget.Ui_MetadataT
         # Contiene un tag 'img' cuyo atributo 'src' es una imagen de un ícono de error.
         self._errorImgTag = self._getErrorImgTag()
 
+        self.metadataTabManager.currentChanged.connect(self._selectedTabChanged)
+
     def getEbookMetadata(self):
         """
         Retorna los metadatos ingresados por el usuario.
@@ -21,7 +23,7 @@ class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget.Ui_MetadataT
         """
         metadata = ebook_metadata.Metadata()
 
-        if self._populateBasicMetadata(metadata) and self._populateAdditionalMetadata(metadata) and self._populateAuthorMetadata(metadata):
+        if self._populateBasicMetadata(metadata) and self._populateAdditionalMetadata(metadata):
             return metadata
         else:
             return None
@@ -75,13 +77,9 @@ class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget.Ui_MetadataT
 
         return isValid
 
-    def _populateAuthorMetadata(self, metadata):
-        isValid = True
-
-        metadata.authorImage = self.authorMetadata.getImage()
-        metadata.authorBiography = self.authorMetadata.getBiography()
-
-        return isValid
+    def _selectedTabChanged(self, index):
+        if self.metadataTabManager.widget(index) == self.authorMetadata:
+            self.authorMetadata.setAuthors(self.basicMetadata.getAuthors())
 
     def _showError(self, error, description, tab, widget):
         toolTipMsg = ('<p>{0} <b> {1}</b></p><p style="margin-left: 0.5em;">{2}</p>'.format(self._errorImgTag, error, description))

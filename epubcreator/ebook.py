@@ -1,4 +1,5 @@
 import os
+import copy
 
 import mako.template
 from pyepub.pyepubwriter import epub
@@ -110,8 +111,12 @@ class Ebook:
     _epubBase = _EpubBase(config.EPUBBASE_FILES_DIR_PATH)
 
     def __init__(self, ebookData, metadata=None):
+        # Debería hacer una copia profunda de ebookData también técnicamente, ya que más adelante
+        # modifico su objecto toc. Esto es prohibitivo, dado que estaría creando una copia de todas
+        # las secciones inútilmente. Lo que podría hacer es generar una copia de la toc aparte, ya
+        # que es lo único que necesito modificar.
         self._ebookData = ebookData or ebook_data.EbookData()
-        self._metadata = metadata or ebook_metadata.Metadata()
+        self._metadata = copy.deepcopy(metadata) if metadata else ebook_metadata.Metadata()
 
         # Guardo una referencia a la sección de notas, si la hay, para facilitarme luego alguas comprobaciones.
         self._notesSection = self._ebookData.sections[-1] if (self._ebookData.sections and

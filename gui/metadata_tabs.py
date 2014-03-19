@@ -363,33 +363,101 @@ class AuthorMetadata(QtGui.QWidget, author_metadata_widget.Ui_AuthorMetadata):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self._extendUi()
 
-        # Debo guardarme aparte los bytes de la imagen, ya no me sirve a mí obtenerlos desde el QLabel
-        # directamente (mismo problema que con la imagen de portada...).
-        self._authorImageBytes = None
+        # Guardo el texto del label porque cuando cargo una imagen luego no tengo manera de recuperar
+        # el texto.
+        self._authorImageText = self.authorImage.text()
 
-        self.authorImage.clicked.connect(self._changeAuthorImage)
+        self._connectSignals()
 
-    def getImage(self):
+    def setAuthors(self, authors):
         """
-        Retorna la imagen del autor.
+        Carga la lista de autores para editar su biografía e imagen.
 
-        @return: los bytes de la imagen.
+        @param authors: una lista de Person.
         """
-        return self._authorImageBytes
+        self.authorsTable.setRowCount(0)
 
-    def getBiography(self):
-        return self.authorBiographyInput.toPlainText().strip()
+        if authors:
+            for author in authors:
+                row = self.authorsTable.rowCount()
+                self.authorsTable.insertRow(row)
 
-    def _changeAuthorImage(self):
+                combo = QtGui.QComboBox()
+
+                # Cuando hay varios autores, no interesa quién es autor o autora, ya que
+                # en el epubbase directamente se pone "Autores".
+                combo.setEnabled(len(authors) == 1)
+
+                combo.addItem("Autor")
+                combo.addItem("Autora")
+
+                combo.currentIndexChanged.connect(lambda index: self._updateAuthorGender(combo.itemText(index)))
+
+                item = QtGui.QTableWidgetItem(author.name)
+
+                # En el primer item de cada fila almaceno el autor.
+                item.setData(QtCore.Qt.UserRole, author)
+
+                self.authorsTable.setItem(row, 0, item)
+                self.authorsTable.setCellWidget(row, 1, combo)
+
+                self.authorBiographyInput.setEnabled(True)
+                self.authorImage.setEnabled(True)
+                self.authorsTable.selectRow(0)
+        else:
+            self.authorBiographyInput.setEnabled(False)
+            self.authorImage.setEnabled(False)
+
+    def _populateAuthorData(self, current, previous):
+        if QtCore.QModelIndex.isValid(previous):
+            previousAuthor = self.authorsTable.item(previous.row(), 0).data(QtCore.Qt.UserRole)
+
+            # Solo guardo la biografía, porque la imagen se guarda automáticamente en el momento
+            # en que el usuario la selecciona.
+            previousAuthor.biography = self.authorBiographyInput.toPlainText().strip()
+
+        if QtCore.QModelIndex.isValid(current):
+            currentAuthor = self.authorsTable.item(current.row(), 0).data(QtCore.Qt.UserRole)
+
+            self.authorBiographyInput.setPlainText(currentAuthor.biography)
+            self._changeAuthorImage(currentAuthor.image)
+
+    def _openImageSelectionDialog(self):
         imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen", filter="Imágenes (*.jpg)")
+
         if imageName:
             with open(imageName, "rb") as file:
-                self._authorImageBytes = file.read()
+                imgBytes = file.read()
 
+            self._changeAuthorImage(imgBytes)
+
+            currentSelectedAuthor = self._getCurrentAuthor()
+            currentSelectedAuthor.image = imgBytes
+
+    def _changeAuthorImage(self, imgBytes):
+        if imgBytes:
             pixmap = QtGui.QPixmap()
-            pixmap.loadFromData(self._authorImageBytes)
+            pixmap.loadFromData(imgBytes)
+
             self.authorImage.setPixmap(pixmap)
+        else:
+            self.authorImage.setText(self._authorImageText)
+
+    def _updateAuthorGender(self, newGenderText):
+        self._getCurrentAuthor().gender = ebook_metadata.Person.MALE_GENDER if newGenderText == "Autor" else ebook_metadata.Person.FEMALE_GENDER
+
+    def _getCurrentAuthor(self):
+        return self.authorsTable.item(self.authorsTable.currentRow(), 0).data(QtCore.Qt.UserRole)
+
+    def _connectSignals(self):
+        self.authorsTable.selectionModel().currentRowChanged.connect(self._populateAuthorData)
+        self.authorImage.clicked.connect(self._openImageSelectionDialog)
+
+    def _extendUi(self):
+        self.authorsTable.setColumnWidth(1, 160)
+        self.authorsTable.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Stretch)
 
 
 class ValidationException(Exception):
