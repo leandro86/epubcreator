@@ -393,7 +393,7 @@ class AuthorMetadata(QtGui.QWidget, author_metadata_widget.Ui_AuthorMetadata):
                 combo.addItem("Autor")
                 combo.addItem("Autora")
 
-                combo.currentIndexChanged.connect(lambda index: self._updateAuthorGender(combo.itemText(index)))
+                combo.currentIndexChanged.connect(lambda index: self._saveAuthorGender(combo.itemText(index)))
 
                 item = QtGui.QTableWidgetItem(author.name)
 
@@ -411,15 +411,8 @@ class AuthorMetadata(QtGui.QWidget, author_metadata_widget.Ui_AuthorMetadata):
             self.authorImage.setEnabled(False)
 
     def _populateAuthorData(self, current, previous):
-        if QtCore.QModelIndex.isValid(previous):
-            previousAuthor = self.authorsTable.item(previous.row(), 0).data(QtCore.Qt.UserRole)
-
-            # Solo guardo la biografía, porque la imagen se guarda automáticamente en el momento
-            # en que el usuario la selecciona.
-            previousAuthor.biography = self.authorBiographyInput.toPlainText().strip()
-
         if QtCore.QModelIndex.isValid(current):
-            currentAuthor = self.authorsTable.item(current.row(), 0).data(QtCore.Qt.UserRole)
+            currentAuthor = self._getCurrentAuthor()
 
             self.authorBiographyInput.setPlainText(currentAuthor.biography)
             self._changeAuthorImage(currentAuthor.image)
@@ -445,8 +438,11 @@ class AuthorMetadata(QtGui.QWidget, author_metadata_widget.Ui_AuthorMetadata):
         else:
             self.authorImage.setText(self._authorImageText)
 
-    def _updateAuthorGender(self, newGenderText):
+    def _saveAuthorGender(self, newGenderText):
         self._getCurrentAuthor().gender = ebook_metadata.Person.MALE_GENDER if newGenderText == "Autor" else ebook_metadata.Person.FEMALE_GENDER
+
+    def _saveAuthorBiography(self):
+        self._getCurrentAuthor().biography = self.authorBiographyInput.toPlainText().strip()
 
     def _getCurrentAuthor(self):
         return self.authorsTable.item(self.authorsTable.currentRow(), 0).data(QtCore.Qt.UserRole)
@@ -454,6 +450,11 @@ class AuthorMetadata(QtGui.QWidget, author_metadata_widget.Ui_AuthorMetadata):
     def _connectSignals(self):
         self.authorsTable.selectionModel().currentRowChanged.connect(self._populateAuthorData)
         self.authorImage.clicked.connect(self._openImageSelectionDialog)
+
+        # Guardo directamente el texto de la biografía cada vez que se realice un cambio
+        # en el control. Me evito de esta manera el tener que de alguna manera forzar el
+        # guardado cuando se va a generar el epub.
+        self.authorBiographyInput.textChanged.connect(self._saveAuthorBiography)
 
     def _extendUi(self):
         self.authorsTable.setColumnWidth(1, 160)
