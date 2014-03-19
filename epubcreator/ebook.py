@@ -232,11 +232,11 @@ class Ebook:
 
         if self._metadata.genres:
             # Ordeno los géneros alfabéticamente.
-            sortedGenres = sorted(self._metadata.genres, key=lambda x: (x.genreType, x.genre, x.subGenre))
+            self._metadata.genres.sort(key=lambda x: (x.genreType, x.genre, x.subGenre))
 
             genres = []
             previousGenre = ""
-            for genre in sortedGenres:
+            for genre in self._metadata.genres:
                 if genre.genre != previousGenre:
                     genres.append(genre.genre)
                     previousGenre = genre.genre
