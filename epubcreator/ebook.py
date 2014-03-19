@@ -47,7 +47,7 @@ class _EpubBase:
         template = _EpubBase._files[epubbase_names.DEDICATION_FILENAME]
         return template.render(**params)
 
-    def getAuthor(self, authorBiography, title):
+    def getAuthor(self, authorBiography, title, imageName):
         params = locals()
         del (params["self"])
 
@@ -198,7 +198,9 @@ class Ebook:
         authorsWithBiographyOrImage = (a for a in self._metadata.authors if a.biography or a.image)
         for i, author in enumerate(authorsWithBiographyOrImage):
             title = self._getTocTitleForAuthorFile() if i == 0 else None
-            authorContent = Ebook._epubBase.getAuthor(author.biography, title)
+            imageName = epubbase_names.generateAuthorImageFileName(i)
+
+            authorContent = Ebook._epubBase.getAuthor(author.biography, title, imageName)
             outputEpub.addHtmlData(epubbase_names.generateAuthorFileName(i), authorContent)
 
         if self._notesSection:

@@ -566,7 +566,7 @@ class AuthorTests(unittest.TestCase):
 
         wantAuthorBiography = AuthorTests._AUTHOR_BIOGRAPHY
 
-        self.assertEqual(gotAuthorBiography, wantAuthorBiography.replace("\n", ""))
+        self.assertEqual(gotAuthorBiography, wantAuthorBiography)
 
     def test_author_biography_text(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="Párrafo 1.\nPárrafo 2.\nPárrafo 3."))
@@ -641,11 +641,33 @@ class AuthorTests(unittest.TestCase):
         self._common.generateEbook()
 
         authors = self._getAuthorFiles()
-        firstAuthor = next(a for a in authors if a[0] == "autor.xhtml")
-        secondAuthor = next(a for a in authors if a[0] == "autor1.xhtml")
+        firstAuthor = next(a[1] for a in authors if a[0] == "autor.xhtml")
+        secondAuthor = next(a[1] for a in authors if a[0] == "autor1.xhtml")
 
-        self.assertEqual(len(self._common.xpath(firstAuthor[1], "//x:h1")), 1)
-        self.assertFalse(self._common.xpath(secondAuthor[1], "//x:h1"))
+        self.assertEqual(len(self._common.xpath(firstAuthor, "//x:h1")), 1)
+        self.assertFalse(self._common.xpath(secondAuthor, "//x:h1"))
+
+    def test_image_reference_when_one_author_file(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+
+        self._common.generateEbook()
+
+        author = self._getAuthorFiles()[0][1]
+
+        self.assertTrue(self._common.xpath(author, "x:body/x:div[@class = 'vineta']/x:img/@src")[0].endswith("autor.jpg"))
+
+    def test_image_reference_when_two_author_files(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
+
+        self._common.generateEbook()
+
+        authors = self._getAuthorFiles()
+        firstAuthor = next(a[1] for a in authors if a[0] == "autor.xhtml")
+        secondAuthor = next(a[1] for a in authors if a[0] == "autor1.xhtml")
+
+        self.assertTrue(self._common.xpath(firstAuthor, "x:body/x:div[@class = 'vineta']/x:img/@src")[0].endswith("autor.jpg"))
+        self.assertTrue(self._common.xpath(secondAuthor, "x:body/x:div[@class = 'vineta']/x:img/@src")[0].endswith("autor1.jpg"))
 
     def test_author_file_is_last_in_play_order_when_epub_doesnt_have_notes(self):
         self._common.generateEbook()
