@@ -593,6 +593,16 @@ class AuthorTests(unittest.TestCase):
         self.assertEqual(self._common.xpath(author, "x:body/x:div[@class = 'autor']/x:p[2]//text()"), ["Párrafo ", "2", "."])
         self.assertEqual(self._common.xpath(author, "x:body/x:div[@class = 'autor']/x:p[3]//text()"), ["Párrafo 3."])
 
+    def test_author_biography_when_custom_image(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="Párrafo 1.", image="bla"))
+
+        self._common.generateEbook()
+
+        author = self._getAuthorFiles()[0][1]
+
+        self.assertEqual(self._common.xpath(author, "count(//x:p)"), 1)
+        self.assertEqual(self._common.xpath(author, "/x:html/x:body/x:div[@class = 'autor']/x:p[position() = 1]/text()")[0], "Párrafo 1.")
+
     def test_author_header_title_when_default_author(self):
         self._common.metadata.authors.clear()
 
@@ -1209,6 +1219,14 @@ class ImagesTests(unittest.TestCase):
 
     def test_author_image_content(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="author image"))
+
+        self._common.generateEbook()
+
+        authorImage = self._common.outputEpub.read(self._common.outputEpub.getFullPathToFile("autor.jpg"))
+        self.assertEqual(authorImage.decode(), "author image")
+
+    def test_author_image_content_when_author_has_custom_biography(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="bla", image="author image"))
 
         self._common.generateEbook()
 

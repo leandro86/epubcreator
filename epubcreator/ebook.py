@@ -367,12 +367,12 @@ class Ebook:
 
             # Solo genero xhtml e imagen para cada autor si en los metadatos viene especificado biografía o imagen.
             for author in self._metadata.authors:
-                if author.biography and not author.image:
-                    author.image = Ebook._epubBase.getAuthorImage()
-                    isAuthorWithData = True
+                if author.biography or author.image:
+                    if author.biography and not author.image:
+                        author.image = Ebook._epubBase.getAuthorImage()
+                    elif author.image and not author.biography:
+                        author.biography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
 
-                if author.image and not author.biography:
-                    author.biography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
                     isAuthorWithData = True
 
             # Si ningún autor tiene datos, necesito imperiosamente generar al menos un xhtml e imagen para autor.
