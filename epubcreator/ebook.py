@@ -361,23 +361,24 @@ class Ebook:
                                                                 Ebook._epubBase.getAuthorImage(),
                                                                 ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY))
         else:
-            # El primer autor siempre tiene su correspondiente xhtml e imagen.
-            firstAuthor = self._metadata.authors[0]
+            isAuthorWithData = False
 
-            if not firstAuthor.biography:
-                firstAuthor.biography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
-
-            if not firstAuthor.image:
-                firstAuthor.image = Ebook._epubBase.getAuthorImage()
-
-            # Para el resto de los autores, solo les genero xhtml e imagen si en los metadatos
-            # viene especificado alguno de esos dos campos.
-            for author in self._metadata.authors[1:]:
+            # Solo genero xhtml e imagen para cada autor si en los metadatos viene especificado biografía o imagen.
+            for author in self._metadata.authors:
                 if author.biography and not author.image:
                     author.image = Ebook._epubBase.getAuthorImage()
+                    isAuthorWithData = True
 
                 if author.image and not author.biography:
                     author.biography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
+                    isAuthorWithData = True
+
+            # Si ningún autor tiene datos, necesito imperiosamente generar al menos un xhtml e imagen para autor.
+            if not isAuthorWithData:
+                firstAuthor = self._metadata.authors[0]
+
+                firstAuthor.image = Ebook._epubBase.getAuthorImage()
+                firstAuthor.biography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
 
     def _getPersonsListAsText(self, persons):
         """

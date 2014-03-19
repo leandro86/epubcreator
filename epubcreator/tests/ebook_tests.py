@@ -498,7 +498,17 @@ class AuthorTests(unittest.TestCase):
         self.assertEqual(len(authors), 1)
         self.assertEqual(authors[0][0], "autor.xhtml")
 
-    def test_only_one_author_file_exists_when_two_authors_but_second_author_doesnt_have_biography_nor_image(self):
+    def test_only_one_author_file_exists_when_one_author(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+
+        self._common.generateEbook()
+
+        authors = self._getAuthorFiles()
+
+        self.assertEqual(len(authors), 1)
+        self.assertEqual(authors[0][0], "autor.xhtml")
+
+    def test_only_one_author_file_exists_when_two_authors_but_none_has_biography_or_image(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
 
@@ -509,19 +519,30 @@ class AuthorTests(unittest.TestCase):
         self.assertEqual(len(authors), 1)
         self.assertEqual(authors[0][0], "autor.xhtml")
 
-    def test_two_author_files_exist_when_two_authors_and_second_author_has_image(self):
+    def test_only_one_author_file_exists_when_two_authors_but_only_one_has_image(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
 
         self._common.generateEbook()
 
-        authors = [a[0] for a in self._getAuthorFiles()]
+        authors = self._getAuthorFiles()
 
-        self.assertEqual(len(authors), 2)
-        self.assertTrue("autor.xhtml" in authors and "autor1.xhtml" in authors)
+        self.assertEqual(len(authors), 1)
+        self.assertEqual(authors[0][0], "autor.xhtml")
 
-    def test_two_author_files_exist_when_two_authors_and_second_author_has_biography(self):
+    def test_only_one_author_file_exists_when_two_authors_but_only_one_has_biography(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="bla"))
+
+        self._common.generateEbook()
+
+        authors = self._getAuthorFiles()
+
+        self.assertEqual(len(authors), 1)
+        self.assertEqual(authors[0][0], "autor.xhtml")
+
+    def test_two_author_files_exist_when_two_authors_and_both_have_biography_or_image(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="bla"))
 
         self._common.generateEbook()
@@ -531,7 +552,7 @@ class AuthorTests(unittest.TestCase):
         self.assertEqual(len(authors), 2)
         self.assertTrue("autor.xhtml" in authors and "autor1.xhtml" in authors)
 
-    def test_default_author_biography_text_in_author_file(self):
+    def test_default_author_biography_text(self):
         self._common.metadata.authors.clear()
 
         self._common.generateEbook()
@@ -547,7 +568,7 @@ class AuthorTests(unittest.TestCase):
 
         self.assertEqual(gotAuthorBiography, wantAuthorBiography.replace("\n", ""))
 
-    def test_author_biography_text_in_author_file(self):
+    def test_author_biography_text(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="Párrafo 1.\nPárrafo 2.\nPárrafo 3."))
 
         self._common.generateEbook()
@@ -558,7 +579,7 @@ class AuthorTests(unittest.TestCase):
         self.assertEqual(self._common.xpath(author, "/x:html/x:body/x:div[@class = 'autor']/x:p[position() = 2]/text()")[0], "Párrafo 2.")
         self.assertEqual(self._common.xpath(author, "/x:html/x:body/x:div[@class = 'autor']/x:p[position() = 3]/text()")[0], "Párrafo 3.")
 
-    def test_author_biography_text_with_tags_are_preserved_in_author_file(self):
+    def test_author_biography_text_with_tags_are_preserved(self):
         biography = "Párrafo 1.\n<strong>Párrafo <em>2</em></strong>.\n<span>Párrafo 3.</span>"
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography=biography))
 
@@ -572,7 +593,7 @@ class AuthorTests(unittest.TestCase):
         self.assertEqual(self._common.xpath(author, "x:body/x:div[@class = 'autor']/x:p[2]//text()"), ["Párrafo ", "2", "."])
         self.assertEqual(self._common.xpath(author, "x:body/x:div[@class = 'autor']/x:p[3]//text()"), ["Párrafo 3."])
 
-    def test_author_header_title_when_default_author_in_author_file(self):
+    def test_author_header_title_when_default_author(self):
         self._common.metadata.authors.clear()
 
         self._common.generateEbook()
@@ -582,7 +603,7 @@ class AuthorTests(unittest.TestCase):
         self.assertEqual(len(self._common.xpath(author, "//x:h1")), 1)
         self.assertEqual(self._common.xpath(author, "x:body/x:h1[@class = 'oculto']/@title")[0], "Autor")
 
-    def test_author_header_title_with_male_author_in_author_file(self):
+    def test_author_header_title_with_male_author(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
 
         self._common.generateEbook()
@@ -592,7 +613,7 @@ class AuthorTests(unittest.TestCase):
         self.assertEqual(len(self._common.xpath(author, "//x:h1")), 1)
         self.assertEqual(self._common.xpath(author, "x:body/x:h1[@class = 'oculto']/@title")[0], "Autor")
 
-    def test_author_header_title_with_female_author_in_author_file(self):
+    def test_author_header_title_with_female_author(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", ebook_metadata.Person.FEMALE_GENDER))
 
         self._common.generateEbook()
@@ -602,7 +623,7 @@ class AuthorTests(unittest.TestCase):
         self.assertEqual(len(self._common.xpath(author, "//x:h1")), 1)
         self.assertEqual(self._common.xpath(author, "x:body/x:h1[@class = 'oculto']/@title")[0], "Autora")
 
-    def test_author_header_title_with_two_authors_in_author_file(self):
+    def test_author_header_title_with_two_authors(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", ebook_metadata.Person.MALE_GENDER))
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", ebook_metadata.Person.FEMALE_GENDER))
 
@@ -613,8 +634,8 @@ class AuthorTests(unittest.TestCase):
         self.assertEqual(len(self._common.xpath(author, "//x:h1")), 1)
         self.assertEqual(self._common.xpath(author, "x:body/x:h1[@class = 'oculto']/@title")[0], "Autores")
 
-    def test_only_first_author_file_has_header_when_two_authors(self):
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+    def test_only_first_author_file_has_header_when_two_author_files(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
 
         self._common.generateEbook()
@@ -639,7 +660,7 @@ class AuthorTests(unittest.TestCase):
         self.assertEqual(htmlFiles[-2], "autor.xhtml")
 
     def test_player_order_when_multiple_author_files(self):
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
@@ -1124,7 +1145,7 @@ class ImagesTests(unittest.TestCase):
         self.assertEqual(len(authorImages), 1)
         self.assertEqual(authorImages[0], "autor.jpg")
 
-    def test_only_one_author_image_exists_when_two_authors_but_second_author_doesnt_have_biography_nor_image(self):
+    def test_only_one_author_image_exists_when_two_authors_but_none_has_biography_or_image(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
 
@@ -1134,19 +1155,29 @@ class ImagesTests(unittest.TestCase):
         self.assertEqual(len(authorImages), 1)
         self.assertEqual(authorImages[0], "autor.jpg")
 
-    def test_two_author_images_exist_when_two_authors_and_second_author_has_image(self):
+    def test_only_one_author_image_exists_when_two_authors_but_only_one_has_image(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
 
         self._common.generateEbook()
 
         authorImages = [f for f in self._common.outputEpub.getNamelist() if f.startswith("autor") and f.endswith(".jpg")]
-        self.assertEqual(len(authorImages), 2)
-        self.assertTrue("autor.jpg" in authorImages and "autor1.jpg" in authorImages)
+        self.assertEqual(len(authorImages), 1)
+        self.assertEqual(authorImages[0], "autor.jpg")
 
-    def test_two_author_images_exist_when_two_authors_and_second_author_has_biography(self):
+    def test_only_one_author_image_exists_when_two_authors_but_only_one_has_biography(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="bla"))
+
+        self._common.generateEbook()
+
+        authorImages = [f for f in self._common.outputEpub.getNamelist() if f.startswith("autor") and f.endswith(".jpg")]
+        self.assertEqual(len(authorImages), 1)
+        self.assertEqual(authorImages[0], "autor.jpg")
+
+    def test_two_author_images_exist_when_two_authors_and_both_have_biography_or_image(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
 
         self._common.generateEbook()
 
