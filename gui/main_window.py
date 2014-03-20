@@ -15,9 +15,20 @@ import config
 
 class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
     _SETTINGS_GROUP = "mainWindow"
+
+    # Las dimensiones y posición de la ventana.
     _MAINWINDOW_GEOMETRY_SETTING = "geometry"
     _MAINWINDOW_STATE_SETTING = "state"
+
+    # El path de la última ubicación desde la cual se abrió un archivo.
     _LAST_FOLDER_OPEN_SETTING = "lastFolderOpen"
+
+    # El path de la última ubicación en la cual se guardó un epub sin asociarle contenido
+    # alguno, es decir, que solo se modificaron algunos metadatos y luego se generó el epub, sin
+    # abrir ningún docx, ni ningún otro archivo. Cuando se le asocia un contenido al epub, entonces
+    # éste se guarda en el mismo directorio donde se encuentra el documento fuente (sea un docx o
+    # cualquier otro).
+    _LAST_EMPTY_EPUB_OUTPUT_FOLDER_SETTING = "lastEmptyEpubOutputFolder"
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -29,8 +40,8 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
         # archivos del epubbase.
         self._workingFilePath = ""
 
-        # El path de la última ubicación desde la cual se abrió un archivo.
         self._lastFolderOpen = ""
+        self._lastEmptyEpubOutputFolder = ""
 
         self.setWindowTitle(version.APP_NAME)
 
@@ -70,9 +81,12 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
             else:
                 # Si no estoy trabajando con ningún archivo, debo pedirle al usuario
                 # el path donde guardar el epub.
-                outputDir = QtGui.QFileDialog.getExistingDirectory(self, "", "")
+                outputDir = QtGui.QFileDialog.getExistingDirectory(self, "", self._lastEmptyEpubOutputFolder)
 
             if outputDir:
+                if not self._workingFilePath:
+                    self._lastEmptyEpubOutputFolder = outputDir
+
                 try:
                     fileName = eebook.save(outputDir)
 
@@ -128,6 +142,7 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
         mainWindowGeometry = settings.value(MainWindow._MAINWINDOW_GEOMETRY_SETTING)
         mainWindowState = settings.value(MainWindow._MAINWINDOW_STATE_SETTING)
         self._lastFolderOpen = settings.value(MainWindow._LAST_FOLDER_OPEN_SETTING)
+        self._lastEmptyEpubOutputFolder = settings.value(MainWindow._LAST_EMPTY_EPUB_OUTPUT_FOLDER_SETTING)
 
         settings.endGroup()
 
@@ -144,6 +159,7 @@ class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
         settings.setValue(MainWindow._MAINWINDOW_GEOMETRY_SETTING, self.saveGeometry())
         settings.setValue(MainWindow._MAINWINDOW_STATE_SETTING, self.saveState())
         settings.setValue(MainWindow._LAST_FOLDER_OPEN_SETTING, self._lastFolderOpen)
+        settings.setValue(MainWindow._LAST_EMPTY_EPUB_OUTPUT_FOLDER_SETTING, self._lastEmptyEpubOutputFolder)
 
         settings.endGroup()
 
