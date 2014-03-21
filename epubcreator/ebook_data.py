@@ -1,4 +1,4 @@
-import lxml.html
+from lxml import etree
 
 from epubcreator import epubbase_names
 
@@ -24,22 +24,78 @@ class EbookData:
 class Section:
     _DOCTYPE = ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"'
                 ' "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">')
-    _XML_DECLARATION = '<?xml version="1.0" encoding="utf-8" standalone="no"?>'
-    _HTML_HEAD = '<head><title></title><link href="../Styles/style.css" rel="stylesheet" type="text/css" /></head>'
-    _HTML_OPENTAG = '<html xmlns="http://www.w3.org/1999/xhtml">'
+
+    _TEXT = 0
+    _TAIL = 1
 
     def __init__(self, sectionNumber):
         self.name = self._generateSectionName(sectionNumber)
-        self._content = []
+
+        self._html = etree.Element("html", xmlns="http://www.w3.org/1999/xhtml")
+
+        head = etree.Element("head")
+        head.append(etree.Element("title"))
+        head.append(etree.Element("link", href="../Styles/style.css", rel="stylesheet", type="text/css"))
+
+        self._html.append(head)
+
+        body = etree.Element("body")
+
+        self._html.append(body)
+
+        # Una pila que contiene los elementos abiertos anidados. La necesito para saber en qué
+        # elemento debo escribir el texto.
+        self._openedElements = [body]
+
+        # El último elemento en ser abierto o cerrado. Representa el elemento en el cual debo
+        # escribir el texto cuando sea necesario.
+        self._lastElement = body
+
+        # Tener el último elemento en ser abierto o cerrado no me basta, sino que necesito saber
+        # en qué posición debo escribir: text o tail, ya que lxml hace esta diferencia.
+        self._textWritePos = Section._TEXT
+
+        # El texto propiamente dicho de cada nodo. Solamente lo vuelco al nodo (ya sea en su
+        # atributo text o tail) al momento de abrir o cerrar otro nodo.
+        self._textBuffer = []
 
     def appendText(self, text):
-        self._content.append(text)
+        self._textBuffer.append(text)
 
     def openTag(self, tag, attributes=None):
-        self.appendText(self._generateOpenTag(tag, attributes))
+        self._writeTextBuffer()
+
+        if attributes:
+            e = etree.Element(tag, **attributes)
+        else:
+            e = etree.Element(tag)
+
+        self._openedElements[-1].append(e)
+        self._openedElements.append(e)
+
+        self._lastElement = e
+        self._textWritePos = Section._TEXT
+
+    def _writeTextBuffer(self):
+        text = "".join(self._textBuffer)
+
+        if self._textWritePos == Section._TEXT:
+            self._lastElement.text = text
+        else:
+            self._lastElement.tail = text
+
+        self._textBuffer = []
 
     def closeTag(self, tag):
-        self.appendText(self._generateCloseTag(tag))
+        self._writeTextBuffer()
+
+        e = self._openedElements.pop()
+
+        if e.tag != tag:
+            raise Exception("Tag mismatch")
+
+        self._lastElement = e
+        self._textWritePos = Section._TAIL
 
     def openHeading(self, level, headingId=None):
         tag = "h{0}".format(level)
@@ -55,19 +111,11 @@ class Section:
         self.closeTag("img")
 
     def toHtml(self):
-        html = "".join((Section._XML_DECLARATION,
-                        Section._DOCTYPE,
-                        Section._HTML_OPENTAG,
-                        Section._HTML_HEAD,
-                        self._generateOpenTag("body"),
-                        "".join(self._content),
-                        self._generateCloseTag("body"),
-                        self._generateCloseTag("html")))
-
-        return html
+        return etree.tostring(self._html, xml_declaration=True, pretty_print=True, encoding="utf-8", doctype=Section._DOCTYPE).decode()
 
     def toRawText(self):
-        return lxml.html.fromstring("".join(self._content)).text_content()
+        text = self._html.xpath("//text()")
+        return "".join(text)
 
     def _generateOpenTag(self, tag, attributes=None):
         if attributes is None:
@@ -95,13 +143,9 @@ class TextSection(Section):
         self.closeTag("a")
 
     def toRawText(self):
-        html = lxml.html.fromstring("".join(self._content))
-
-        sups = html.xpath("//sup[parent::a]")
-        for sup in sups:
-            sup.text = ""
-
-        return html.text_content()
+        # Debo ignorar las referencias a las notas al pie.
+        text = self._html.xpath("//text()[not(parent::sup[parent::a])]")
+        return "".join(text)
 
     def _generateSectionName(self, sectionNumber):
         return epubbase_names.generateTextSectionName(sectionNumber)
@@ -141,30 +185,30 @@ class NotesSection(Section):
         self._footnotesCount += 1
 
     def closeNote(self):
-        pos = len(self._content) - 1
-
         # Debe haber un espacio antes del link de retorno.
-        returnLink = ' <a href="../Text/{0}#rf{1}">&lt;&lt;</a>'.format(self._currentFootnoteSection,
-                                                                        self._footnotesCount)
-        self._content.insert(pos, returnLink)
+        # No hay posibilidad de que se genere una excepción acá, porque sé que siempre al menos el
+        # elemento "sup" va a existir.
+        # Como sé que _lastElement contiene el último elemento en ser abierto o cerrado, entonces el elemento
+        # "a" debe ir dentro de éste. No sólo eso, sino que además, obteniendo el tail de su último elemento
+        # hijo, tengo la posición exacta para agregar el espacio necesario que separa el link de retorno.
+        lastChild = list(self._lastElement)[-1]
 
+        # Cuidado, porque tail puede ser None!
+        if lastChild.tail:
+            lastChild.tail += " "
+        else:
+            lastChild.tail = " "
+
+        anchor = etree.Element("a", href="../Text/{0}#rf{1}".format(self._currentFootnoteSection, self._footnotesCount))
+        anchor.text = "<<"
+
+        self._lastElement.append(anchor)
         self.closeTag("div")
 
     def toRawText(self):
-        html = lxml.html.fromstring("".join(self._content))
-
-        title = html.xpath("h1[text() = 'Notas']")[0]
-        title.text = ""
-
-        sups = html.xpath("//sup[parent::p[@id]]")
-        for sup in sups:
-            sup.text = ""
-
-        anchors = html.xpath("//a")
-        for a in anchors:
-            a.text = ""
-
-        return html.text_content()
+        # Debo obviar el título "Notas", el texto de los superíndices y el texto del link de retorno.
+        text = self._html.xpath("//text()[not(parent::h1) and not(parent::sup[parent::p[@id]]) and not(parent::a)]")
+        return "".join(text)
 
     def _generateSectionName(self, sectionNumber):
         return epubbase_names.NOTES_FILENAME
