@@ -249,7 +249,7 @@ class DocxConverter(converter_base.AbstractConverter):
                 nextParagraphStyleId = self._styles.getParagraphStyleId(nextParagraph)
 
             if styleId != previousParagraphStyleId and styleId == nextParagraphStyleId:
-                self._currentSection.openTag("div", {"class": customStyleName})
+                self._currentSection.openTag("div", **{"class": customStyleName})
                 isParagraphInsideDiv = True
             elif styleId == previousParagraphStyleId:
                 if styleId != nextParagraphStyleId:
@@ -263,15 +263,15 @@ class DocxConverter(converter_base.AbstractConverter):
             if customStyleName and not isParagraphInsideDiv:
                 classValue.append(customStyleName)
 
-            attributes = {"class": " ".join(classValue)} if classValue else None
+            attributes = {"class": " ".join(classValue)} if classValue else {}
 
-            self._currentSection.openTag(tag, attributes)
+            self._currentSection.openTag(tag, **attributes)
             self._processParagraphContent(paragraph)
             self._currentSection.closeTag(tag)
         else:
             pic = utils.getPic(paragraph)
             if pic is not None:
-                self._currentSection.openTag("p", {"class": "ilustra"})
+                self._currentSection.openTag("p", **{"class": "ilustra"})
                 self._processPic(pic)
                 self._currentSection.closeTag("p")
 
@@ -331,7 +331,7 @@ class DocxConverter(converter_base.AbstractConverter):
                     nextRunStyleId = self._styles.getRunStyleId(nextRun)
 
                 if styleId != previousRunStyleId:
-                    self._currentSection.openTag("span", {"class": customStyleName})
+                    self._currentSection.openTag("span", **{"class": customStyleName})
 
                 if styleId != nextRunStyleId:
                     needToCloseSpan = True
@@ -396,7 +396,7 @@ class DocxConverter(converter_base.AbstractConverter):
                 self._currentSection.closeTag("ul")
 
     def _processTable(self, table):
-        self._currentSection.openTag("table", dict(frame="box", rules="all"))
+        self._currentSection.openTag("table", frame="box", rules="all")
 
         for child in table:
             if child.tag.endswith("tr"):

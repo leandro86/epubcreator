@@ -62,13 +62,10 @@ class Section:
     def appendText(self, text):
         self._textBuffer.append(text)
 
-    def openTag(self, tag, attributes=None):
+    def openTag(self, tag, **attributes):
         self._writeTextBuffer()
 
-        if attributes:
-            e = etree.Element(tag, **attributes)
-        else:
-            e = etree.Element(tag)
+        e = etree.Element(tag, **attributes)
 
         self._openedElements[-1].append(e)
         self._openedElements.append(e)
@@ -99,15 +96,17 @@ class Section:
 
     def openHeading(self, level, headingId=None):
         tag = "h{0}".format(level)
-        attributes = dict(id=headingId) if headingId else None
-        self.openTag(tag, attributes)
+        if headingId:
+            self.openTag(tag, id=headingId)
+        else:
+            self.openTag(tag)
 
     def closeHeading(self, level):
         tag = "h{0}".format(level)
         self.closeTag(tag)
 
     def appendImg(self, imageName):
-        self.openTag("img", dict(alt="", src="../Images/{0}".format(imageName)))
+        self.openTag("img", alt="", src="../Images/{0}".format(imageName))
         self.closeTag("img")
 
     def toHtml(self):
@@ -136,7 +135,7 @@ class TextSection(Section):
         super().__init__(sectionNumber)
 
     def insertNoteReference(self, noteNumber):
-        self.openTag("a", dict(id="rf{0}".format(noteNumber), href="../Text/notas.xhtml#nt{0}".format(noteNumber)))
+        self.openTag("a", id="rf{0}".format(noteNumber), href="../Text/notas.xhtml#nt{0}".format(noteNumber))
         self.openTag("sup")
         self.appendText("[{0}]".format(str(noteNumber)))
         self.closeTag("sup")
@@ -163,22 +162,21 @@ class NotesSection(Section):
         self.appendText("Notas")
         self.closeHeading(1)
 
-    def openTag(self, tag, attributes=None):
+    def openTag(self, tag, **attributes):
         if not self._hasCurrentFootnoteContent:
-            attributes = attributes or {}
             attributes["id"] = "nt{0}".format(self._footnotesCount)
 
-            super().openTag(tag, attributes)
+            super().openTag(tag, **attributes)
             super().openTag("sup")
             self.appendText("[{0}]".format(self._footnotesCount))
             super().closeTag("sup")
 
             self._hasCurrentFootnoteContent = True
         else:
-            super().openTag(tag, attributes)
+            super().openTag(tag, **attributes)
 
     def openNote(self, footnoteSection):
-        super().openTag("div", {"class": "nota"})
+        super().openTag("div", **{"class": "nota"})
 
         self._currentFootnoteSection = footnoteSection
         self._hasCurrentFootnoteContent = False
