@@ -8,8 +8,8 @@ from epubcreator.converters.docx import utils
 
 class Footnotes:
     def __init__(self, footnotes, footnotesRels=None):
-        self._footnotesXml = etree.XML(footnotes)
-        self._footnotesRelsXml = etree.XML(footnotesRels) if footnotesRels else None
+        self._footnotesXml = etree.fromstring(footnotes)
+        self._footnotesRelsXml = etree.fromstring(footnotesRels) if footnotesRels else None
 
     def getFootnote(self, footnoteId):
         return xml_utils.xpath(self._footnotesXml, 'w:footnote[@w:id = "{0}"]'.format(footnoteId), utils.NAMESPACES)[0]

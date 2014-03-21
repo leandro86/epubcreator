@@ -9,7 +9,7 @@ class Opf:
         """
         @param opfContent: un string con el contenido de content.opf.
         """
-        self._opf = etree.XML(opfContent)
+        self._opf = etree.fromstring(opfContent)
 
     def getSpineItems(self):
         return self._xpath(self._opf, "/opf:package/opf:spine/opf:itemref/@idref")

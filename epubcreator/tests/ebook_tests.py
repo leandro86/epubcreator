@@ -83,7 +83,7 @@ class SynopsisTests(unittest.TestCase):
         self.assertEqual(self._common.outputEpub.getDescription(), "Párrafo 1. Párrafo 2. Párrafo 3.")
 
     def _getSynopsisFile(self):
-        return etree.XML(self._common.outputEpub.read("OEBPS/Text/{0}".format("sinopsis.xhtml")))
+        return etree.fromstring(self._common.outputEpub.read("OEBPS/Text/{0}".format("sinopsis.xhtml")))
 
 
 class TitleTests(unittest.TestCase):
@@ -202,7 +202,7 @@ class TitleTests(unittest.TestCase):
                          datetime.datetime.now().strftime("%d.%m.%y"))
 
     def _getTitleFile(self):
-        return etree.XML(self._common.outputEpub.read("OEBPS/Text/{0}".format("titulo.xhtml")))
+        return etree.fromstring(self._common.outputEpub.read("OEBPS/Text/{0}".format("titulo.xhtml")))
 
 
 class InfoTests(unittest.TestCase):
@@ -413,7 +413,7 @@ class InfoTests(unittest.TestCase):
         self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[4]/text()")[0], "ePub base r1.1")
 
     def _getInfoFile(self):
-        return etree.XML(self._common.outputEpub.read("OEBPS/Text/{0}".format("info.xhtml")))
+        return etree.fromstring(self._common.outputEpub.read("OEBPS/Text/{0}".format("info.xhtml")))
 
 
 class DedicationTests(unittest.TestCase):
@@ -472,7 +472,7 @@ class DedicationTests(unittest.TestCase):
         self.assertEqual(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[3]//text()"), ["Párrafo 3."])
 
     def _getDedicationFile(self):
-        return etree.XML(self._common.outputEpub.read("OEBPS/Text/{0}".format("dedicatoria.xhtml")))
+        return etree.fromstring(self._common.outputEpub.read("OEBPS/Text/{0}".format("dedicatoria.xhtml")))
 
 
 class AuthorTests(unittest.TestCase):
@@ -706,7 +706,7 @@ class AuthorTests(unittest.TestCase):
         authorFiles = []
 
         for authorFileName in (f for f in self._common.outputEpub.getNamelist() if f.startswith("autor") and f.endswith(".xhtml")):
-            authorFiles.append((authorFileName, etree.XML(self._common.outputEpub.read("OEBPS/Text/{0}".format(authorFileName)))))
+            authorFiles.append((authorFileName, etree.fromstring(self._common.outputEpub.read("OEBPS/Text/{0}".format(authorFileName)))))
 
         return authorFiles
 

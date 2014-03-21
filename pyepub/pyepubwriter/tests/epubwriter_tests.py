@@ -117,7 +117,7 @@ class EpubWriterTests(unittest.TestCase):
         self._generateEpub()
 
         toc = self._getToc()
-        opf = etree.XML(self._resultingEpub.read("OEBPS/content.opf"))
+        opf = etree.fromstring(self._resultingEpub.read("OEBPS/content.opf"))
 
         self.assertEqual(len(self._xpath(toc, "/toc:ncx[@version = '2005-1']")), 1)
 
@@ -212,13 +212,13 @@ class EpubWriterTests(unittest.TestCase):
 
     def _getToc(self):
         try:
-            return etree.XML(self._resultingEpub.read("OEBPS/toc.ncx"))
+            return etree.fromstring(self._resultingEpub.read("OEBPS/toc.ncx"))
         except KeyError as e:
             self.fail(e)
 
     def _getOpf(self):
         try:
-            return etree.XML(self._resultingEpub.read("OEBPS/content.opf"))
+            return etree.fromstring(self._resultingEpub.read("OEBPS/content.opf"))
         except KeyError as e:
             self.fail(e)
 

@@ -249,8 +249,8 @@ class _XmlComparer:
         normalizedX1 = re.sub(r"\n\s*<", "<", x1)
         normalizedX2 = re.sub(r"\n\s*<", "<", x2)
 
-        return _XmlComparer._performCompare(etree.XML(bytes(normalizedX1, "utf-8")),
-                                            etree.XML(bytes(normalizedX2, "utf-8")))
+        return _XmlComparer._performCompare(etree.fromstring(bytes(normalizedX1, "utf-8")),
+                                            etree.fromstring(bytes(normalizedX2, "utf-8")))
 
     @staticmethod
     def _performCompare(x1, x2):

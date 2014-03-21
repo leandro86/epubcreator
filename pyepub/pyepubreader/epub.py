@@ -97,7 +97,7 @@ class EpubReader:
         return self._epub.read(fileName)
 
     def _getPathToOpf(self):
-        container = etree.XML(self._epub.read("META-INF/container.xml"))
+        container = etree.fromstring(self._epub.read("META-INF/container.xml"))
         return container.xpath("/inf:container/inf:rootfiles/inf:rootfile/@full-path",
                                namespaces={"inf": "urn:oasis:names:tc:opendocument:xmlns:container"})[0]
 

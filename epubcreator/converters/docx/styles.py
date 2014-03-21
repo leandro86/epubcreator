@@ -47,7 +47,7 @@ class Styles:
         return styleName[5:] if styleName.startswith("epub_") else None
 
     def _readStyles(self, stylesXml):
-        xml = etree.XML(stylesXml)
+        xml = etree.fromstring(stylesXml)
         styles = {}
 
         for child in xml:

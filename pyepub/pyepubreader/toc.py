@@ -8,7 +8,7 @@ class Toc:
         """
         @param tocContent: un string con el contenido de toc.ncx.
         """
-        self._toc = etree.XML(tocContent)
+        self._toc = etree.fromstring(tocContent)
 
     def getTitles(self):
         navMap = self._xpath(self._toc, "/toc:ncx/toc:navMap")[0]

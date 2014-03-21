@@ -88,13 +88,13 @@ class DocxConverter(converter_base.AbstractConverter):
 
     def _openDocx(self, inputFile):
         with zipfile.ZipFile(inputFile) as docx:
-            contentTypesXml = etree.XML(docx.read("[Content_Types].xml"))
+            contentTypesXml = etree.fromstring(docx.read("[Content_Types].xml"))
 
             path = '/ct:Types/ct:Override[@ContentType = "{0}"]/@PartName'
 
             docPath = xml_utils.xpath(contentTypesXml, path.format(DocxConverter._DOCUMENT_CONTENT_TYPE), namespaces=utils.NAMESPACES)[0]
             docPath = docPath.strip("/")
-            self._documentXml = etree.XML(docx.read(docPath))
+            self._documentXml = etree.fromstring(docx.read(docPath))
 
             stylesPath = xml_utils.xpath(contentTypesXml, path.format(DocxConverter._STYLES_CONTENT_TYPE), namespaces=utils.NAMESPACES)[0]
             self._styles = styles.Styles(docx.read(stylesPath.strip("/")))
@@ -117,7 +117,7 @@ class DocxConverter(converter_base.AbstractConverter):
             docRelsPath = docDir + "/_rels/" + docFileName + ".rels"
 
             try:
-                self._documentRelsXml = etree.XML(docx.read(docRelsPath))
+                self._documentRelsXml = etree.fromstring(docx.read(docRelsPath))
             except KeyError:
                 self._documentRelsXml = None
 
