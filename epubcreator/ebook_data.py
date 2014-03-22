@@ -143,7 +143,7 @@ class TextSection(Section):
 
     def toRawText(self):
         # Debo ignorar las referencias a las notas al pie.
-        text = self._html.xpath("//text()[not(parent::sup[parent::a])]")
+        text = self._html.xpath("//*[not(self::sup[parent::a[starts-with(@id, 'rf')]])]/text()")
         return "".join(text)
 
     def _generateSectionName(self, sectionNumber):
@@ -204,8 +204,10 @@ class NotesSection(Section):
         self.closeTag("div")
 
     def toRawText(self):
-        # Debo obviar el título "Notas", el texto de los superíndices y el texto del link de retorno.
-        text = self._html.xpath("//text()[not(parent::h1) and not(parent::sup[parent::p[@id]]) and not(parent::a)]")
+        # Debo obviar el título "Notas", el texto del primer superíndice y el texto del link de retorno.
+        text = self._html.xpath("//*[not(self::a) and "
+                                "not(. = ./parent::*[starts-with(@id, 'nt')]/child::sup[1]) and "
+                                ". != /html/body/child::*[1]]/text()")
         return "".join(text)
 
     def _generateSectionName(self, sectionNumber):
