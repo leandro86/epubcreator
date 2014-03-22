@@ -116,16 +116,6 @@ class Section:
         text = self._html.xpath("//text()")
         return "".join(text)
 
-    def _generateOpenTag(self, tag, attributes=None):
-        if attributes is None:
-            return "<{0}>".format(tag)
-        else:
-            attr = " ".join(['{0}="{1}"'.format(k, v) for k, v in attributes.items()])
-            return "<{0} {1}>".format(tag, attr)
-
-    def _generateCloseTag(self, tag):
-        return "</{0}>".format(tag)
-
     def _generateSectionName(self, sectionNumber):
         raise NotImplemented
 

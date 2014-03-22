@@ -10,6 +10,10 @@ NAMESPACES = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main
               "wps": "http://schemas.microsoft.com/office/word/2010/wordprocessingShape",
               "ct": "http://schemas.openxmlformats.org/package/2006/content-types"}
 
+PAGE_BREAK_ON_BEGINNING = 0
+PAGE_BREAK_ON_END = 1
+NO_PAGE_BREAK = 2
+
 
 def getRunFormats(run):
     rpr = run.find("w:rPr", namespaces=NAMESPACES)
@@ -45,12 +49,21 @@ def getFormats(node, processSubAndSup=True):
     return formats
 
 
-def isPageBreakOnBeginning(paragraph):
-    return bool(xml_utils.xpath(paragraph, "w:r[1][w:br/@w:type = 'page'] or w:pPr/w:pageBreakBefore", NAMESPACES))
+def getPageBreakPosition(paragraph):
+    if xml_utils.xpath(paragraph, "w:pPr/w:pageBreakBefore", NAMESPACES):
+        return PAGE_BREAK_ON_BEGINNING
 
-
-def isPageBreakOnEnd(paragraph):
-    return bool(xml_utils.xpath(paragraph, "w:r[w:br/@w:type = 'page' and position() > 1]", NAMESPACES))
+    runWithBreak = xml_utils.xpath(paragraph, "w:r[w:br/@w:type = 'page']", NAMESPACES)
+    if runWithBreak:
+        # Compruebo si arriba del run hay texto. De ser así, entiendo entonces que el salto de página se
+        # encuentra al final del párrafo. Caso contrario (si no hay texto arriba del run), el salto de página
+        # se encuentra al principio del párrafo.
+        if xml_utils.xpath(runWithBreak[0], "preceding-sibling::*[descendant::w:t[normalize-space(text()) != '']]", NAMESPACES):
+            return PAGE_BREAK_ON_END
+        else:
+            return PAGE_BREAK_ON_BEGINNING
+    else:
+        return NO_PAGE_BREAK
 
 
 def getNextParagraph(paragraph):

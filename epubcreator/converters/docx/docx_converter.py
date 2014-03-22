@@ -144,11 +144,10 @@ class DocxConverter(converter_base.AbstractConverter):
         for child in node:
             if child.tag.endswith("}p"):
                 hasParagraphText = utils.hasText(child)
-                hasParagraphPageBreak = False
+                pageBreakPosition = utils.getPageBreakPosition(child)
 
-                if utils.isPageBreakOnBeginning(child):
+                if pageBreakPosition == utils.PAGE_BREAK_ON_BEGINNING:
                     self._saveCurrentSection()
-                    hasParagraphPageBreak = True
 
                 if self._styles.hasParagraphHeadingStyle(child):
                     self._processHeading(child, hasParagraphText)
@@ -159,10 +158,10 @@ class DocxConverter(converter_base.AbstractConverter):
                     else:
                         self._processParagraph(child, hasParagraphText, tag, previousEmptyParagraphsCount)
 
-                if utils.isPageBreakOnEnd(child):
+                if pageBreakPosition == utils.PAGE_BREAK_ON_END:
                     self._saveCurrentSection()
 
-                if hasParagraphText or hasParagraphPageBreak:
+                if hasParagraphText or pageBreakPosition != utils.NO_PAGE_BREAK:
                     previousEmptyParagraphsCount = 0
                 else:
                     previousEmptyParagraphsCount += 1
