@@ -73,16 +73,6 @@ class Section:
         self._lastElement = e
         self._textWritePos = Section._TEXT
 
-    def _writeTextBuffer(self):
-        text = "".join(self._textBuffer)
-
-        if self._textWritePos == Section._TEXT:
-            self._lastElement.text = text
-        else:
-            self._lastElement.tail = text
-
-        self._textBuffer = []
-
     def closeTag(self, tag):
         self._writeTextBuffer()
 
@@ -118,6 +108,16 @@ class Section:
 
     def _generateSectionName(self, sectionNumber):
         raise NotImplemented
+
+    def _writeTextBuffer(self):
+        text = "".join(self._textBuffer)
+
+        if self._textWritePos == Section._TEXT:
+            self._lastElement.text = text
+        else:
+            self._lastElement.tail = text
+
+        self._textBuffer = []
 
 
 class TextSection(Section):

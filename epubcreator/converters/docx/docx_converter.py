@@ -234,8 +234,8 @@ class DocxConverter(converter_base.AbstractConverter):
 
         customStyleName = self._styles.getParagaphCustomStyleName(paragraph)
         if customStyleName:
-            previousParagraph = utils.getPreviousParagraph(paragraph)
-            nextParagraph = utils.getNextParagraph(paragraph)
+            previousParagraph = self._getPreviousParagraph(paragraph)
+            nextParagraph = self._getNextParagraph(paragraph)
 
             styleId = self._styles.getParagraphStyleId(paragraph)
             previousParagraphStyleId = None
@@ -362,8 +362,8 @@ class DocxConverter(converter_base.AbstractConverter):
         self._currentSection.appendText(node.text)
 
     def _processList(self, paragraph, listLevel):
-        previousParagraph = utils.getPreviousParagraph(paragraph)
-        nextParagraph = utils.getNextParagraph(paragraph)
+        previousParagraph = self._getPreviousParagraph(paragraph)
+        nextParagraph = self._getNextParagraph(paragraph)
 
         previousParagraphListLevel = utils.getListLevel(previousParagraph) if previousParagraph is not None else -1
         nextParagraphListLevel = utils.getListLevel(nextParagraph) if nextParagraph is not None else -1
@@ -464,3 +464,32 @@ class DocxConverter(converter_base.AbstractConverter):
     def _addImageToCurrentSection(self, imageName):
         self._currentSection.appendImg(imageName)
         self._ebookData.addImage(imageName, self._mediaFiles[imageName])
+
+    def _getNextParagraph(self, paragraph):
+        # Debo tener en cuenta los saltos de página en este método. Si el párrafo
+        # en cuestión tiene un salto de página al final, o el párrafo siguiente lo tiene
+        # al principio, significa que el párrafo siguiente va a ir en una nueva sección, por lo
+        # que desde el punto de vista del párrafo actual, no hay ningún párrafo siguiente, y no
+        # debo retornar nada. De no tener en cuenta esto, algunos tags pueden no cerrarse o abrirse
+        # correctamente, como por ejemplo, las listas, que necesitan examinar el párrafo anterior y
+        # siguiente al actual. Un razonamiento similar se aplica para el método getPreviousParagraph().
+        nextP = utils.getNextParagraph(paragraph)
+
+        if nextP is not None:
+            nextPBrPos = utils.getPageBreakPosition(nextP)
+            currentPBrPos = utils.getPageBreakPosition(paragraph)
+
+            return nextP if nextPBrPos != utils.PAGE_BREAK_ON_BEGINNING and currentPBrPos != utils.PAGE_BREAK_ON_END else None
+        else:
+            return None
+
+    def _getPreviousParagraph(self, paragraph):
+        previousP = utils.getPreviousParagraph(paragraph)
+
+        if previousP is not None:
+            previousPBrPos = utils.getPageBreakPosition(previousP)
+            currentPBrPos = utils.getPageBreakPosition(paragraph)
+
+            return previousP if previousPBrPos != utils.PAGE_BREAK_ON_END and currentPBrPos != utils.PAGE_BREAK_ON_BEGINNING else None
+        else:
+            return None
