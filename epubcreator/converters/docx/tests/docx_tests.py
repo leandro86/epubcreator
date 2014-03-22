@@ -143,6 +143,12 @@ class DocxConverterTests(unittest.TestCase):
         self.assertEqual(len(data.sections), 3)
         self.assertTrue(self._compareSections("footnotes.docx", data.sections))
 
+    def test_multiple_paragraphs_in_footnotes(self):
+        data = self._getOutput("multiple_paragraphs_in_footnotes.docx")
+
+        self.assertEqual(len(data.sections), 2)
+        self.assertTrue(self._compareSections("multiple_paragraphs_in_footnotes.docx", data.sections))
+
     def test_empty_paragraphs_conversion(self):
         data = self._getOutput("empty_paragraphs_conversion.docx", False)
 

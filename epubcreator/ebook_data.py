@@ -173,19 +173,24 @@ class NotesSection(Section):
         self._footnotesCount += 1
 
     def closeNote(self):
-        # Debe haber un espacio antes del link de retorno.
-        # No hay posibilidad de que se genere una excepción acá, porque sé que siempre al menos el
-        # elemento "sup" va a existir.
-        # Como sé que _lastElement contiene el último elemento en ser abierto o cerrado, entonces el elemento
-        # "a" debe ir dentro de éste. No sólo eso, sino que además, obteniendo el tail de su último elemento
-        # hijo, tengo la posición exacta para agregar el espacio necesario que separa el link de retorno.
-        lastChild = list(self._lastElement)[-1]
+        # Debe haber un espacio antes del link de retorno, y debo escribirlo en el nodo correcto.
+        # Al cerrar la nota, lo único que sé es que _lastElement contiene el último elemento en ser cerrado
+        # y por ende, es el elemento donde debo insertar el tag "a". Ahora, dependiendo de si dicho elemento
+        # tiene hijos o no, escribo el texto donde corresponda.
+        children = list(self._lastElement)
 
-        # Cuidado, porque tail puede ser None!
-        if lastChild.tail:
-            lastChild.tail += " "
+        if children:
+            lastChild = children[-1]
+
+            if lastChild.tail:
+                lastChild.tail += " "
+            else:
+                lastChild.tail = " "
         else:
-            lastChild.tail = " "
+            if self._lastElement.text:
+                self._lastElement.text += " "
+            else:
+                self._lastElement.text = " "
 
         anchor = etree.Element("a", href="../Text/{0}#rf{1}".format(self._currentFootnoteSection, self._footnotesCount))
         anchor.text = "<<"
