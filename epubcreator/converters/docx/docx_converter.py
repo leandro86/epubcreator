@@ -268,11 +268,22 @@ class DocxConverter(converter_base.AbstractConverter):
             self._processParagraphContent(paragraph)
             self._currentSection.closeTag(tag)
         else:
-            pic = utils.getPic(paragraph)
-            if pic is not None:
-                self._currentSection.openTag("p", **{"class": "ilustra"})
-                self._processPic(pic)
-                self._currentSection.closeTag("p")
+            pics = utils.getPics(paragraph)
+
+            if pics:
+                if len(pics) == 1:
+                    self._currentSection.openTag("p", **{"class": "ilustra"})
+                    self._processPic(pics[0])
+                    self._currentSection.closeTag("p")
+                else:
+                    # Si hay varias imágenes en un mismo párrafo que no contiene texto, entonces
+                    # simplemente las agrego una detrás de otra.
+                    self._currentSection.openTag("p")
+
+                    for pic in pics:
+                        self._processPic(pic)
+
+                    self._currentSection.closeTag("p")
 
         # Aun si el párrafo no tiene texto, debo cerrar el div que agrupa estilos si es necesario. Si no
         # lo hago, puede darse el caso de que el párrafo actual (sin texto) que estoy procesando tenga el
@@ -343,9 +354,9 @@ class DocxConverter(converter_base.AbstractConverter):
                 self._footnotesIdSection.append((footnoteId, self._currentSection.name))
                 self._currentSection.insertNoteReference(len(self._footnotesIdSection))
             elif child.tag.endswith("}drawing"):
-                pic = utils.getPic(child)
-                if pic is not None:
-                    self._processPic(pic)
+                pics = utils.getPics(child)
+                if pics:
+                    self._processPic(pics[0])
             elif child.tag.endswith("}AlternateContent"):
                 self._processAlternateContent(child)
 

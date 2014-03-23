@@ -165,7 +165,7 @@ class DocxConverterTests(unittest.TestCase):
         data = self._getOutput("images.docx")
 
         self.assertEqual(len(data.sections), 1)
-        self.assertEqual(len(data.images), 6)
+        self.assertEqual(len(data.images), 9)
 
         self.assertTrue(self._compareSections("images.docx", data.sections))
 
