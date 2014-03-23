@@ -463,7 +463,10 @@ class DocxConverter(converter_base.AbstractConverter):
 
     def _addImageToCurrentSection(self, imageName):
         self._currentSection.appendImg(imageName)
-        self._ebookData.addImage(imageName, self._mediaFiles[imageName])
+
+        if imageName not in (img.name for img in self._ebookData.images):
+            print(imageName)
+            self._ebookData.addImage(imageName, self._mediaFiles[imageName])
 
     def _getNextParagraph(self, paragraph):
         # Debo tener en cuenta los saltos de página en este método. Si el párrafo
