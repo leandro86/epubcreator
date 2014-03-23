@@ -169,6 +169,14 @@ class DocxConverterTests(unittest.TestCase):
 
         self.assertTrue(self._compareSections("images.docx", data.sections))
 
+    def test_repeated_image(self):
+        data = self._getOutput("repeated_image.docx")
+
+        self.assertEqual(len(data.sections), 1)
+        self.assertEqual(len(data.images), 3)
+
+        self.assertTrue(self._compareSections("repeated_image.docx", data.sections))
+
     def test_broken_headings(self):
         data = self._getOutput("broken_headings.docx")
 
