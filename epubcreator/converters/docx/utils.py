@@ -91,8 +91,8 @@ def getListLevel(paragraph):
     return int(level[0]) if level else -1
 
 
-def getPics(node):
-    return xml_utils.xpath(node, "descendant::pic:pic[pic:blipFill/a:blip/@r:embed]", NAMESPACES)
+def getImagesId(node):
+    return xml_utils.xpath(node, "descendant::pic:pic/pic:blipFill/a:blip/@r:embed", NAMESPACES)
 
 
 def hasText(node):

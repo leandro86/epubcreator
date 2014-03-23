@@ -268,20 +268,20 @@ class DocxConverter(converter_base.AbstractConverter):
             self._processParagraphContent(paragraph)
             self._currentSection.closeTag(tag)
         else:
-            pics = utils.getPics(paragraph)
+            imagesId = utils.getImagesId(paragraph)
 
-            if pics:
-                if len(pics) == 1:
+            if imagesId:
+                if len(imagesId) == 1:
                     self._currentSection.openTag("p", **{"class": "ilustra"})
-                    self._processPic(pics[0])
+                    self._processImage(imagesId[0])
                     self._currentSection.closeTag("p")
                 else:
                     # Si hay varias imágenes en un mismo párrafo que no contiene texto, entonces
                     # simplemente las agrego una detrás de otra.
                     self._currentSection.openTag("p")
 
-                    for pic in pics:
-                        self._processPic(pic)
+                    for imageId in imagesId:
+                        self._processImage(imageId)
 
                     self._currentSection.closeTag("p")
 
@@ -354,9 +354,9 @@ class DocxConverter(converter_base.AbstractConverter):
                 self._footnotesIdSection.append((footnoteId, self._currentSection.name))
                 self._currentSection.insertNoteReference(len(self._footnotesIdSection))
             elif child.tag.endswith("}drawing"):
-                pics = utils.getPics(child)
-                if pics:
-                    self._processPic(pics[0])
+                imagesId = utils.getImagesId(child)
+                if imagesId:
+                    self._processImage(imagesId[0])
             elif child.tag.endswith("}AlternateContent"):
                 self._processAlternateContent(child)
 
@@ -452,9 +452,12 @@ class DocxConverter(converter_base.AbstractConverter):
 
         self._currentSection.closeNote()
 
-    def _processPic(self, pic):
-        rId = xml_utils.xpath(pic, "pic:blipFill/a:blip/@r:embed", utils.NAMESPACES)[0]
-        self._addImageToCurrentSection(self._getImageName(rId))
+    def _processImage(self, imageId):
+        imageName = self._getImageName(imageId)
+        self._currentSection.appendImg(imageName)
+
+        if imageName not in (img.name for img in self._ebookData.images):
+            self._ebookData.addImage(imageName, self._mediaFiles[imageName])
 
     def _processAlternateContent(self, alternateContent):
         pathToTxbxContent = "mc:Choice/w:drawing/wp:inline/a:graphic/a:graphicData/wps:wsp/wps:txbx/w:txbxContent"
@@ -471,12 +474,6 @@ class DocxConverter(converter_base.AbstractConverter):
             return os.path.split(imagePath)[1]
         else:
             return self._footnotes.getImageName(rId)
-
-    def _addImageToCurrentSection(self, imageName):
-        self._currentSection.appendImg(imageName)
-
-        if imageName not in (img.name for img in self._ebookData.images):
-            self._ebookData.addImage(imageName, self._mediaFiles[imageName])
 
     def _getNextParagraph(self, paragraph):
         # Debo tener en cuenta los saltos de página en este método. Si el párrafo
