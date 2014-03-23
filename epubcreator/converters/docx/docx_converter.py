@@ -465,7 +465,6 @@ class DocxConverter(converter_base.AbstractConverter):
         self._currentSection.appendImg(imageName)
 
         if imageName not in (img.name for img in self._ebookData.images):
-            print(imageName)
             self._ebookData.addImage(imageName, self._mediaFiles[imageName])
 
     def _getNextParagraph(self, paragraph):
