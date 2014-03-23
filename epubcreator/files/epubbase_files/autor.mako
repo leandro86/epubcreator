@@ -18,7 +18,11 @@
     <div class="autor">
         <% paragraphs = authorBiography.splitlines() %>
          % for p in paragraphs:
-               <p>${p}</p>
+             % if p.startswith("<p"):
+                   ${p}
+             % else:
+                   <p>${p}</p>
+             % endif
          % endfor
     </div>
 </body>

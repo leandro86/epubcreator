@@ -19,7 +19,7 @@ class Metadata:
     # En el epubbase, en la dedicatoria de ejemplo, el segundo párrafo lleva la clase "salto05", por eso utilizo directamente el
     # tag "p" para poder agregar la clase, ya que de otra manera me sería imposible hacerlo.
     DEFAULT_DEDICATION = ("Suspiró entonces mío Cid, de pesadumbre cargado, y comenzó a hablar así, justamente mesurado: «¡Loado "
-                          "seas, Señor, Padre que estás en lo alto! Todo esto me han urdido mis enemigos malvados»."
+                          "seas, Señor, Padre que estás en lo alto! Todo esto me han urdido mis enemigos malvados».\n"
                           '<p class="salto05">A<small>NÓNIMO</small></p>')
 
     DEFAULT_AUTHOR_BIOGRAPHY = ("N<small>OMBRE DEL</small> A<small>UTOR</small> (Reikiavik, Islandia, 2013 - Terra III, 3096). Lorem "

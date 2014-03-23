@@ -13,7 +13,11 @@
         <% paragraphs = synopsis.splitlines() %>        
         <p class="salto10">${paragraphs[0]}</p>
         % for p in paragraphs[1:]:
-            <p>${p}</p>
+            % if p.startswith("<p"):
+                  ${p}
+            % else:
+                  <p>${p}</p>
+            % endif
         % endfor
     </div>
 </body>
