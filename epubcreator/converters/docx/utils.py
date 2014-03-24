@@ -8,7 +8,8 @@ NAMESPACES = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main
               "rels": "http://schemas.openxmlformats.org/package/2006/relationships",
               "mc": "http://schemas.openxmlformats.org/markup-compatibility/2006",
               "wps": "http://schemas.microsoft.com/office/word/2010/wordprocessingShape",
-              "ct": "http://schemas.openxmlformats.org/package/2006/content-types"}
+              "ct": "http://schemas.openxmlformats.org/package/2006/content-types",
+              "v": "urn:schemas-microsoft-com:vml"}
 
 PAGE_BREAK_ON_BEGINNING = 0
 PAGE_BREAK_ON_END = 1
@@ -92,7 +93,7 @@ def getListLevel(paragraph):
 
 
 def getImagesId(node):
-    return xml_utils.xpath(node, "descendant::pic:pic/pic:blipFill/a:blip/@r:embed", NAMESPACES)
+    return xml_utils.xpath(node, "descendant::pic:pic/pic:blipFill/a:blip/@r:embed | descendant::v:imagedata/@r:id", NAMESPACES)
 
 
 def hasText(node):

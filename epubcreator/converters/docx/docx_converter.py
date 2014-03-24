@@ -353,7 +353,7 @@ class DocxConverter(converter_base.AbstractConverter):
                 footnoteId = xml_utils.xpath(run, "w:footnoteReference/@w:id", utils.NAMESPACES)[0]
                 self._footnotesIdSection.append((footnoteId, self._currentSection.name))
                 self._currentSection.insertNoteReference(len(self._footnotesIdSection))
-            elif child.tag.endswith("}drawing"):
+            elif child.tag.endswith("}drawing") or child.tag.endswith("}pict"):
                 imagesId = utils.getImagesId(child)
                 if imagesId:
                     self._processImage(imagesId[0])
