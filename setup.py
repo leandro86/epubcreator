@@ -14,8 +14,7 @@ import subprocess
 from PyQt4 import QtCore
 from cx_Freeze import setup, Executable
 
-import version
-import config
+from epubcreator import version, config
 
 
 def getImgFormatsPluginsPath():
@@ -42,17 +41,15 @@ def freezeApp():
     packages = ["lxml"]
     excludes = ["PyQt4.QtSvg", "PyQt4.QtNetwork", "PyQt4.QtOpenGL", "PyQt4.QtScript", "PyQt4.QtSql", "PyQt4.Qsci", "PyQt4.QtXml",
                 "PyQt4.QtTest"]
-    include_files = [("ecreator/files", "files"), ("gui/resources/translations/qt_es.qm", "translations/qt_es.qm")]
+    include_files = [("epubcreator/epubbase/files", "files"), ("epubcreator/gui/resources/translations/qt_es.qm", "translations/qt_es.qm")]
 
-    options["icon"] = "gui/resources/images/icons/app_icon.ico"
-    options["build_exe"] = "build/epubcreator"
+    options["icon"] = "epubcreator/gui/resources/images/icons/app_icon.ico"
+    options["build_exe"] = "bin/epubcreator"
 
     if config.IS_RUNNING_ON_LINUX:
         libsPath = "/usr/lib/i386-linux-gnu"
         if sys.maxsize > 2 ** 32:
             libsPath = "/usr/lib/x86_64-linux-gnu"
-        include_files.append((os.path.join(libsPath, "libxslt.so.1"), "libxslt.so.1"))
-        include_files.append((os.path.join(libsPath, "libexslt.so.0"), "libexslt.so.0"))
         include_files.append((os.path.join(libsPath, "libxml2.so.2"), "libxml2.so.2"))
         include_files.append((os.path.join(libsPath, "libz.so"), "libz.so"))
     else:
@@ -79,26 +76,26 @@ def freezeApp():
     options["include_files"] = include_files
     options["include_msvcr"] = True
 
-    if os.path.isdir("build"):
-        shutil.rmtree("build")
+    if os.path.isdir("bin"):
+        shutil.rmtree("bin")
 
     setup(name=version.APP_NAME,
           version=version.VERSION,
           description=version.DESCRIPTION,
           options={"build_exe": options},
-          executables=[Executable("main.py",
+          executables=[Executable("epubcreator/gui/main.py",
                                   base="Win32GUI" if config.IS_RUNNING_ON_WIN else None,
                                   targetName="{0}{1}".format(version.APP_NAME, ".exe" if config.IS_RUNNING_ON_WIN else ""))])
 
     if config.IS_RUNNING_ON_WIN:
         # Necesito el archivo qt.conf vacío. Si está vacío, Qt carga todos los paths por defecto, que
         # en el caso de los plugins es el directorio "plugins".
-        with open(os.path.join("build", "epubcreator", "qt.conf"), "w", encoding="utf-8"):
+        with open(os.path.join("bin", "epubcreator", "qt.conf"), "w", encoding="utf-8"):
             pass
 
     if config.IS_RUNNING_ON_MAC:
         # El bundle ".app" creado, por defecto tiene el nombre de esta forma: name-version.app.
-        bundlePath = "build/{0}-{1}.app".format(version.APP_NAME, version.VERSION)
+        bundlePath = "bin/{0}-{1}.app".format(version.APP_NAME, version.VERSION)
         bundleMacOsDir = os.path.join(bundlePath, "Contents", "MacOS")
         bundleResourcesDir = os.path.join(bundlePath, "Contents", "Resources")
 
@@ -138,12 +135,11 @@ def freezeApp():
 
         # Copio el ícono.
         shutil.copy("gui/resources/images/icons/app_icon.icns",
-                    "build/{0}-{1}.app/Contents/Resources".format(version.APP_NAME, version.VERSION))
+                    "bin/{0}-{1}.app/Contents/Resources".format(version.APP_NAME, version.VERSION))
 
         # Renombro el bundle, porque no quiero que el nombre incluya la versión.
-        os.rename(bundlePath, "build/EpubCreator.app")
+        os.rename(bundlePath, "bin/EpubCreator.app")
 
 
 if __name__ == "__main__":
     freezeApp()
-

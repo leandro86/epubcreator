@@ -4,7 +4,7 @@ import os
 from lxml import etree
 
 from epubcreator.converters import converter_base, xml_utils
-from epubcreator import ebook_data
+from epubcreator.epubbase import ebook_data
 from epubcreator.converters.docx import utils, styles, footnotes
 
 
