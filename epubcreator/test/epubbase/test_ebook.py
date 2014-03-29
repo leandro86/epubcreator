@@ -40,7 +40,7 @@ class SynopsisTest(unittest.TestCase):
         gotSynopsis = "".join(self._common.xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[1][@class = 'salto10']//text()"))
         gotSynopsis += "".join(self._common.xpath(synopsis, "x:body/x:div[@class = 'sinopsis']/x:p[2]//text()"))
 
-        self.assertEqual(gotSynopsis, SynopsisTests._DEFAULT_SYNOPSIS)
+        self.assertEqual(gotSynopsis, SynopsisTest._DEFAULT_SYNOPSIS)
 
     def test_synopsis(self):
         self._common.metadata.synopsis = "Párrafo 1.\nPárrafo 2.\nPárrafo 3."
@@ -450,7 +450,7 @@ class DedicationTest(unittest.TestCase):
         gotDedication = "".join(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[1]//text()"))
         gotDedication += "".join(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[2][@class = 'salto05']//text()"))
 
-        self.assertEqual(gotDedication, DedicationTests._DEDICATION)
+        self.assertEqual(gotDedication, DedicationTest._DEDICATION)
 
     def test_dedication(self):
         self._common.metadata.dedication = "Párrafo 1.\nPárrafo 2.\nPárrafo 3."
@@ -571,7 +571,7 @@ class AuthorTest(unittest.TestCase):
         gotAuthorBiography = "".join(self._common.xpath(author, "x:body/x:div[@class = 'autor']/x:p[1]//text()"))
         gotAuthorBiography += "".join(self._common.xpath(author, "x:body/x:div[@class = 'autor']/x:p[2]//text()"))
 
-        wantAuthorBiography = AuthorTests._AUTHOR_BIOGRAPHY
+        wantAuthorBiography = AuthorTest._AUTHOR_BIOGRAPHY
 
         self.assertEqual(gotAuthorBiography, wantAuthorBiography)
 

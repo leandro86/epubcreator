@@ -7,7 +7,7 @@ from lxml import etree
 from epubcreator.converters.docx import docx_converter
 
 
-class DocxConverterTests(unittest.TestCase):
+class DocxConverterTest(unittest.TestCase):
     def setUp(self):
         self._pathToTestDataFolder = os.path.join(os.path.dirname(__file__), "data")
 
