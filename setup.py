@@ -31,7 +31,7 @@ def getImgFormatsPluginsPath():
     if imgFormatsPath:
         return imgFormatsPath
     else:
-        raise "Missing qt imageformats directory!"
+        raise Exception("Missing qt imageformats directory!")
 
 
 def freezeApp():
