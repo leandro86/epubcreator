@@ -18,7 +18,7 @@ from epubcreator import version, config
 
 
 def getImgFormatsPluginsPath():
-    app = QtCore.QCoreApplication(sys.argv)
+    #app = QtCore.QCoreApplication(sys.argv)
     libraryPaths = QtCore.QCoreApplication.libraryPaths()
 
     imgFormatsPath = ""
@@ -55,9 +55,9 @@ def freezeApp():
     else:
         imgPluginsPath = getImgFormatsPluginsPath()
 
-        if config.IS_RUNNING_ON_WIN:
-            include_files.append((os.path.join(imgPluginsPath, "qjpeg4.dll"), "plugins/imageformats/qjpeg4.dll"))
-        elif config.IS_RUNNING_ON_MAC:
+        # if config.IS_RUNNING_ON_WIN:
+        #     include_files.append((os.path.join(imgPluginsPath, "qjpeg4.dll"), "plugins/imageformats/qjpeg4.dll"))
+        if config.IS_RUNNING_ON_MAC:
             include_files.append((os.path.join(imgPluginsPath, "libqjpeg.dylib"), "plugins/imageformats/libqjpeg.dylib"))
             include_files.append(("/opt/local/lib/libjpeg.9.dylib", "libjpeg.9.dylib"))
 
