@@ -26,7 +26,7 @@ class _EpubBase:
         template = _EpubBase._files[epubbase_names.SYNOPSIS_FILENAME]
         return template.render(**params)
 
-    def getTitle(self, author, title, subtitle, editor):
+    def getTitle(self, author, title, subtitle, editor, collectionName, subCollectionName, collectionVolume):
         params = locals()
         del (params["self"])
 
@@ -168,7 +168,10 @@ class Ebook:
         outputEpub.addHtmlData(epubbase_names.TITLE_FILENAME, Ebook._epubBase.getTitle(author,
                                                                                        self._metadata.title,
                                                                                        self._metadata.subtitle,
-                                                                                       self._metadata.editor))
+                                                                                       self._metadata.editor,
+                                                                                       self._metadata.collectionName,
+                                                                                       self._metadata.subCollectionName,
+                                                                                       self._metadata.collectionVolume))
         outputEpub.addHtmlData(epubbase_names.INFO_FILENAME, Ebook._epubBase.getInfo(self._metadata.originalTitle,
                                                                                      author,
                                                                                      publicationYear,

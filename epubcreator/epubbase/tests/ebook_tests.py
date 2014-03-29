@@ -201,6 +201,27 @@ class TitleTests(unittest.TestCase):
         self.assertEqual(self._common.xpath(title, "x:body/x:p[@class = 'tfirma']/x:span[@class = 'tfecha']/text()")[0],
                          datetime.datetime.now().strftime("%d.%m.%y"))
 
+    def test_collection(self):
+        self._common.metadata.collectionName = "La saga"
+        self._common.metadata.subCollectionName = "La serie"
+        self._common.metadata.collectionVolume = "2"
+
+        self._common.generateEbook()
+
+        title = self._getTitleFile()
+
+        self.assertEqual(self._common.xpath(title, "x:body/x:p[@class = 'tsubtitulo']/text()")[0], "La saga: La serie - 2")
+
+    def test_subcollection_only(self):
+        self._common.metadata.subCollectionName = "La serie"
+        self._common.metadata.collectionVolume = "2"
+
+        self._common.generateEbook()
+
+        title = self._getTitleFile()
+
+        self.assertEqual(self._common.xpath(title, "x:body/x:p[@class = 'tsubtitulo']/text()")[0], "La serie - 2")
+
     def _getTitleFile(self):
         return etree.fromstring(self._common.outputEpub.read("OEBPS/Text/{0}".format("titulo.xhtml")))
 

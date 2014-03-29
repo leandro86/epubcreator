@@ -21,6 +21,16 @@
           <p class="tsubtitulo">${subtitle}</p><!-- esta línea es opcional, debe eliminarse si no tiene texto -->
     % endif
 
+    % if subCollectionName:
+        <%
+            serie = ""
+            if collectionName:
+                serie = collectionName + ": "          
+            serie += "{0} - {1}".format(subCollectionName, collectionVolume)
+        %>
+        <p class="tsubtitulo">${serie}</p><!-- esta línea es opcional, debe eliminarse si no tiene texto -->        
+    % endif
+    
     <p class="trevision">ePub r1.0</p>    
 
     <p class="tfirma">${editor} <span class="tfecha">${datetime.datetime.now().strftime("%d.%m.%y")}</span></p>

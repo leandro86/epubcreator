@@ -22,10 +22,9 @@ class Metadata:
                           "seas, Señor, Padre que estás en lo alto! Todo esto me han urdido mis enemigos malvados».\n"
                           '<p class="salto05">A<small>NÓNIMO</small></p>')
 
-    DEFAULT_AUTHOR_BIOGRAPHY = ("N<small>OMBRE DEL</small> A<small>UTOR</small> (Reikiavik, Islandia, 2013 - Terra III, 3096). Lorem "
-                                "ipsum dolor sit amet, consectetur adipiscing elit. Nunc vel libero sed est ultrices elementum at vel "
-                                "lacus. Sed laoreet, velit nec congue pellentesque, quam urna pretium nunc, et ultrices nulla lacus "
-                                "non libero.\n"
+    DEFAULT_AUTHOR_BIOGRAPHY = ("NOMBRE DEL AUTOR (Reikiavik, Islandia, 2013 - Terra III, 3096). Lorem ipsum dolor sit amet, consectetur "
+                                "adipiscing elit. Nunc vel libero sed est ultrices elementum at vel lacus. Sed laoreet, velit nec congue "
+                                "pellentesque, quam urna pretium nunc, et ultrices nulla lacus non libero.\n"
                                 "Integer eu leo justo, vel sodales arcu. Donec posuere nunc in lectus laoreet a rhoncus enim fermentum. "
                                 "Nunc luctus accumsan ligula eu molestie.")
 

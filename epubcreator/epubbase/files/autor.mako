@@ -10,7 +10,7 @@
 
 <body>
     % if title:
-          <h1 class="oculto" title="${title}"></h1><!-- puede cambiarse a «Autora» o «Autores» de ser necesario -->
+          <h1 class="oculto" title="${title}"></h1><!-- debe cambiarse a «Autora» o «Autores» de ser necesario -->
     % endif
 
     <div class="vineta"><img alt="" height="40%" src="../Images/${imageName}" /></div><!-- atención: por compatibilidad, este archivo de imagen no debe exceder los 600px de ancho ni haber sido guardado como jpeg «progresivo» -->

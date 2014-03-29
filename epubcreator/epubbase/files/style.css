@@ -12,7 +12,8 @@ sup, sub { font-size:0.75em; line-height:normal; }
 .tlogo, .tautor, .ttitulo, .tsubtitulo, .trevision, .tfirma { margin:0 0.25em; text-align:center; text-indent:0; font-family:sans-serif; font-weight:bold; adobe-hyphenate:none; hyphenate:none; hyphens:none; -moz-hyphens:none; -webkit-hyphens:none; }
 	.tlogo span { margin:3em 0 2.5em; display:inline-block; width:8em; }
 	.tautor { margin-bottom:0.5em; font-size:1.2em; font-weight:normal; color:#595959; }
-	.ttitulo { margin-bottom:0.15em; padding:0; border:0; font-size:1.8em; font-style:normal; text-decoration:none; color:black; visibility:visible; }
+	.ttitulo { padding:0; border:0; font-size:1.8em; font-style:normal; text-decoration:none; color:black; visibility:visible; }
+	.tsubtitulo { margin-top:0.3em; }
 	.trevision { margin-top:2.5em; font-size:0.8em; color:#595959; }
 	.tfirma { margin-top:0.25em; font-size:0.65em; }
 	.tfecha { font-family:sans-serif; font-weight:normal; color:#595959; }
@@ -37,7 +38,7 @@ h1, h2, h3, h4, h5, h6 { margin:25% 0.25em 1em; text-align:center; text-indent:0
 	h6 { font-size:1.1em; }
 
 /* dedicatoria */
-.dedicatoria { margin:5em 1em 0 2em; text-align:right; }
+.dedicatoria { margin:5em 1em 0 3em; text-align:right; }
 	.dedicatoria p { text-align:right; text-indent:0; }
 
 /* tipografía */
