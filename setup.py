@@ -18,7 +18,10 @@ from epubcreator import version, config
 
 
 def getImgFormatsPluginsPath():
-    #app = QtCore.QCoreApplication(sys.argv)
+    # Necesito esta línea para que pyqt cargue las librerías con los plugins, sino
+    # no voy a encontrar el path hacia los mismos!
+    app = QtCore.QCoreApplication(sys.argv)
+
     libraryPaths = QtCore.QCoreApplication.libraryPaths()
 
     imgFormatsPath = ""
