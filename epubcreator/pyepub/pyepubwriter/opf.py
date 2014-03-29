@@ -2,8 +2,8 @@ from lxml import etree
 
 
 class Opf:
-    OPF_NS = "http://www.idpf.org/2007/opf"
-    DC_NS = "http://purl.org/dc/elements/1.1/"
+    _OPF_NS = "http://www.idpf.org/2007/opf"
+    _DC_NS = "http://purl.org/dc/elements/1.1/"
 
     def __init__(self):
         self.metadata = Metadata()
@@ -15,7 +15,7 @@ class Opf:
         return etree.tostring(self._generateOpf(), encoding="utf-8", xml_declaration=True, pretty_print=True)
 
     def _generateOpf(self):
-        opf = etree.Element("{{{0}}}package".format(Opf.OPF_NS), {"unique-identifier": "BookId", "version": "2.0"}, nsmap={None: Opf.OPF_NS})
+        opf = etree.Element("{{{0}}}package".format(Opf._OPF_NS), {"unique-identifier": "BookId", "version": "2.0"}, nsmap={None: Opf._OPF_NS})
 
         opf.append(self.metadata.toElement())
         opf.append(self.manifest.toElement())
@@ -122,7 +122,7 @@ class Metadata:
         self._items.append(item)
 
     def toElement(self):
-        metadata = etree.Element("metadata", nsmap={"opf": Opf.OPF_NS, "dc": Opf.DC_NS})
+        metadata = etree.Element("metadata", nsmap={"opf": Opf._OPF_NS, "dc": Opf._DC_NS})
 
         for dcItem in self._dcItems:
             metadata.append(dcItem.toElement())
@@ -180,8 +180,8 @@ class _MetadataDCItem:
         self._opfAttributes[name] = value
 
     def toElement(self):
-        dc_ns = "{{{0}}}".format(Opf.DC_NS)
-        opf_ns = "{{{0}}}".format(Opf.OPF_NS)
+        dc_ns = "{{{0}}}".format(Opf._DC_NS)
+        opf_ns = "{{{0}}}".format(Opf._OPF_NS)
 
         element = etree.Element(dc_ns + self._name)
 

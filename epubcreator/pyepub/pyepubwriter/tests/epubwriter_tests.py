@@ -7,19 +7,13 @@ import datetime
 
 from lxml import etree
 
-import pyepub.pyepubwriter.epub
-import pyepub.pyepubwriter.toc
-import pyepub.pyepubwriter.opf
+import epubcreator.pyepub.pyepubwriter.epub
 
 
 class EpubWriterTests(unittest.TestCase):
-    _NAMESPACES = {"opf": pyepub.pyepubwriter.opf.Opf.OPF_NS,
-                   "dc": pyepub.pyepubwriter.opf.Opf.DC_NS,
-                   "toc": pyepub.pyepubwriter.toc.Toc.TOC_NS}
-
     def setUp(self):
         self._outputFile = tempfile.TemporaryFile()
-        self._epub = pyepub.pyepubwriter.epub.EpubWriter()
+        self._epub = epubcreator.pyepub.pyepubwriter.epub.EpubWriter()
         self._resultingEpub = None
 
     def tearDown(self):
@@ -223,7 +217,9 @@ class EpubWriterTests(unittest.TestCase):
             self.fail(e)
 
     def _xpath(self, element, xpath):
-        return element.xpath(xpath, namespaces=EpubWriterTests._NAMESPACES)
+        return element.xpath(xpath, namespaces={"opf": "http://www.idpf.org/2007/opf",
+                                                "dc": "http://purl.org/dc/elements/1.1/",
+                                                "toc": "http://www.daisy.org/z3986/2005/ncx/"})
 
     def _generateEpub(self):
         self._epub.generate(self._outputFile)
@@ -238,7 +234,7 @@ class EpubValidationTests(unittest.TestCase):
 
     def setUp(self):
         self._outputFile = tempfile.NamedTemporaryFile(suffix=".epub", delete=False)
-        self._epub = pyepub.pyepubwriter.epub.EpubWriter()
+        self._epub = epubcreator.pyepub.pyepubwriter.epub.EpubWriter()
         self._epub.addTitle("Título del libro")
         self._epub.addLanguage("es")
 

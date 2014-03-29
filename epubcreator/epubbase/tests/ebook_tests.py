@@ -3,8 +3,8 @@ import tempfile
 import datetime
 
 from lxml import etree
-from pyepub.pyepubreader import epub
 
+from epubcreator.pyepub.pyepubreader import epub
 from epubcreator.epubbase import ebook, ebook_data, ebook_metadata
 
 

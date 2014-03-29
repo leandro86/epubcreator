@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from pyepub.pyepubreader import epub
+from epubcreator.pyepub.pyepubreader import epub
 
 
 class EpubReaderTests(unittest.TestCase):

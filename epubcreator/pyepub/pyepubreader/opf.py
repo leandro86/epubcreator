@@ -2,7 +2,7 @@ from lxml import etree
 
 
 class Opf:
-    OPF_NS = "http://www.idpf.org/2007/opf"
+    _OPF_NS = "http://www.idpf.org/2007/opf"
     DC_NS = "http://purl.org/dc/elements/1.1/"
 
     def __init__(self, opfContent):
@@ -93,4 +93,4 @@ class Opf:
         return self._xpath(self._opf, "/opf:package/opf:manifest/opf:item[@media-type = 'application/x-dtbncx+xml']/@href")[0]
 
     def _xpath(self, element, xpath):
-        return element.xpath(xpath, namespaces={"opf": Opf.OPF_NS, "dc": Opf.DC_NS})
+        return element.xpath(xpath, namespaces={"opf": Opf._OPF_NS, "dc": Opf.DC_NS})

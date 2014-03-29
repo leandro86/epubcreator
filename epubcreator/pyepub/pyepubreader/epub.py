@@ -3,7 +3,7 @@ import os
 
 from lxml import etree
 
-from pyepub.pyepubreader import opf, toc
+from epubcreator.pyepub.pyepubreader import opf, toc
 
 
 class EpubReader:

@@ -2,7 +2,7 @@ from lxml import etree
 
 
 class Toc:
-    TOC_NS = "http://www.daisy.org/z3986/2005/ncx/"
+    _TOC_NS = "http://www.daisy.org/z3986/2005/ncx/"
 
     def __init__(self):
         self._headItems = []
@@ -22,7 +22,7 @@ class Toc:
         return navPoint
 
     def toXml(self):
-        toc = etree.Element("{{{0}}}ncx".format(Toc.TOC_NS), {"version": "2005-1"}, nsmap={None: Toc.TOC_NS})
+        toc = etree.Element("{{{0}}}ncx".format(Toc._TOC_NS), {"version": "2005-1"}, nsmap={None: Toc._TOC_NS})
 
         # Agrego todos los playorders e ids de los navpoints.
         playOrder = 1

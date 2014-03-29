@@ -2,7 +2,7 @@ from lxml import etree
 
 
 class Toc:
-    TOC_NS = "http://www.daisy.org/z3986/2005/ncx/"
+    _TOC_NS = "http://www.daisy.org/z3986/2005/ncx/"
 
     def __init__(self, tocContent):
         """
@@ -22,4 +22,4 @@ class Toc:
         return titles
 
     def _xpath(self, element, xpath):
-        return element.xpath(xpath, namespaces={"toc": Toc.TOC_NS})
+        return element.xpath(xpath, namespaces={"toc": Toc._TOC_NS})
