@@ -51,7 +51,7 @@ class Metadata:
     GENRES = {
         "Ficción": (
             (
-                ("Guión", "Obra compuesta o adaptada para medios masivos (cine, televisión, radio, Internet)."),
+                ("Guion", "Obra compuesta o adaptada para medios masivos (cine, televisión, radio, Internet)."),
                 ("Novela", "Obra narrativa en prosa, extensa y compleja, de sucesos imaginados y parecidos a la realidad."),
                 ("Poesía", "Obra lírica, usualmente en verso, con fines estético-emocionales."),
                 ("Relato", "Obra narrativa en prosa, de menor extensión que la novela. Puede ser corta (Cuento) o mediana "
