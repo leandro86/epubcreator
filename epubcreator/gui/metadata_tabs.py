@@ -162,12 +162,22 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
         @raise: ValidationException, si la fecha no tiene un formato válido.
         """
         if self.publicationDateInput.text() != "--":
+            day, month, year = self.publicationDateInput.text().split("-")
+
+            if not day:
+                day = "01"
+
+            if not month:
+                month = "01"
+
+            self.publicationDateInput.setText("{0}-{1}-{2}".format(day, month, year))
+
             try:
                 return datetime.datetime.strptime(self.publicationDateInput.text().strip(), "%d-%m-%Y").date()
             except ValueError:
                 raise ValidationException("Fecha de publicación no válida",
-                                          "El formato de la fecha de publicación debe ser: dd-mm-aaaa. Si no conoce el día o mes exacto, "
-                                          "coloque el 1 de enero.",
+                                          "El formato de la fecha de publicación debe ser: dd-mm-aaaa. Si no conoce el día o mes exacto, déjelo en "
+                                          "blanco, que automáticamente el campo se autocompleta a 01-01-aaaa al momento de generar el epub.",
                                           self, self.publicationDateInput)
 
     def getDedication(self):
