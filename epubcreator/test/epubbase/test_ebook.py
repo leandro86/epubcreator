@@ -483,7 +483,7 @@ class DedicationTest(unittest.TestCase):
 
 
 class AuthorTest(unittest.TestCase):
-    _AUTHOR_BIOGRAPHY = ("NOMBRE DEL AUTOR (Reikiavik, Islandia, 2013 - Terra III, 3096). Lorem ipsum dolor sit amet, consectetur "
+    _AUTHOR_BIOGRAPHY = ("NOMBRE DEL AUTOR (Reikiavik, Islandia, 2013 - Terra III, 3072). Lorem ipsum dolor sit amet, consectetur "
                          "adipiscing elit. Nunc vel libero sed est ultrices elementum at vel lacus. Sed laoreet, velit nec congue "
                          "pellentesque, quam urna pretium nunc, et ultrices nulla lacus non libero."
                          "Integer eu leo justo, vel sodales arcu. Donec posuere nunc in lectus laoreet a rhoncus enim fermentum. Nunc "
