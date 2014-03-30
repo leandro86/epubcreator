@@ -42,27 +42,27 @@ class DocxConverterTest(unittest.TestCase):
 
         h1 = data.toc.titles[0]
         self.assertEqual(h1.text, "Capítulo 1")
-        self.assertEqual(h1.titleLocation, "Section0000.xhtml#heading_id_1")
+        self.assertEqual(h1.titleLocation, "Section0001.xhtml#heading_id_1")
 
         h2 = h1.childTitles[0]
         self.assertEqual(h2.text, "Capítulo 2")
-        self.assertEqual(h2.titleLocation, "Section0000.xhtml#heading_id_2")
+        self.assertEqual(h2.titleLocation, "Section0001.xhtml#heading_id_2")
 
         h3 = h2.childTitles[0]
         self.assertEqual(h3.text, "Capítulo 3")
-        self.assertEqual(h3.titleLocation, "Section0000.xhtml#heading_id_3")
+        self.assertEqual(h3.titleLocation, "Section0001.xhtml#heading_id_3")
 
         h4 = h3.childTitles[0]
         self.assertEqual(h4.text, "Capítulo 4")
-        self.assertEqual(h4.titleLocation, "Section0000.xhtml#heading_id_4")
+        self.assertEqual(h4.titleLocation, "Section0001.xhtml#heading_id_4")
 
         h5 = h4.childTitles[0]
         self.assertEqual(h5.text, "Capítulo 5")
-        self.assertEqual(h5.titleLocation, "Section0000.xhtml#heading_id_5")
+        self.assertEqual(h5.titleLocation, "Section0001.xhtml#heading_id_5")
 
         h6 = h5.childTitles[0]
         self.assertEqual(h6.text, "Capítulo 6")
-        self.assertEqual(h6.titleLocation, "Section0000.xhtml#heading_id_6")
+        self.assertEqual(h6.titleLocation, "Section0001.xhtml#heading_id_6")
 
     def test_spanish_headings(self):
         # Testeo los títulos cuando el nombre de los estilos de los mismos tienen nombre en

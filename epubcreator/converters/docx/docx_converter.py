@@ -125,7 +125,7 @@ class DocxConverter(converter_base.AbstractConverter):
                 self._mediaFiles[os.path.split(imgPath)[1]] = docx.read(imgPath)
 
     def _processDocument(self):
-        self._currentSection = ebook_data.TextSection(0)
+        self._currentSection = ebook_data.TextSection(1)
 
         body = xml_utils.find(self._documentXml, "w:body", utils.NAMESPACES)
         self._processMainContent(body)
@@ -466,7 +466,7 @@ class DocxConverter(converter_base.AbstractConverter):
 
     def _saveCurrentSection(self):
         self._ebookData.addSection(self._currentSection)
-        self._currentSection = ebook_data.TextSection(len(self._ebookData.sections))
+        self._currentSection = ebook_data.TextSection(len(self._ebookData.sections) + 1)
 
     def _getImageName(self, rId):
         if not self._isProcessingFootnotes:
