@@ -1,3 +1,6 @@
+import unicodedata
+
+
 class Language:
     _languageNameMap = {}
     _languageCodeMap = {}
@@ -6,7 +9,7 @@ class Language:
     def getSortedLanguagesNames():
         Language._loadLanguages()
         languages = [language for language in Language._languageNameMap.keys()]
-        languages.sort()
+        languages.sort(key=lambda l: unicodedata.normalize("NFKD", l))
 
         return languages
 
@@ -32,7 +35,7 @@ class Language:
                      ("ak", "Akano"),
                      ("am", "Amárico"),
                      ("an", "Aragonés"),
-                     ("ar", "árabe"),
+                     ("ar", "Árabe"),
                      ("as", "Asamés"),
                      ("av", "Avar"),
                      ("ay", "Aimara"),
