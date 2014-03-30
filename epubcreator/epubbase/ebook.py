@@ -346,6 +346,10 @@ class Ebook:
         if not self._metadata.language:
             self._metadata.language = ebook_metadata.Metadata.DEFAULT_LANGUAGE
 
+        if not self._metadata.genres:
+            # El tipo de género no interesa, dado que no aparece en los metadatos del epub.
+            self._metadata.genres.append(ebook_metadata.Genre("bla", "Género", "Subgéneros"))
+
         if not self._metadata.coverModification:
             self._metadata.coverModification = ebook_metadata.Metadata.DEFAULT_COVER_MODIFICATION
 
@@ -358,8 +362,7 @@ class Ebook:
         if not self._metadata.coverImage:
             self._metadata.coverImage = Ebook._epubBase.getCoverImage()
 
-        # Por ahora siempre dejo un autor por defecto, a pesar de que en los metadatos no se haya especificado
-        # ninguno.
+        # Por ahora siempre dejo un autor por defecto, a pesar de que en los metadatos no se haya especificado ninguno.
         if not self._metadata.authors:
             self._metadata.authors.append(ebook_metadata.Person(ebook_metadata.Metadata.DEFAULT_AUTHOR,
                                                                 ebook_metadata.Metadata.DEFAULT_AUTHOR,

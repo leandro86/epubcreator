@@ -903,6 +903,13 @@ class MetadataTest(unittest.TestCase):
 
         self.assertTrue(self._common.outputEpub.getLanguage(), "en")
 
+    def test_default_genre(self):
+        self._common.metadata.genres.clear()
+
+        self._common.generateEbook()
+
+        self.assertEqual(self._common.outputEpub.getSubject(), "Género, Subgéneros")
+
     def test_one_genretype_one_genre_one_subgenre(self):
         self._common.metadata.genres.append(ebook_metadata.Genre("Tipo1", "Genero1", "Subgenero1"))
 
@@ -957,13 +964,6 @@ class MetadataTest(unittest.TestCase):
         self._common.generateEbook()
 
         self.assertEqual(self._common.outputEpub.getSubject(), "a, a, b, d, e, f, k, a, u, a")
-
-    def test_not_genres(self):
-        self._common.metadata.genres.clear()
-
-        self._common.generateEbook()
-
-        self.assertIsNone(self._common.outputEpub.getSubject())
 
     def test_default_publisher(self):
         self._common.generateEbook()
