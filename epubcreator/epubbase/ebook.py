@@ -226,10 +226,13 @@ class Ebook:
         outputEpub.addAuthor(author[0], author[1])
         outputEpub.addLanguage(self._metadata.language)
 
-        # En la sinopsis (el campo description) en los metadatos, no puedo tener saltos de línea. Podría directamente
-        # eliminarlos, pero entonces el texto del párrafo B quedaría pegado al del párrafo A. Por eso es que reemplazo
-        # los saltos de línea por un espacio.
-        outputEpub.addDescription(utils.removeTags(self._metadata.synopsis.replace("\n", " ")))
+        if self._metadata.synopsis == ebook_metadata.Metadata.DEFAULT_SYNOPSIS:
+            outputEpub.addDescription("Sinopsis")
+        else:
+            # En la sinopsis (el campo description) en los metadatos, no puedo tener saltos de línea. Podría directamente
+            # eliminarlos, pero entonces el texto del párrafo B quedaría pegado al del párrafo A. Por eso es que reemplazo
+            # los saltos de línea por un espacio.
+            outputEpub.addDescription(utils.removeTags(self._metadata.synopsis.replace("\n", " ")))
 
         outputEpub.addPublisher("ePubLibre")
 

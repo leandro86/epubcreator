@@ -847,6 +847,11 @@ class MetadataTest(unittest.TestCase):
 
         self.assertFalse(self._common.outputEpub.getIlustrators())
 
+    def test_default_synopsis(self):
+        self._common.generateEbook()
+
+        self.assertEqual(self._common.outputEpub.getDescription(), "Sinopsis")
+
     def test_synopsis(self):
         self._common.metadata.synopsis = "Párrafo 1.\nPárrafo 2.\nPárrafo 3."
 
