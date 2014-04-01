@@ -358,6 +358,7 @@ class InfoTest(unittest.TestCase):
         self.assertFalse(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[starts-with(text(), 'Ilustraciones')]"))
 
     def test_default_cover_modification(self):
+        self._common.metadata.coverDesigner = "bla"
         self._common.metadata.coverModification = ""
 
         self._common.generateEbook()
@@ -366,17 +367,8 @@ class InfoTest(unittest.TestCase):
 
         self.assertTrue(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0].startswith("Diseño de cubierta: "))
 
-    def test_default_cover_designer(self):
-        self._common.metadata.coverDesigner = ""
-
-        self._common.generateEbook()
-
-        info = self._getInfoFile()
-
-        self.assertTrue(
-            self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0].endswith("Editor"))
-
     def test_cover_modification(self):
+        self._common.metadata.coverDesigner = "bla"
         self._common.metadata.coverModification = "Retoque"
 
         self._common.generateEbook()
@@ -385,14 +377,15 @@ class InfoTest(unittest.TestCase):
 
         self.assertTrue(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0].startswith("Retoque de cubierta: "))
 
-    def test_cover_designer(self):
-        self._common.metadata.coverDesigner = "Jorge Luis Borges"
+    def test_not_cover_modification(self):
+        self._common.metadata.coverDesigner = ""
 
         self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertTrue(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0].endswith("Jorge Luis Borges"))
+        self.assertFalse(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[starts-with(text(), 'Diseño de cubierta')]"))
+        self.assertFalse(any("si la cubierta fue creada" in x.text for x in self._common.xpath(info, "x:body/x:div[@class = 'info']/comment()")))
 
     def test_default_editor(self):
         self._common.metadata.editor = ""
@@ -401,7 +394,7 @@ class InfoTest(unittest.TestCase):
 
         info = self._getInfoFile()
 
-        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[3]/text()")[0], "Editor digital: Editor")
+        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0], "Editor digital: Editor")
 
     def test_editor(self):
         self._common.metadata.editor = "El editor"
@@ -410,14 +403,14 @@ class InfoTest(unittest.TestCase):
 
         info = self._getInfoFile()
 
-        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[3]/text()")[0], "Editor digital: El editor")
+        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[2]/text()")[0], "Editor digital: El editor")
 
     def test_epub_base_revision(self):
         self._common.generateEbook()
 
         info = self._getInfoFile()
 
-        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[4]/text()")[0], "ePub base r1.1")
+        self.assertEqual(self._common.xpath(info, "x:body/x:div[@class = 'info']/x:p[3]/text()")[0], "ePub base r1.1")
 
     def _getInfoFile(self):
         return etree.fromstring(self._common.outputEpub.read("OEBPS/Text/{0}".format("info.xhtml")))

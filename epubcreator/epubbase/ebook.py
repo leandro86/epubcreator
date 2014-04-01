@@ -356,9 +356,6 @@ class Ebook:
         if not self._metadata.coverModification:
             self._metadata.coverModification = ebook_metadata.Metadata.DEFAULT_COVER_MODIFICATION
 
-        if not self._metadata.coverDesigner:
-            self._metadata.coverDesigner = ebook_metadata.Metadata.DEFAULT_EDITOR
-
         if not self._metadata.dedication:
             self._metadata.dedication = ebook_metadata.Metadata.DEFAULT_DEDICATION
 
