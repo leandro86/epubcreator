@@ -7,6 +7,8 @@ import sip
 from epubcreator.gui.misc import utils
 from epubcreator.gui import main_window
 from epubcreator import config, version
+# Necesito este import para obtener el ícono de la aplicación.
+from epubcreator.gui.forms.compiled import epubcreator_rc
 
 
 def handleUnknownException(exc_type, exc_value, exc_traceback):
@@ -31,7 +33,7 @@ if __name__ == "__main__":
     QtGui.QApplication.setDesktopSettingsAware(True)
 
     app = QtGui.QApplication(sys.argv)
-    app.setWindowIcon(config.getAppIcon())
+    app.setWindowIcon(QtGui.QIcon(":/epubcreator/resources/images/icons/app_icon_512x512.png"))
 
     # Intento cargar las traducciones a español para todos los diálogos, botones, etc., estándares de Qt.
     locale = QtCore.QLocale.system().name()
