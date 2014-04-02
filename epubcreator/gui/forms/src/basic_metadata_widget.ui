@@ -21,41 +21,8 @@
    <property name="spacing">
     <number>6</number>
    </property>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Cubierta</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Autores</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Título</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1" colspan="3">
-    <widget class="QLineEdit" name="titleInput">
+   <item row="1" column="2" colspan="5">
+    <widget class="QLineEdit" name="subtitleInput">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -92,8 +59,8 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1" colspan="3">
-    <widget class="QLineEdit" name="subtitleInput">
+   <item row="0" column="2" colspan="5">
+    <widget class="QLineEdit" name="titleInput">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -117,7 +84,40 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="1" colspan="3">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Título</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Cubierta</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Autores</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2" colspan="5">
     <widget class="QGroupBox" name="groupBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -206,7 +206,7 @@
      </layout>
     </widget>
    </item>
-   <item row="4" column="1" colspan="3">
+   <item row="4" column="2" colspan="5">
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,1">
      <item>
       <widget class="QFrame" name="frame">
@@ -329,21 +329,11 @@
    <item row="2" column="0">
     <widget class="QLabel" name="label_7">
      <property name="text">
-      <string>Idioma</string>
+      <string>ID</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QComboBox" name="languageInput">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3">
+   <item row="2" column="2">
     <widget class="QLineEdit" name="idInput">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -353,22 +343,32 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>100</width>
        <height>16777215</height>
       </size>
      </property>
     </widget>
    </item>
-   <item row="2" column="2">
+   <item row="2" column="3">
     <widget class="QLabel" name="label_8">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="text">
-      <string>ID</string>
+      <string>Idioma</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="4" colspan="3">
+    <widget class="QComboBox" name="languageInput">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
     </widget>
    </item>
@@ -389,12 +389,11 @@
  <tabstops>
   <tabstop>titleInput</tabstop>
   <tabstop>subtitleInput</tabstop>
-  <tabstop>languageInput</tabstop>
   <tabstop>idInput</tabstop>
+  <tabstop>languageInput</tabstop>
   <tabstop>authorInput</tabstop>
   <tabstop>authorFileAsInput</tabstop>
   <tabstop>addAuthorButton</tabstop>
-  <tabstop>authorsList</tabstop>
   <tabstop>coverModificationInput</tabstop>
   <tabstop>coverDesignerInput</tabstop>
   <tabstop>synopsisInput</tabstop>
