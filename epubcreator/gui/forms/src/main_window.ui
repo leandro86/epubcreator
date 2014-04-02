@@ -84,7 +84,7 @@
   </widget>
   <action name="openFileAction">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../../resources/images/images.qrc">
      <normaloff>:/open_24x24.png</normaloff>:/open_24x24.png</iconset>
    </property>
    <property name="text">
@@ -96,7 +96,7 @@
   </action>
   <action name="generateEpubAction">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../../resources/images/images.qrc">
      <normaloff>:/epub.png</normaloff>:/epub.png</iconset>
    </property>
    <property name="text">
@@ -145,7 +145,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="images.qrc"/>
+  <include location="../../resources/images/images.qrc"/>
  </resources>
  <connections/>
 </ui>

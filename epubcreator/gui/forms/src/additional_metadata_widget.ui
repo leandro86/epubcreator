@@ -257,7 +257,7 @@
          <string>Agregar Traductor</string>
         </property>
         <property name="icon">
-         <iconset resource="images.qrc">
+         <iconset resource="../../resources/images/images.qrc">
           <normaloff>:/add_16x16.png</normaloff>:/add_16x16.png</iconset>
         </property>
         <property name="iconSize">
@@ -334,7 +334,7 @@
          <string>Agregar Ilustrador</string>
         </property>
         <property name="icon">
-         <iconset resource="images.qrc">
+         <iconset resource="../../resources/images/images.qrc">
           <normaloff>:/add_16x16.png</normaloff>:/add_16x16.png</iconset>
         </property>
         <property name="iconSize">
@@ -454,7 +454,7 @@
          <string>Agregar Género</string>
         </property>
         <property name="icon">
-         <iconset resource="images.qrc">
+         <iconset resource="../../resources/images/images.qrc">
           <normaloff>:/add_16x16.png</normaloff>:/add_16x16.png</iconset>
         </property>
         <property name="iconSize">
@@ -590,7 +590,7 @@
   <tabstop>collectionVolumeInput</tabstop>
  </tabstops>
  <resources>
-  <include location="images.qrc"/>
+  <include location="../../resources/images/images.qrc"/>
  </resources>
  <connections/>
 </ui>
