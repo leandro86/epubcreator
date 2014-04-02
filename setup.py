@@ -66,7 +66,7 @@ def freezeApp():
     options["include_msvcr"] = True
 
     if os.path.isdir("bin"):
-        shutil.rmtree("bin")
+        shutil.rmtree("bin", ignore_errors=True)
 
     setup(name=version.APP_NAME,
           version=version.VERSION,
