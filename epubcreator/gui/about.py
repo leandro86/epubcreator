@@ -1,10 +1,10 @@
 from PyQt4 import QtGui, QtCore
 
-from epubcreator.gui.forms.compiled import about_dialog
+from epubcreator.gui.forms import about_dialog_ui
 from epubcreator import version
 
 
-class About(QtGui.QDialog, about_dialog.Ui_Dialog):
+class About(QtGui.QDialog, about_dialog_ui.Ui_Dialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)

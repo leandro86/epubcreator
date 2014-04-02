@@ -3,11 +3,11 @@ import datetime
 from PyQt4 import QtGui, QtCore
 
 from epubcreator.gui.misc import language, utils
-from epubcreator.gui.forms.compiled import basic_metadata_widget, additional_metadata_widget, author_metadata_widget
+from epubcreator.gui.forms import basic_metadata_widget_ui, additional_metadata_widget_ui, author_metadata_widget_ui
 from epubcreator.epubbase import ebook_metadata
 
 
-class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
+class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
@@ -138,7 +138,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget.Ui_BasicMetadata):
         self.authorFileAsInput.returnPressed.connect(self._addAuthorToList)
 
 
-class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_AdditionalMetadata):
+class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget_ui.Ui_AdditionalMetadata):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
@@ -369,7 +369,7 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget.Ui_Additional
         self.ilustratorFileAsInput.returnPressed.connect(self._addIlustratorToList)
 
 
-class AuthorMetadata(QtGui.QWidget, author_metadata_widget.Ui_AuthorMetadata):
+class AuthorMetadata(QtGui.QWidget, author_metadata_widget_ui.Ui_AuthorMetadata):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)

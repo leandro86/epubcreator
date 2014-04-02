@@ -15,36 +15,24 @@ from PyQt4 import QtCore
 from cx_Freeze import setup, Executable
 
 from epubcreator import version, config
-
-
-def getImgFormatsPluginsPath():
-    # Necesito esta línea para que pyqt cargue las librerías con los plugins, sino
-    # no voy a encontrar el path hacia los mismos!
-    app = QtCore.QCoreApplication(sys.argv)
-
-    libraryPaths = QtCore.QCoreApplication.libraryPaths()
-
-    imgFormatsPath = ""
-    i = 0
-    while i < len(libraryPaths) and not imgFormatsPath:
-        if "plugins" in libraryPaths[i]:
-            imgFormatsPath = os.path.join(libraryPaths[i], "imageformats")
-        i += 1
-
-    if imgFormatsPath:
-        return imgFormatsPath
-    else:
-        raise Exception("Missing qt imageformats directory!")
+import epubcreator.gui
 
 
 def freezeApp():
+    # Necesito esta línea para que se carguen correctamente los paths de qt hacia los plugins, traducciones, etc.
+    app = QtCore.QCoreApplication(sys.argv)
+
     options = {}
 
     includes = ["PyQt4", "PyQt4.QtCore", "PyQt4.QtGui"]
     packages = ["lxml"]
-    excludes = ["PyQt4.QtSvg", "PyQt4.QtNetwork", "PyQt4.QtOpenGL", "PyQt4.QtScript", "PyQt4.QtSql", "PyQt4.Qsci", "PyQt4.QtXml",
-                "PyQt4.QtTest"]
-    include_files = [("epubcreator/epubbase/files", "files"), ("epubcreator/gui/resources/translations/qt_es.qm", "translations/qt_es.qm")]
+    excludes = ["PyQt4.QtSvg", "PyQt4.QtNetwork", "PyQt4.QtOpenGL", "PyQt4.QtScript", "PyQt4.QtSql", "PyQt4.Qsci", "PyQt4.QtXml", "PyQt4.QtTest",
+                "PyQt4.uic"]
+    include_files = [("epubcreator/epubbase/files", "files")]
+
+    translationPath = config.getTranslationPath()
+    translationFileName = os.path.split(translationPath)[1]
+    include_files.append((translationPath, "translations/{0}".format(translationFileName)))
 
     options["icon"] = "epubcreator/gui/resources/images/icons/app_icon.ico"
     options["build_exe"] = "bin/epubcreator"
@@ -56,12 +44,10 @@ def freezeApp():
         include_files.append((os.path.join(libsPath, "libxml2.so.2"), "libxml2.so.2"))
         include_files.append((os.path.join(libsPath, "libz.so"), "libz.so"))
     else:
-        imgPluginsPath = getImgFormatsPluginsPath()
+        imageFormatsPath = os.path.join(QtCore.QLibraryInfo.location(QtCore.QLibraryInfo.PluginsPath), "imageformats")
 
-        # if config.IS_RUNNING_ON_WIN:
-        #     include_files.append((os.path.join(imgPluginsPath, "qjpeg4.dll"), "plugins/imageformats/qjpeg4.dll"))
         if config.IS_RUNNING_ON_MAC:
-            include_files.append((os.path.join(imgPluginsPath, "libqjpeg.dylib"), "plugins/imageformats/libqjpeg.dylib"))
+            include_files.append((os.path.join(imageFormatsPath, "libqjpeg.dylib"), "plugins/imageformats/libqjpeg.dylib"))
             include_files.append(("/opt/local/lib/libjpeg.9.dylib", "libjpeg.9.dylib"))
 
             # Elimino el archivo ".ico": en mac el ícono es un archivo ".icns", que luego
@@ -97,7 +83,7 @@ def freezeApp():
             pass
 
     if config.IS_RUNNING_ON_MAC:
-        # El bundle ".app" creado, por defecto tiene el nombre de esta forma: name-version.app.
+        # El bundle ".app" creado por defecto tiene el nombre de esta forma: name-version.app.
         bundlePath = "bin/{0}-{1}.app".format(version.APP_NAME, version.VERSION)
         bundleMacOsDir = os.path.join(bundlePath, "Contents", "MacOS")
         bundleResourcesDir = os.path.join(bundlePath, "Contents", "Resources")
@@ -137,12 +123,12 @@ def freezeApp():
                     subprocess.call(("install_name_tool", "-change", filename, newfilename, lib))
 
         # Copio el ícono.
-        shutil.copy("gui/resources/images/icons/app_icon.icns",
-                    "bin/{0}-{1}.app/Contents/Resources".format(version.APP_NAME, version.VERSION))
+        shutil.copy("gui/resources/images/icons/app_icon.icns", "bin/{0}-{1}.app/Contents/Resources".format(version.APP_NAME, version.VERSION))
 
         # Renombro el bundle, porque no quiero que el nombre incluya la versión.
         os.rename(bundlePath, "bin/EpubCreator.app")
 
 
 if __name__ == "__main__":
+    epubcreator.gui.compileGui()
     freezeApp()

@@ -257,8 +257,8 @@
          <string>Agregar Traductor</string>
         </property>
         <property name="icon">
-         <iconset resource="additional_metadata_widget.qrc">
-          <normaloff>:/additional_metadata_widget/resources/images/add_16x16.png</normaloff>:/additional_metadata_widget/resources/images/add_16x16.png</iconset>
+         <iconset resource="images.qrc">
+          <normaloff>:/add_16x16.png</normaloff>:/add_16x16.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -334,8 +334,8 @@
          <string>Agregar Ilustrador</string>
         </property>
         <property name="icon">
-         <iconset resource="additional_metadata_widget.qrc">
-          <normaloff>:/additional_metadata_widget/resources/images/add_16x16.png</normaloff>:/additional_metadata_widget/resources/images/add_16x16.png</iconset>
+         <iconset resource="images.qrc">
+          <normaloff>:/add_16x16.png</normaloff>:/add_16x16.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -454,8 +454,8 @@
          <string>Agregar Género</string>
         </property>
         <property name="icon">
-         <iconset resource="additional_metadata_widget.qrc">
-          <normaloff>:/additional_metadata_widget/resources/images/add_16x16.png</normaloff>:/additional_metadata_widget/resources/images/add_16x16.png</iconset>
+         <iconset resource="images.qrc">
+          <normaloff>:/add_16x16.png</normaloff>:/add_16x16.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -590,7 +590,7 @@
   <tabstop>collectionVolumeInput</tabstop>
  </tabstops>
  <resources>
-  <include location="additional_metadata_widget.qrc"/>
+  <include location="images.qrc"/>
  </resources>
  <connections/>
 </ui>

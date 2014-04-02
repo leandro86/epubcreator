@@ -7,12 +7,12 @@ from PyQt4 import QtGui
 from epubcreator.epubbase import ebook
 from epubcreator.converters.docx import docx_converter
 from epubcreator.gui.misc import settings_store, utils
-from epubcreator.gui.forms.compiled import main_window
+from epubcreator.gui.forms import main_window_ui
 from epubcreator.gui import preferences, about
 from epubcreator import version, config
 
 
-class MainWindow(QtGui.QMainWindow, main_window.Ui_MainWindow):
+class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
     _SETTINGS_GROUP = "mainWindow"
 
     # Las dimensiones y posición de la ventana.

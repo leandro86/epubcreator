@@ -2,7 +2,7 @@ import platform
 
 from PyQt4 import QtGui, QtCore
 
-from epubcreator.gui.forms.compiled import preferences_general_widget, preferences_docx_widget
+from epubcreator.gui.forms import preferences_general_widget_ui, preferences_docx_widget_ui
 from epubcreator.gui.misc import settings_store
 
 
@@ -14,7 +14,7 @@ class PreferencesAbstract(QtGui.QWidget):
         raise NotImplemented
 
 
-class GeneralPreferences(PreferencesAbstract, preferences_general_widget.Ui_GeneralPreferences):
+class GeneralPreferences(PreferencesAbstract, preferences_general_widget_ui.Ui_GeneralPreferences):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
@@ -48,7 +48,7 @@ class GeneralPreferences(PreferencesAbstract, preferences_general_widget.Ui_Gene
             self.sigilPathInput.setText(fileName)
 
 
-class DocxPreferences(PreferencesAbstract, preferences_docx_widget.Ui_DocxPreferences):
+class DocxPreferences(PreferencesAbstract, preferences_docx_widget_ui.Ui_DocxPreferences):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)

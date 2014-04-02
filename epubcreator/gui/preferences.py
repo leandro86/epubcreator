@@ -1,9 +1,9 @@
 from PyQt4 import QtGui
 
-from epubcreator.gui.forms.compiled import preferences_dialog
+from epubcreator.gui.forms import preferences_dialog_ui
 
 
-class Preferences(QtGui.QDialog, preferences_dialog.Ui_Preferences):
+class Preferences(QtGui.QDialog, preferences_dialog_ui.Ui_Preferences):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)

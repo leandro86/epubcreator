@@ -173,8 +173,8 @@
          <string>Agregar Autor</string>
         </property>
         <property name="icon">
-         <iconset resource="basic_metadata_widget.qrc">
-          <normaloff>:/basic_metadata_widget/resources/images/add_16x16.png</normaloff>:/basic_metadata_widget/resources/images/add_16x16.png</iconset>
+         <iconset resource="images.qrc">
+          <normaloff>:/add_16x16.png</normaloff>:/add_16x16.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -400,7 +400,7 @@
   <tabstop>synopsisInput</tabstop>
  </tabstops>
  <resources>
-  <include location="basic_metadata_widget.qrc"/>
+  <include location="images.qrc"/>
  </resources>
  <connections/>
 </ui>

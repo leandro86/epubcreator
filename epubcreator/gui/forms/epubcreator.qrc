@@ -1,5 +1,0 @@
-<RCC>
-  <qresource prefix="epubcreator">
-    <file>../resources/images/icons/app_icon_512x512.png</file>
-  </qresource>
-</RCC>

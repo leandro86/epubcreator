@@ -1,11 +1,11 @@
 from PyQt4 import QtGui, QtCore
 
 from epubcreator.epubbase import ebook_metadata
-from epubcreator.gui.forms.compiled import metadata_tab_manager_widget
+from epubcreator.gui.forms import metadata_tab_manager_widget_ui
 from epubcreator.gui import metadata_tabs
 
 
-class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget.Ui_MetadataTabManager):
+class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget_ui.Ui_MetadataTabManager):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)

@@ -1,5 +1,0 @@
-<RCC>
-  <qresource prefix="additional_metadata_widget">
-    <file>../resources/images/add_16x16.png</file>
-  </qresource>
-</RCC>

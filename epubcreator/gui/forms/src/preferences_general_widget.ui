@@ -23,8 +23,8 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="preferences_general_widget.qrc">
-       <normaloff>:/preferences_general_widget/resources/images/search_16x16.png</normaloff>:/preferences_general_widget/resources/images/search_16x16.png</iconset>
+      <iconset resource="images.qrc">
+       <normaloff>:/search_16x16.png</normaloff>:/search_16x16.png</iconset>
      </property>
     </widget>
    </item>
@@ -66,7 +66,7 @@
   <tabstop>changeSigilPathButton</tabstop>
  </tabstops>
  <resources>
-  <include location="preferences_general_widget.qrc"/>
+  <include location="images.qrc"/>
  </resources>
  <connections/>
 </ui>

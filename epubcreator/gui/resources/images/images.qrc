@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="/">
+    <file>epub.png</file>
+    <file>open_24x24.png</file>  
+    <file>add_16x16.png</file>
+    <file>search_16x16.png</file>
+    <file>icons/app_icon_512x512.png</file>
+  </qresource>
+</RCC>
