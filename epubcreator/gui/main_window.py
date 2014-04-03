@@ -169,7 +169,9 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
         rawText = None
 
         if self._workingFilePath.endswith(".docx"):
-            converter = docx_converter.DocxConverter(self._workingFilePath, settings.docxIgnoreEmptyParagraphs)
+            converter = docx_converter.DocxConverter(self._workingFilePath)
+            converter.setOptions(ignoreEmptyParagraphs=settings.docxIgnoreEmptyParagraphs)
+
             data = converter.convert()
             rawText = converter.getRawText()
 

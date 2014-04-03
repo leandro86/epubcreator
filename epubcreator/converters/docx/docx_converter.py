@@ -9,6 +9,12 @@ from epubcreator.converters.docx import utils, styles, footnotes
 
 
 class DocxConverter(converter_base.AbstractConverter):
+    OPTIONS = [converter_base.ConversionOption(name="ignoreEmptyParagraphs",
+                                               value=True,
+                                               description='Indica si los párrafos en blanco deben ignorarse, o reemplazarse por la clase '
+                                                           '"salto" de acuerdo al siguiente criterio: un párrafo en blanco, se reemplaza por la '
+                                                           'clase "salto10"; dos o más, por la clase "salto25".')]
+
     _MAX_HEADING_NUMBER = 6
 
     _DOCUMENT_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"
@@ -18,7 +24,7 @@ class DocxConverter(converter_base.AbstractConverter):
     # De haber imágenes, deben estar en este directorio dentro del docx.
     _MEDIA_FILES_PATH = "word/media"
 
-    def __init__(self, inputFile, ignoreEmptyParagraphs=True):
+    def __init__(self, inputFile):
         super().__init__(inputFile)
 
         self._documentXml = None
@@ -26,8 +32,6 @@ class DocxConverter(converter_base.AbstractConverter):
         self._styles = None
         self._footnotes = None
         self._mediaFiles = {}
-
-        self._ignoreEmptyParagraphs = ignoreEmptyParagraphs
 
         # El objeto Section actual en el cual estoy escribiendo.
         self._currentSection = None
@@ -256,7 +260,7 @@ class DocxConverter(converter_base.AbstractConverter):
                 isParagraphInsideDiv = True
 
         if hasText:
-            if not self._ignoreEmptyParagraphs and previousEmptyParagraphsCount > 0:
+            if not self._options.ignoreEmptyParagraphs and previousEmptyParagraphsCount > 0:
                 classValue.append("salto25" if previousEmptyParagraphsCount > 1 else "salto10")
 
             if customStyleName and not isParagraphInsideDiv:

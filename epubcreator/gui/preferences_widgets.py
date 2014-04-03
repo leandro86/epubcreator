@@ -3,7 +3,8 @@ import platform
 from PyQt4 import QtGui, QtCore
 
 from epubcreator.gui.forms import preferences_general_widget_ui, preferences_docx_widget_ui
-from epubcreator.gui.misc import settings_store
+from epubcreator.gui.misc import settings_store, utils
+from epubcreator.converters.docx import docx_converter
 
 
 class PreferencesAbstract(QtGui.QWidget):
@@ -52,6 +53,7 @@ class DocxPreferences(PreferencesAbstract, preferences_docx_widget_ui.Ui_DocxPre
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self._extendUi()
 
         self._loadSettings()
 
@@ -64,3 +66,7 @@ class DocxPreferences(PreferencesAbstract, preferences_docx_widget_ui.Ui_DocxPre
         settings = settings_store.SettingsStore()
 
         self.ignoreEmptyParagraphsInput.setCheckState(QtCore.Qt.Checked if settings.docxIgnoreEmptyParagraphs else QtCore.Qt.Unchecked)
+
+    def _extendUi(self):
+        self.ignoreEmptyParagraphsInput.setToolTip(utils.insertNewLines(docx_converter.DocxConverter.getOptionDescription("ignoreEmptyParagraphs"),
+                                                                        100))

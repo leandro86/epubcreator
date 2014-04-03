@@ -232,7 +232,10 @@ class DocxConverterTest(unittest.TestCase):
 
     def _getOutput(self, docxTestFileName, ignoreEmptyParagraphs=True):
         pathToDocxTestFile = os.path.join(self._pathToTestDataFolder, docxTestFileName)
-        transformer = docx_converter.DocxConverter(pathToDocxTestFile, ignoreEmptyParagraphs)
+
+        transformer = docx_converter.DocxConverter(pathToDocxTestFile)
+        transformer.setOptions(ignoreEmptyParagraphs=ignoreEmptyParagraphs)
+
         ebookData = transformer.convert()
         return ebookData
 
