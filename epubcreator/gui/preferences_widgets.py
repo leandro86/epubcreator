@@ -20,6 +20,7 @@ class GeneralPreferences(PreferencesAbstract, preferences_general_widget_ui.Ui_G
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self._extendUi()
 
         self.changeSigilPathButton.clicked.connect(self._changeSigilPath)
 
@@ -48,6 +49,11 @@ class GeneralPreferences(PreferencesAbstract, preferences_general_widget_ui.Ui_G
         fileName = QtGui.QFileDialog.getOpenFileName(self, "", "", dialogFilter)
         if fileName:
             self.sigilPathInput.setText(fileName)
+
+    def _extendUi(self):
+        self.editorInput.setToolTip(utils.formatTextForTooltip("El alias del editor."))
+        self.sigilPathInput.setToolTip(utils.formatTextForTooltip("Si se desea abrir automáticamente con Sigil el epub generado, entonces "
+                                                                  "completar este campo con la ruta hacia el ejecutable."))
 
 
 class DocxPreferences(PreferencesAbstract, preferences_docx_widget_ui.Ui_DocxPreferences):
