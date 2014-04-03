@@ -6,14 +6,15 @@ from lxml import etree
 from epubcreator.converters import converter_base, xml_utils
 from epubcreator.epubbase import ebook_data
 from epubcreator.converters.docx import utils, styles, footnotes
+from epubcreator.misc import options
 
 
 class DocxConverter(converter_base.AbstractConverter):
-    OPTIONS = [converter_base.ConversionOption(name="ignoreEmptyParagraphs",
-                                               value=True,
-                                               description='Indica si los párrafos en blanco deben ignorarse, o reemplazarse por la clase '
-                                                           '"salto" de acuerdo al siguiente criterio: un párrafo en blanco, se reemplaza por la '
-                                                           'clase "salto10"; dos o más, por la clase "salto25".')]
+    OPTIONS = [options.Option(name="ignoreEmptyParagraphs",
+                              value=True,
+                              description='Indica si los párrafos en blanco deben ignorarse, o reemplazarse por la clase '
+                                          '"salto" de acuerdo al siguiente criterio: un párrafo en blanco, se reemplaza por la '
+                                          'clase "salto10"; dos o más, por la clase "salto25".')]
 
     _MAX_HEADING_NUMBER = 6
 
