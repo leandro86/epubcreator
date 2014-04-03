@@ -2,6 +2,20 @@ import types
 
 
 class Options:
+    """
+    Brinda un mecanismo simple para aquellas clases que requieren que se provean diversas
+    opciones para realizar su función.
+
+    Lo único que se debe hacer es:
+
+    1- Crear una clase descendiente de Options.
+    2- Asignarle a la variable estática OPTIONS una lista de OPTION, con todas las posibles
+       opciones que la clase admite.
+    3- A cada opción se accede a través del objeto _options, que contiene un atributo con el
+       nombre de la opción por cada una de las opciones especificadas en OPTIONS.
+    4- El consumer especifica las opciones a modificar a través del método setOptions.
+    """
+
     OPTIONS = []
 
     def __init__(self):
