@@ -68,7 +68,7 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
             metadata.editor = settings.editor
 
             data, rawText = self._prepareEbook()
-            eebook = ebook.Ebook(data, metadata, includeOptionalFiles=settings.epubBaseIncludeOptionalFiles)
+            eebook = ebook.Ebook(data, metadata, includeOptionalFiles=settings.epubIncludeOptionalFiles)
 
             if data:
                 self._checkForMissingText(data.sections, rawText)

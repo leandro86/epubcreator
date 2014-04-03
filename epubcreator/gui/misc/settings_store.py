@@ -9,7 +9,7 @@ class SettingsStore(QtCore.QSettings):
     _EDITOR_SETTING = "{0}/editor".format(_SETTINGS_GROUP)
     _SIGIL_PATH_SETTING = "{0}/sigilPath".format(_SETTINGS_GROUP)
 
-    _EPUBBASE_INCLUDE_OPTIONAL_FILES_SETTING = "{0}/epubBaseIncludeOptionalFiles".format(_SETTINGS_GROUP)
+    _EPUB_INCLUDE_OPTIONAL_FILES_SETTING = "{0}/epubIncludeOptionalFiles".format(_SETTINGS_GROUP)
 
     _DOCX_IGNORE_EMPTY_PARAGRAPHS_SETTING = "{0}/docxIgnoreEmptyParagraphs".format(_SETTINGS_GROUP)
 
@@ -30,12 +30,12 @@ class SettingsStore(QtCore.QSettings):
         self.setValue(SettingsStore._SIGIL_PATH_SETTING, value)
 
     @property
-    def epubBaseIncludeOptionalFiles(self):
-        return self.value(SettingsStore._EPUBBASE_INCLUDE_OPTIONAL_FILES_SETTING, "true") == "true"
+    def epubIncludeOptionalFiles(self):
+        return self.value(SettingsStore._EPUB_INCLUDE_OPTIONAL_FILES_SETTING, "true") == "true"
 
-    @epubBaseIncludeOptionalFiles.setter
-    def epubBaseIncludeOptionalFiles(self, value):
-        self.setValue(SettingsStore._EPUBBASE_INCLUDE_OPTIONAL_FILES_SETTING, value)
+    @epubIncludeOptionalFiles.setter
+    def epubIncludeOptionalFiles(self, value):
+        self.setValue(SettingsStore._EPUB_INCLUDE_OPTIONAL_FILES_SETTING, value)
 
     @property
     def docxIgnoreEmptyParagraphs(self):

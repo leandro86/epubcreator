@@ -34,7 +34,7 @@
        </item>
        <item>
         <property name="text">
-         <string>Epub Base</string>
+         <string>Generación de Epub</string>
         </property>
        </item>
        <item>
@@ -56,7 +56,7 @@
         <number>1</number>
        </property>
        <widget class="GeneralPreferences" name="page_9"/>
-       <widget class="EpubBasePreferences" name="page"/>
+       <widget class="EpubPreferences" name="page"/>
        <widget class="DocxPreferences" name="page_10"/>
       </widget>
      </item>
@@ -88,7 +88,7 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>EpubBasePreferences</class>
+   <class>EpubPreferences</class>
    <extends>QWidget</extends>
    <header>epubcreator.gui.preferences_widgets</header>
    <container>1</container>
