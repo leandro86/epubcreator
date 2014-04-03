@@ -2,9 +2,10 @@ import platform
 
 from PyQt4 import QtGui, QtCore
 
-from epubcreator.gui.forms import preferences_general_widget_ui, preferences_docx_widget_ui
+from epubcreator.gui.forms import preferences_general_widget_ui, preferences_docx_widget_ui, preferences_epubbase_widget_ui
 from epubcreator.gui.misc import settings_store, utils
 from epubcreator.converters.docx import docx_converter
+from epubcreator.epubbase import ebook
 
 
 class PreferencesAbstract(QtGui.QWidget):
@@ -68,4 +69,28 @@ class DocxPreferences(PreferencesAbstract, preferences_docx_widget_ui.Ui_DocxPre
         self.ignoreEmptyParagraphsInput.setCheckState(QtCore.Qt.Checked if settings.docxIgnoreEmptyParagraphs else QtCore.Qt.Unchecked)
 
     def _extendUi(self):
-        self.ignoreEmptyParagraphsInput.setToolTip(utils.formatTextForTooltip(docx_converter.DocxConverter.getOptionDescription("ignoreEmptyParagraphs")))
+        description = utils.formatTextForTooltip(docx_converter.DocxConverter.getOptionDescription("ignoreEmptyParagraphs"))
+        self.ignoreEmptyParagraphsInput.setToolTip(description)
+
+
+class EpubBasePreferences(PreferencesAbstract, preferences_epubbase_widget_ui.Ui_EpubBasePreferences):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
+        self._extendUi()
+
+        self._loadSettings()
+
+    def saveSettings(self):
+        settings = settings_store.SettingsStore()
+
+        settings.epubBaseIncludeOptionalFiles = self.includeOptionalFilesInput.isChecked()
+
+    def _loadSettings(self):
+        settings = settings_store.SettingsStore()
+
+        self.includeOptionalFilesInput.setCheckState(QtCore.Qt.Checked if settings.epubBaseIncludeOptionalFiles else QtCore.Qt.Unchecked)
+
+    def _extendUi(self):
+        description = utils.formatTextForTooltip(ebook.Ebook.getOptionDescription("includeOptionalFiles"))
+        self.includeOptionalFilesInput.setToolTip(description)

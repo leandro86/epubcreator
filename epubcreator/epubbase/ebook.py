@@ -111,7 +111,8 @@ class _Templates:
 class Ebook(Options):
     OPTIONS = [Option(name="includeOptionalFiles",
                       value=True,
-                      description="Indica si los archivos opcionales se incluyen.")]
+                      description="Indica si los archivos opcionales (dedicatoria.xhtml, autor.xhtml y autor.jpg) deben incluirse en el epub "
+                                  "incluso si dichos campos no fueron ingresados.")]
 
     _epubBase = _Templates(config.EPUBBASE_FILES_DIR_PATH)
 

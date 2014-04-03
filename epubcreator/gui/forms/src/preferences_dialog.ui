@@ -25,11 +25,16 @@
         </sizepolicy>
        </property>
        <property name="currentRow">
-        <number>0</number>
+        <number>-1</number>
        </property>
        <item>
         <property name="text">
          <string>Preferencias Generales</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Epub Base</string>
         </property>
        </item>
        <item>
@@ -48,9 +53,10 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="GeneralPreferences" name="page_9"/>
+       <widget class="EpubBasePreferences" name="page"/>
        <widget class="DocxPreferences" name="page_10"/>
       </widget>
      </item>
@@ -77,6 +83,12 @@
   </customwidget>
   <customwidget>
    <class>DocxPreferences</class>
+   <extends>QWidget</extends>
+   <header>epubcreator.gui.preferences_widgets</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>EpubBasePreferences</class>
    <extends>QWidget</extends>
    <header>epubcreator.gui.preferences_widgets</header>
    <container>1</container>
