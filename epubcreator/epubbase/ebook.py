@@ -299,7 +299,8 @@ class Ebook(Options):
         # El título del libro debe ser la segunda entrada en la toc.
         outputEpub.addNavPoint(epubbase_names.TITLE_FILENAME, self._metadata.title)
 
-        self._ebookData.toc.addFirstLevelTitle(epubbase_names.AUTHOR_FILENAME, self._getTocTitleForAuthorFile(), False)
+        if any(a for a in self._metadata.authors if a.biography or a.image):
+            self._ebookData.toc.addFirstLevelTitle(epubbase_names.AUTHOR_FILENAME, self._getTocTitleForAuthorFile(), False)
 
         if self._notesSection:
             self._ebookData.toc.addFirstLevelTitle(epubbase_names.NOTES_FILENAME, "Notas", False)

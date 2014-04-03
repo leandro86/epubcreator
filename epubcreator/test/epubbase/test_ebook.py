@@ -934,32 +934,32 @@ class TocTest(unittest.TestCase):
     def tearDown(self):
         self._common.release()
 
-    def test_author_entry_when_default_author(self):
+    def test_author_entry_when_no_authors_and_include_optional_files(self):
         self._common.metadata.authors.clear()
 
         self._common.generateEbook()
 
-        titles = self._common.outputEpub.getTitles()
+        titles = [t[0] for t in self._common.outputEpub.getTitles()]
 
-        self.assertEqual(titles[-1][0], "Autor")
+        self.assertEqual(titles[-1], "Autor")
 
     def test_author_entry_when_male_author(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
 
         self._common.generateEbook()
 
-        titles = self._common.outputEpub.getTitles()
+        titles = [t[0] for t in self._common.outputEpub.getTitles()]
 
-        self.assertEqual(titles[-1][0], "Autor")
+        self.assertEqual(titles[-1], "Autor")
 
     def test_author_entry_when_female_author(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", ebook_metadata.Person.FEMALE_GENDER))
 
         self._common.generateEbook()
 
-        titles = self._common.outputEpub.getTitles()
+        titles = [t[0] for t in self._common.outputEpub.getTitles()]
 
-        self.assertEqual(titles[-1][0], "Autora")
+        self.assertEqual(titles[-1], "Autora")
 
     def test_author_entry_when_two_authors(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", ebook_metadata.Person.MALE_GENDER))
@@ -967,21 +967,20 @@ class TocTest(unittest.TestCase):
 
         self._common.generateEbook()
 
+        titles = [t[0] for t in self._common.outputEpub.getTitles()]
+
+        self.assertEqual(titles[-1], "Autores")
+
+    def test_required_entries_when_not_include_optional_files(self):
+        self._common.generateEbook(includeOptionalFiles=False)
+
         titles = self._common.outputEpub.getTitles()
 
-        self.assertEqual(titles[-1][0], "Autores")
-
-    def test_required_entries(self):
-        self._common.generateEbook()
-
-        titles = self._common.outputEpub.getTitles()
-
-        self.assertEqual([t[0] for t in titles], ["Cubierta", "Título", "Autor"])
+        self.assertEqual([t[0] for t in titles], ["Cubierta", "Título"])
         self.assertTrue(titles[0][1].endswith("cubierta.xhtml"))
         self.assertTrue(titles[1][1].endswith("titulo.xhtml"))
-        self.assertTrue(titles[2][1].endswith("autor.xhtml"))
 
-    def test_notes_entry_existswhen_epub_contains_notes(self):
+    def test_notes_entry_exists_when_epub_contains_notes(self):
         self._common.generateEbook([ebook_data.NotesSection()])
 
         titles = self._common.outputEpub.getTitles()
@@ -994,9 +993,9 @@ class TocTest(unittest.TestCase):
 
         self._common.generateEbook()
 
-        titles = self._common.outputEpub.getTitles()
+        titles = [t[0] for t in self._common.outputEpub.getTitles()]
 
-        self.assertEqual(titles[1][0], "El título del libro")
+        self.assertEqual(titles[1], "El título del libro")
 
 
 class EpubFileNameTest(unittest.TestCase):
