@@ -6,12 +6,12 @@ from PyQt4 import QtCore, QtGui
 class SettingsStore(QtCore.QSettings):
     _SETTINGS_GROUP = "userPreferences"
 
-    _EDITOR_SETTING = "{0}/{1}".format(_SETTINGS_GROUP, "editor")
-    _SIGIL_PATH_SETTING = "{0}/{1}".format(_SETTINGS_GROUP, "sigilPath")
+    _EDITOR_SETTING = "{0}/editor".format(_SETTINGS_GROUP)
+    _SIGIL_PATH_SETTING = "{0}/sigilPath".format(_SETTINGS_GROUP)
 
-    _EPUBBASE_INCLUDE_OPTIONAL_FILES_SETTING = "{0}/{1}".format(_SETTINGS_GROUP, "epubBaseIncludeOptionalFiles")
+    _EPUBBASE_INCLUDE_OPTIONAL_FILES_SETTING = "{0}/epubBaseIncludeOptionalFiles".format(_SETTINGS_GROUP)
 
-    _DOCX_IGNORE_EMPTY_PARAGRAPHS_SETTING = "{0}/{1}".format(_SETTINGS_GROUP, "docxIgnoreEmptyParagraphs")
+    _DOCX_IGNORE_EMPTY_PARAGRAPHS_SETTING = "{0}/docxIgnoreEmptyParagraphs".format(_SETTINGS_GROUP)
 
     @property
     def editor(self):
