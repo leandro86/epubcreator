@@ -417,6 +417,14 @@ class AuthorMetadata(QtGui.QWidget, author_metadata_widget_ui.Ui_AuthorMetadata)
                 self.authorImage.setEnabled(True)
                 self.authorsTable.selectRow(0)
         else:
+            # Evito disparar la señal textChanged, porque sino se se dispara una excepción
+            # cuando se intenta obtener el autor seleccionado (que no lo hay, porque la tabla
+            # de autores va estar vacía)
+            self.authorBiographyInput.blockSignals(True)
+            self.authorBiographyInput.clear()
+            self.authorBiographyInput.blockSignals(False)
+
+            self.authorImage.setText(self._authorImageText)
             self.authorBiographyInput.setEnabled(False)
             self.authorImage.setEnabled(False)
 
