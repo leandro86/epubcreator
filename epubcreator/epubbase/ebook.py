@@ -9,68 +9,68 @@ from epubcreator.epubbase.misc import utils
 from epubcreator import config
 
 
-class _EpubBase:
+class _Templates:
     _files = {}
 
     def __init__(self, epubBaseFilesDirPath):
-        if not _EpubBase._files:
-            _EpubBase._loadEpubBaseFiles(epubBaseFilesDirPath)
+        if not _Templates._files:
+            _Templates._loadEpubBaseFiles(epubBaseFilesDirPath)
 
     def getCover(self):
-        return _EpubBase._files[epubbase_names.COVER_FILENAME]
+        return _Templates._files[epubbase_names.COVER_FILENAME]
 
     def getSynopsis(self, synopsis):
         params = locals()
         del (params["self"])
 
-        template = _EpubBase._files[epubbase_names.SYNOPSIS_FILENAME]
+        template = _Templates._files[epubbase_names.SYNOPSIS_FILENAME]
         return template.render(**params)
 
     def getTitle(self, author, title, subtitle, editor, collectionName, subCollectionName, collectionVolume):
         params = locals()
         del (params["self"])
 
-        template = _EpubBase._files[epubbase_names.TITLE_FILENAME]
+        template = _Templates._files[epubbase_names.TITLE_FILENAME]
         return template.render(**params)
 
     def getInfo(self, originalTitle, author, publicationYear, translator, ilustrator, coverDesigner, coverModification, editor):
         params = locals()
         del (params["self"])
 
-        template = _EpubBase._files[epubbase_names.INFO_FILENAME]
+        template = _Templates._files[epubbase_names.INFO_FILENAME]
         return template.render(**params)
 
     def getDedication(self, dedication):
         params = locals()
         del (params["self"])
 
-        template = _EpubBase._files[epubbase_names.DEDICATION_FILENAME]
+        template = _Templates._files[epubbase_names.DEDICATION_FILENAME]
         return template.render(**params)
 
     def getAuthor(self, authorBiography, title, imageName):
         params = locals()
         del (params["self"])
 
-        template = _EpubBase._files[epubbase_names.AUTHOR_FILENAME]
+        template = _Templates._files[epubbase_names.AUTHOR_FILENAME]
         return template.render(**params)
 
     def getEplLogoImage(self):
-        return _EpubBase._files[epubbase_names.EPL_LOGO_FILENAME]
+        return _Templates._files[epubbase_names.EPL_LOGO_FILENAME]
 
     def getExLibrisImage(self):
-        return _EpubBase._files[epubbase_names.EX_LIBRIS_FILENAME]
+        return _Templates._files[epubbase_names.EX_LIBRIS_FILENAME]
 
     def getCss(self):
-        return _EpubBase._files[epubbase_names.STYLE_FILENAME]
+        return _Templates._files[epubbase_names.STYLE_FILENAME]
 
     def getCoverImage(self):
-        return _EpubBase._files[epubbase_names.COVER_IMAGE_FILENAME]
+        return _Templates._files[epubbase_names.COVER_IMAGE_FILENAME]
 
     def getAuthorImage(self):
-        return _EpubBase._files[epubbase_names.AUTHOR_IMAGE_FILENAME]
+        return _Templates._files[epubbase_names.AUTHOR_IMAGE_FILENAME]
 
     def getIBooksDisplayOptionsFile(self):
-        return _EpubBase._files[epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME]
+        return _Templates._files[epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME]
 
     @staticmethod
     def _loadEpubBaseFiles(epubBaseFilesDirPath):
@@ -98,17 +98,17 @@ class _EpubBase:
 
             if fileName.endswith(".png") or fileName.endswith(".jpg"):
                 with open(filePath, "rb") as file:
-                    _EpubBase._files[fileName] = file.read()
+                    _Templates._files[fileName] = file.read()
             elif fileName in textFiles:
                 with open(filePath, encoding="utf-8") as file:
-                    _EpubBase._files[fileName] = file.read()
+                    _Templates._files[fileName] = file.read()
             else:
                 newFilePath = filePath.replace(".xhtml", ".mako")
-                _EpubBase._files[fileName] = mako.template.Template(filename=newFilePath, input_encoding="utf-8", output_encoding="utf-8")
+                _Templates._files[fileName] = mako.template.Template(filename=newFilePath, input_encoding="utf-8", output_encoding="utf-8")
 
 
 class Ebook:
-    _epubBase = _EpubBase(config.EPUBBASE_FILES_DIR_PATH)
+    _epubBase = _Templates(config.EPUBBASE_FILES_DIR_PATH)
 
     def __init__(self, ebookData, metadata=None):
         # Debería hacer una copia profunda de ebookData también técnicamente, ya que más adelante
