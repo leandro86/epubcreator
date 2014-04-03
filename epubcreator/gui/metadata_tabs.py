@@ -79,7 +79,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
     def _populateCoverModificationOptions(self):
         for i, option in enumerate(ebook_metadata.Metadata.COVER_MODIFICATION_OPTIONS):
             self.coverModificationInput.addItem(option[0])
-            self.coverModificationInput.setItemData(i, utils.insertNewLines(option[1], 100), QtCore.Qt.ToolTipRole)
+            self.coverModificationInput.setItemData(i, utils.insertNewLines(option[1]), QtCore.Qt.ToolTipRole)
 
     def _populateLanguages(self):
         for languageName in language.Language.getSortedLanguagesNames():
