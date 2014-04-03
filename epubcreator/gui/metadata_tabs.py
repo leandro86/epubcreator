@@ -265,11 +265,11 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget_ui.Ui_Additio
 
         for i, genre in enumerate(genres):
             self.genreGenreInput.addItem(genre[0])
-            self.genreGenreInput.setItemData(i, utils.insertNewLines(genre[1], 100), QtCore.Qt.ToolTipRole)
+            self.genreGenreInput.setItemData(i, utils.insertNewLines(genre[1]), QtCore.Qt.ToolTipRole)
 
         for i, subGenre in enumerate(subGenres):
             self.genreSubGenreInput.addItem(subGenre[0])
-            self.genreSubGenreInput.setItemData(i, utils.insertNewLines(subGenre[1], 100), QtCore.Qt.ToolTipRole)
+            self.genreSubGenreInput.setItemData(i, utils.insertNewLines(subGenre[1]), QtCore.Qt.ToolTipRole)
 
     def _addTranslatorToList(self):
         name = self.translatorInput.text().strip()

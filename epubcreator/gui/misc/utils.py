@@ -34,7 +34,7 @@ def displayExceptionErrorDialog(exceptionMessage):
     msgBox.exec()
 
 
-def insertNewLines(text, every):
+def insertNewLines(text, every=100):
     """
     Inserta saltos de línea en un texto cada cierta cantidad de caracteres.
     Los saltos de línea se insertan luego de algún espacio, de manera tal de no cortar
