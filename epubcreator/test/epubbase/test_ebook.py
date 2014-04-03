@@ -1221,14 +1221,14 @@ class Common:
     def xpath(self, element, xpath):
         return element.xpath(xpath, namespaces=Common.NAMESPACES)
 
-    def generateEbook(self, sections=None, **options):
+    def generateEbook(self, sections=None, includeOptionalFiles=True):
         ebookData = ebook_data.EbookData()
 
         if sections:
             for section in sections:
                 ebookData.addSection(section)
 
-        eebook = ebook.Ebook(ebookData, self.metadata, **options)
+        eebook = ebook.Ebook(ebookData, self.metadata, includeOptionalFiles=includeOptionalFiles)
         fileName = eebook.save(self._outputFile)
         self.outputEpub = epub.EpubReader(self._outputFile)
 
