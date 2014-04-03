@@ -233,10 +233,9 @@ class DocxConverterTest(unittest.TestCase):
     def _getOutput(self, docxTestFileName, ignoreEmptyParagraphs=True):
         pathToDocxTestFile = os.path.join(self._pathToTestDataFolder, docxTestFileName)
 
-        converter = docx_converter.DocxConverter(pathToDocxTestFile)
-        converter.setOptions(ignoreEmptyParagraphs=ignoreEmptyParagraphs)
-
+        converter = docx_converter.DocxConverter(pathToDocxTestFile, ignoreEmptyParagraphs=ignoreEmptyParagraphs)
         ebookData = converter.convert()
+
         return ebookData
 
     def _saveSectionsToDisk(self, sections, folderPath):

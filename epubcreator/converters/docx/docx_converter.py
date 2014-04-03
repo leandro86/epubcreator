@@ -6,15 +6,15 @@ from lxml import etree
 from epubcreator.converters import converter_base, xml_utils
 from epubcreator.epubbase import ebook_data
 from epubcreator.converters.docx import utils, styles, footnotes
-from epubcreator.misc import options
+from epubcreator.misc.options import Option
 
 
 class DocxConverter(converter_base.AbstractConverter):
-    OPTIONS = [options.Option(name="ignoreEmptyParagraphs",
-                              value=True,
-                              description='Indica si los párrafos en blanco deben ignorarse, o reemplazarse por la clase '
-                                          '"salto" de acuerdo al siguiente criterio: un párrafo en blanco, se reemplaza por la '
-                                          'clase "salto10"; dos o más, por la clase "salto25".')]
+    OPTIONS = [Option(name="ignoreEmptyParagraphs",
+                      value=True,
+                      description='Indica si los párrafos en blanco deben ignorarse, o reemplazarse por la clase '
+                                  '"salto" de acuerdo al siguiente criterio: un párrafo en blanco, se reemplaza por la '
+                                  'clase "salto10"; dos o más, por la clase "salto25".')]
 
     _MAX_HEADING_NUMBER = 6
 
@@ -25,8 +25,8 @@ class DocxConverter(converter_base.AbstractConverter):
     # De haber imágenes, deben estar en este directorio dentro del docx.
     _MEDIA_FILES_PATH = "word/media"
 
-    def __init__(self, inputFile):
-        super().__init__(inputFile)
+    def __init__(self, inputFile, **options):
+        super().__init__(inputFile, **options)
 
         self._documentXml = None
         self._documentRelsXml = None

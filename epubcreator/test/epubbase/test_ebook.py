@@ -417,33 +417,11 @@ class InfoTest(unittest.TestCase):
 
 
 class DedicationTest(unittest.TestCase):
-    _DEDICATION = ("Suspiró entonces mío Cid, de pesadumbre cargado, y comenzó a hablar así, justamente mesurado: «¡Loado seas, Señor, Padre "
-                   "que estás en lo alto! Todo esto me han urdido mis enemigos malvados».ANÓNIMO")
-
     def setUp(self):
         self._common = Common()
 
     def tearDown(self):
         self._common.release()
-
-    def test_dedication_file_exists(self):
-        self._common.generateEbook()
-
-        self.assertTrue(self._common.outputEpub.hasFile("dedicatoria.xhtml"))
-
-    def test_default_dedication(self):
-        self._common.metadata.dedication = ""
-
-        self._common.generateEbook()
-
-        dedication = self._getDedicationFile()
-
-        self.assertEqual(self._common.xpath(dedication, "count(//x:p)"), 2)
-
-        gotDedication = "".join(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[1]//text()"))
-        gotDedication += "".join(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[2][@class = 'salto05']//text()"))
-
-        self.assertEqual(gotDedication, DedicationTest._DEDICATION)
 
     def test_dedication(self):
         self._common.metadata.dedication = "Párrafo 1.\nPárrafo 2.\nPárrafo 3."
@@ -471,6 +449,20 @@ class DedicationTest(unittest.TestCase):
         self.assertEqual(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[2]//text()"), ["Párrafo ", "2", "."])
         self.assertEqual(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[3]//text()"), ["Párrafo 3."])
 
+    def test_not_dedication(self):
+        self._common.metadata.dedication = ""
+
+        self._common.generateEbook(includeOptionalFiles=False)
+
+        self.assertFalse(self._common.outputEpub.hasFile("dedicatoria.xhtml"))
+
+    def test_dedication_exists_when_not_include_optional_files(self):
+        self._common.metadata.dedication = "bla"
+
+        self._common.generateEbook(includeOptionalFiles=False)
+
+        self.assertTrue(self._common.outputEpub.hasFile("dedicatoria.xhtml"))
+
     def _getDedicationFile(self):
         return etree.fromstring(self._common.outputEpub.read("OEBPS/Text/{0}".format("dedicatoria.xhtml")))
 
@@ -488,62 +480,29 @@ class AuthorTest(unittest.TestCase):
     def tearDown(self):
         self._common.release()
 
-    def test_only_one_author_file_exists_when_no_authors(self):
+    def test_only_one_author_file_exists_when_no_authors_but_include_optional_files(self):
         self._common.metadata.authors.clear()
 
         self._common.generateEbook()
 
-        authors = self._getAuthorFiles()
+        authors = [a[0] for a in self._getAuthorFiles()]
 
         self.assertEqual(len(authors), 1)
-        self.assertEqual(authors[0][0], "autor.xhtml")
+        self.assertEqual(authors[0], "autor.xhtml")
 
-    def test_only_one_author_file_exists_when_one_author(self):
+    def test_only_one_author_file_exists_when_author_has_no_data_but_include_optional_files(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
 
         self._common.generateEbook()
 
-        authors = self._getAuthorFiles()
+        authors = [a[0] for a in self._getAuthorFiles()]
 
         self.assertEqual(len(authors), 1)
-        self.assertEqual(authors[0][0], "autor.xhtml")
+        self.assertEqual(authors[0], "autor.xhtml")
 
-    def test_only_one_author_file_exists_when_two_authors_but_none_has_biography_or_image(self):
+    def test_two_author_files_exist_when_both_authors_have_no_data_but_include_optional_files(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
-
-        self._common.generateEbook()
-
-        authors = self._getAuthorFiles()
-
-        self.assertEqual(len(authors), 1)
-        self.assertEqual(authors[0][0], "autor.xhtml")
-
-    def test_only_one_author_file_exists_when_two_authors_but_only_one_has_image(self):
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
-
-        self._common.generateEbook()
-
-        authors = self._getAuthorFiles()
-
-        self.assertEqual(len(authors), 1)
-        self.assertEqual(authors[0][0], "autor.xhtml")
-
-    def test_only_one_author_file_exists_when_two_authors_but_only_one_has_biography(self):
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="bla"))
-
-        self._common.generateEbook()
-
-        authors = self._getAuthorFiles()
-
-        self.assertEqual(len(authors), 1)
-        self.assertEqual(authors[0][0], "autor.xhtml")
-
-    def test_two_author_files_exist_when_two_authors_and_both_have_biography_or_image(self):
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="bla"))
 
         self._common.generateEbook()
 
@@ -552,8 +511,17 @@ class AuthorTest(unittest.TestCase):
         self.assertEqual(len(authors), 2)
         self.assertTrue("autor.xhtml" in authors and "autor1.xhtml" in authors)
 
-    def test_default_author_biography(self):
+    def test_no_author_file_exist_when_no_authors_and_not_include_optional_files(self):
         self._common.metadata.authors.clear()
+
+        self._common.generateEbook(includeOptionalFiles=False)
+
+        authors = self._getAuthorFiles()
+
+        self.assertFalse(authors)
+
+    def test_default_author_biography(self):
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
 
         self._common.generateEbook()
 
@@ -603,16 +571,6 @@ class AuthorTest(unittest.TestCase):
         self.assertEqual(self._common.xpath(author, "count(//x:p)"), 1)
         self.assertEqual(self._common.xpath(author, "/x:html/x:body/x:div[@class = 'autor']/x:p[position() = 1]/text()")[0], "Párrafo 1.")
 
-    def test_author_header_title_when_default_author(self):
-        self._common.metadata.authors.clear()
-
-        self._common.generateEbook()
-
-        author = self._getAuthorFiles()[0][1]
-
-        self.assertEqual(len(self._common.xpath(author, "//x:h1")), 1)
-        self.assertEqual(self._common.xpath(author, "x:body/x:h1[@class = 'oculto']/@title")[0], "Autor")
-
     def test_author_header_title_with_male_author(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
 
@@ -639,10 +597,10 @@ class AuthorTest(unittest.TestCase):
 
         self._common.generateEbook()
 
-        author = self._getAuthorFiles()[0][1]
+        firstAuthor = next(a[1] for a in self._getAuthorFiles() if a[0] == "autor.xhtml")
 
-        self.assertEqual(len(self._common.xpath(author, "//x:h1")), 1)
-        self.assertEqual(self._common.xpath(author, "x:body/x:h1[@class = 'oculto']/@title")[0], "Autores")
+        self.assertEqual(len(self._common.xpath(firstAuthor, "//x:h1")), 1)
+        self.assertEqual(self._common.xpath(firstAuthor, "x:body/x:h1[@class = 'oculto']/@title")[0], "Autores")
 
     def test_only_first_author_file_has_header_when_two_author_files(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
@@ -1178,7 +1136,7 @@ class ImagesTest(unittest.TestCase):
         coverImage = self._common.outputEpub.read(self._common.outputEpub.getFullPathToFile("cover.jpg"))
         self.assertEqual(coverImage.decode(), "cover image")
 
-    def test_only_one_author_image_exists_when_no_authors(self):
+    def test_only_one_author_image_exists_when_no_authors_but_include_optional_files(self):
         self._common.metadata.authors.clear()
 
         self._common.generateEbook()
@@ -1196,35 +1154,16 @@ class ImagesTest(unittest.TestCase):
         self.assertEqual(len(authorImages), 1)
         self.assertEqual(authorImages[0], "autor.jpg")
 
-    def test_only_one_author_image_exists_when_two_authors_but_none_has_biography_or_image(self):
+    def test_two_author_images_exist_when_two_authors(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
 
         self._common.generateEbook()
 
         authorImages = [f for f in self._common.outputEpub.getNamelist() if f.startswith("autor") and f.endswith(".jpg")]
-        self.assertEqual(len(authorImages), 1)
-        self.assertEqual(authorImages[0], "autor.jpg")
 
-    def test_only_one_author_image_exists_when_two_authors_but_only_one_has_image(self):
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
-
-        self._common.generateEbook()
-
-        authorImages = [f for f in self._common.outputEpub.getNamelist() if f.startswith("autor") and f.endswith(".jpg")]
-        self.assertEqual(len(authorImages), 1)
-        self.assertEqual(authorImages[0], "autor.jpg")
-
-    def test_only_one_author_image_exists_when_two_authors_but_only_one_has_biography(self):
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="bla"))
-
-        self._common.generateEbook()
-
-        authorImages = [f for f in self._common.outputEpub.getNamelist() if f.startswith("autor") and f.endswith(".jpg")]
-        self.assertEqual(len(authorImages), 1)
-        self.assertEqual(authorImages[0], "autor.jpg")
+        self.assertEqual(len(authorImages), 2)
+        self.assertTrue("autor.jpg" in authorImages and "autor1.jpg" in authorImages)
 
     def test_two_author_images_exist_when_two_authors_and_both_have_biography_or_image(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="bla"))
@@ -1283,16 +1222,17 @@ class Common:
     def xpath(self, element, xpath):
         return element.xpath(xpath, namespaces=Common.NAMESPACES)
 
-    def generateEbook(self, sections=None):
+    def generateEbook(self, sections=None, **options):
         ebookData = ebook_data.EbookData()
 
         if sections:
             for section in sections:
                 ebookData.addSection(section)
 
-        eebook = ebook.Ebook(ebookData, self.metadata)
+        eebook = ebook.Ebook(ebookData, self.metadata, **options)
         fileName = eebook.save(self._outputFile)
         self.outputEpub = epub.EpubReader(self._outputFile)
+
         return fileName
 
     def release(self):

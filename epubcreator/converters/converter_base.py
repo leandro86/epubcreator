@@ -1,9 +1,9 @@
-from epubcreator.misc import options
+import epubcreator.misc.options
 
 
-class AbstractConverter(options.Options):
-    def __init__(self, inputFile):
-        super().__init__()
+class AbstractConverter(epubcreator.misc.options.Options):
+    def __init__(self, inputFile, **options):
+        super().__init__(**options)
 
         self._inputFile = inputFile
 

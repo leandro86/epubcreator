@@ -7,6 +7,7 @@ from epubcreator.pyepub.pyepubwriter import epub
 from epubcreator.epubbase import ebook_metadata, ebook_data, epubbase_names
 from epubcreator.epubbase.misc import utils
 from epubcreator import config
+from epubcreator.misc.options import Options, Option
 
 
 class _Templates:
@@ -107,10 +108,16 @@ class _Templates:
                 _Templates._files[fileName] = mako.template.Template(filename=newFilePath, input_encoding="utf-8", output_encoding="utf-8")
 
 
-class Ebook:
+class Ebook(Options):
+    OPTIONS = [Option(name="includeOptionalFiles",
+                      value=True,
+                      description="Indica si los archivos opcionales se incluyen.")]
+
     _epubBase = _Templates(config.EPUBBASE_FILES_DIR_PATH)
 
-    def __init__(self, ebookData, metadata=None):
+    def __init__(self, ebookData, metadata=None, **options):
+        super().__init__(**options)
+
         # Debería hacer una copia profunda de ebookData también técnicamente, ya que más adelante
         # modifico su objecto toc. Esto es prohibitivo, dado que estaría creando una copia de todas
         # las secciones inútilmente. Lo que podría hacer es generar una copia de la toc aparte, ya
@@ -180,7 +187,9 @@ class Ebook:
                                                                                      self._metadata.coverDesigner,
                                                                                      self._metadata.coverModification,
                                                                                      self._metadata.editor))
-        outputEpub.addHtmlData(epubbase_names.DEDICATION_FILENAME, Ebook._epubBase.getDedication(self._metadata.dedication))
+
+        if self._metadata.dedication or self._options.includeOptionalFiles:
+            outputEpub.addHtmlData(epubbase_names.DEDICATION_FILENAME, Ebook._epubBase.getDedication(self._metadata.dedication))
 
         outputEpub.addImageData(epubbase_names.COVER_IMAGE_FILENAME, self._metadata.coverImage)
 
@@ -340,9 +349,6 @@ class Ebook:
         if not self._metadata.bookId:
             self._metadata.bookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
 
-        if not self._metadata.authors:
-            self._metadata.authors.append(ebook_metadata.Person(ebook_metadata.Metadata.DEFAULT_AUTHOR, ebook_metadata.Metadata.DEFAULT_AUTHOR))
-
         if not self._metadata.editor:
             self._metadata.editor = ebook_metadata.Metadata.DEFAULT_EDITOR
 
@@ -356,37 +362,19 @@ class Ebook:
         if not self._metadata.coverModification:
             self._metadata.coverModification = ebook_metadata.Metadata.DEFAULT_COVER_MODIFICATION
 
-        if not self._metadata.dedication:
-            self._metadata.dedication = ebook_metadata.Metadata.DEFAULT_DEDICATION
-
         if not self._metadata.coverImage:
             self._metadata.coverImage = Ebook._epubBase.getCoverImage()
 
-        # Por ahora siempre dejo un autor por defecto, a pesar de que en los metadatos no se haya especificado ninguno.
         if not self._metadata.authors:
-            self._metadata.authors.append(ebook_metadata.Person(ebook_metadata.Metadata.DEFAULT_AUTHOR,
-                                                                ebook_metadata.Metadata.DEFAULT_AUTHOR,
-                                                                Ebook._epubBase.getAuthorImage(),
-                                                                ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY))
-        else:
-            isAuthorWithData = False
+            self._metadata.authors.append(ebook_metadata.Person(ebook_metadata.Metadata.DEFAULT_AUTHOR, ebook_metadata.Metadata.DEFAULT_AUTHOR))
 
-            # Solo genero xhtml e imagen para cada autor si en los metadatos viene especificado biografía o imagen.
-            for author in self._metadata.authors:
-                if author.biography or author.image:
-                    if author.biography and not author.image:
-                        author.image = Ebook._epubBase.getAuthorImage()
-                    elif author.image and not author.biography:
-                        author.biography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
-
-                    isAuthorWithData = True
-
-            # Si ningún autor tiene datos, necesito imperiosamente generar al menos un xhtml e imagen para autor.
-            if not isAuthorWithData:
-                firstAuthor = self._metadata.authors[0]
-
-                firstAuthor.image = Ebook._epubBase.getAuthorImage()
-                firstAuthor.biography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
+        # Veo a qué autor debo agregarle su biografía o imagen para que se incluya autor.xhtml y autor.jpg.
+        for author in self._metadata.authors:
+            if author.biography or author.image or self._options.includeOptionalFiles:
+                if not author.biography:
+                    author.biography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
+                if not author.image:
+                    author.image = Ebook._epubBase.getAuthorImage()
 
     def _getPersonsListAsText(self, persons):
         """
