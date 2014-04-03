@@ -34,16 +34,16 @@ def displayExceptionErrorDialog(exceptionMessage):
     msgBox.exec()
 
 
-def insertNewLines(text, every=100):
+def formatTextForTooltip(text, every=100):
     """
-    Inserta saltos de línea en un texto cada cierta cantidad de caracteres.
+    Inserta saltos de línea en un string para que el ancho del tooltip sea razonable.
     Los saltos de línea se insertan luego de algún espacio, de manera tal de no cortar
     una palabra a la mitad.
 
     @param text: un string con el texto.
     @param every: un int que indica cada cuántos caracteres se inserta un salto de línea.
 
-    @return: un string con el texto con los saltos de línea.
+    @return: un string con el texto formateado.
     """
     lines = []
     previousNewLinePos = 0

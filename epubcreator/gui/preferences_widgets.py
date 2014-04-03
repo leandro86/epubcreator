@@ -68,4 +68,4 @@ class DocxPreferences(PreferencesAbstract, preferences_docx_widget_ui.Ui_DocxPre
         self.ignoreEmptyParagraphsInput.setCheckState(QtCore.Qt.Checked if settings.docxIgnoreEmptyParagraphs else QtCore.Qt.Unchecked)
 
     def _extendUi(self):
-        self.ignoreEmptyParagraphsInput.setToolTip(utils.insertNewLines(docx_converter.DocxConverter.getOptionDescription("ignoreEmptyParagraphs")))
+        self.ignoreEmptyParagraphsInput.setToolTip(utils.formatTextForTooltip(docx_converter.DocxConverter.getOptionDescription("ignoreEmptyParagraphs")))
