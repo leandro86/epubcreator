@@ -5,7 +5,7 @@ import re
 from PyQt4 import QtGui
 
 from epubcreator.epubbase import ebook
-from epubcreator.converters.docx import docx_converter
+from epubcreator.converters import converter_factory
 from epubcreator.gui.misc import settings_store, utils
 from epubcreator.gui.forms import main_window_ui
 from epubcreator.gui import preferences, about
@@ -165,13 +165,14 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
     def _prepareEbook(self):
         settings = settings_store.SettingsStore()
 
-        data = None
-        rawText = None
+        options = {}
 
         if self._workingFilePath.endswith(".docx"):
-            converter = docx_converter.DocxConverter(self._workingFilePath, ignoreEmptyParagraphs=settings.docxIgnoreEmptyParagraphs)
-            data = converter.convert()
-            rawText = converter.getRawText()
+            options = dict(ignoreEmptyParagraphs=settings.docxIgnoreEmptyParagraphs)
+
+        converter = converter_factory.ConverterFactory.getConverter(self._workingFilePath, **options)
+        data = converter.convert()
+        rawText = converter.getRawText()
 
         return data, rawText
 

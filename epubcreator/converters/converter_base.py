@@ -2,10 +2,12 @@ import epubcreator.misc.options
 
 
 class AbstractConverter(epubcreator.misc.options.Options):
-    def __init__(self, inputFile, **options):
+    FILE_TYPE = ""
+
+    def __init__(self, inputFilePath, **options):
         super().__init__(**options)
 
-        self._inputFile = inputFile
+        self._inputFile = inputFilePath
 
     def convert(self):
         raise NotImplemented

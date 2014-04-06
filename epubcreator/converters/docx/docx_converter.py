@@ -10,6 +10,7 @@ from epubcreator.misc.options import Option
 
 
 class DocxConverter(converter_base.AbstractConverter):
+    FILE_TYPE = "docx"
     OPTIONS = [Option(name="ignoreEmptyParagraphs",
                       value=True,
                       description='Indica si los párrafos en blanco deben ignorarse, o reemplazarse por la clase '
@@ -25,8 +26,8 @@ class DocxConverter(converter_base.AbstractConverter):
     # De haber imágenes, deben estar en este directorio dentro del docx.
     _MEDIA_FILES_PATH = "word/media"
 
-    def __init__(self, inputFile, **options):
-        super().__init__(inputFile, **options)
+    def __init__(self, inputFilePath, **options):
+        super().__init__(inputFilePath, **options)
 
         self._documentXml = None
         self._documentRelsXml = None
@@ -68,7 +69,7 @@ class DocxConverter(converter_base.AbstractConverter):
         # Un objeto EbookData.
         self._ebookData = None
 
-        self._openDocx(inputFile)
+        self._openDocx(inputFilePath)
 
     def convert(self):
         self._titles = []
@@ -91,8 +92,8 @@ class DocxConverter(converter_base.AbstractConverter):
 
         return docText + footnotesText
 
-    def _openDocx(self, inputFile):
-        with zipfile.ZipFile(inputFile) as docx:
+    def _openDocx(self, inputFilePath):
+        with zipfile.ZipFile(inputFilePath) as docx:
             contentTypesXml = etree.fromstring(docx.read("[Content_Types].xml"))
 
             path = '/ct:Types/ct:Override[@ContentType = "{0}"]/@PartName'
