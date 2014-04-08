@@ -348,6 +348,9 @@ class Ebook(Options):
         if not self._metadata.title:
             self._metadata.title = ebook_metadata.Metadata.DEFAULT_TITLE
 
+        if not self._metadata.dedication and self._options.includeOptionalFiles:
+            self._metadata.dedication = ebook_metadata.Metadata.DEFAULT_DEDICATION
+
         if not self._metadata.bookId:
             self._metadata.bookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
 

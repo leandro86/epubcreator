@@ -417,6 +417,9 @@ class InfoTest(unittest.TestCase):
 
 
 class DedicationTest(unittest.TestCase):
+    DEFAULT_DEDICATION = ("Suspiró entonces mío Cid, de pesadumbre cargado, y comenzó a hablar así, justamente mesurado: «¡Loado "
+                          "seas, Señor, Padre que estás en lo alto! Todo esto me han urdido mis enemigos malvados».ANÓNIMO")
+
     def setUp(self):
         self._common = Common()
 
@@ -462,6 +465,22 @@ class DedicationTest(unittest.TestCase):
         self._common.generateEbook(includeOptionalFiles=False)
 
         self.assertTrue(self._common.outputEpub.hasFile("dedicatoria.xhtml"))
+
+    def test_default_dedication(self):
+        self._common.metadata.dedication = ""
+
+        self._common.generateEbook()
+
+        dedication = self._getDedicationFile()
+
+        self.assertEqual(self._common.xpath(dedication, "count(//x:p)"), 2)
+
+        gotDedication = "".join(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[1]//text()"))
+        gotDedication += "".join(self._common.xpath(dedication, "x:body/x:div[@class = 'dedicatoria']/x:p[2]//text()"))
+
+        wantDedication = DedicationTest.DEFAULT_DEDICATION
+
+        self.assertEqual(gotDedication, wantDedication)
 
     def _getDedicationFile(self):
         return etree.fromstring(self._common.outputEpub.read("OEBPS/Text/{0}".format("dedicatoria.xhtml")))
