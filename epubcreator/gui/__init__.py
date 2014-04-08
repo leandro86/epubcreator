@@ -2,11 +2,8 @@ import os
 
 from epubcreator import config
 
-_FORMS_DIR = os.path.join(os.path.dirname(__file__), "forms", "src")
-_FORMS_COMPILED_DIR = os.path.join(os.path.dirname(__file__), "forms")
-
+_FORMS_DIR = os.path.join(os.path.dirname(__file__), "forms")
 _RESOURCES_DIR = os.path.join(os.path.dirname(__file__), "resources", "images")
-_RESOURCES_COMPILED_DIR = _FORMS_COMPILED_DIR
 
 
 def compileGui():
@@ -37,7 +34,7 @@ def _compileForms():
     for form in forms:
         formName = os.path.split(form)[1]
         compiledFormName = "{0}_ui.py".format(os.path.splitext(formName)[0])
-        pathToCompiledForm = os.path.join(_FORMS_COMPILED_DIR, compiledFormName)
+        pathToCompiledForm = os.path.join(_FORMS_DIR, compiledFormName)
 
         if not os.path.exists(pathToCompiledForm) or os.stat(form).st_mtime > os.stat(pathToCompiledForm).st_mtime:
             with open(pathToCompiledForm, "w", encoding="utf-8") as file:
@@ -53,7 +50,7 @@ def _compileResources():
     for resource in resources:
         resourceName = os.path.split(resource)[1]
         compiledResourceName = "{0}_rc.py".format(os.path.splitext(resourceName)[0])
-        pathToCompiledResource = os.path.join(_RESOURCES_COMPILED_DIR, compiledResourceName)
+        pathToCompiledResource = os.path.join(_FORMS_DIR, compiledResourceName)
 
         if not os.path.exists(pathToCompiledResource) or os.stat(resource).st_mtime > os.stat(pathToCompiledResource).st_mtime:
             subprocess.call([pyrcc, "-py3", resource, "-o", pathToCompiledResource])
