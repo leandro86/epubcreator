@@ -90,12 +90,12 @@ class EpubPreferences(PreferencesAbstract, preferences_epub_widget_ui.Ui_EpubBas
     def saveSettings(self):
         settings = settings_store.SettingsStore()
 
-        settings.epubIncludeOptionalFiles = self.includeOptionalFilesInput.isChecked()
+        settings.epubOutputIncludeOptionalFiles = self.includeOptionalFilesInput.isChecked()
 
     def _loadSettings(self):
         settings = settings_store.SettingsStore()
 
-        self.includeOptionalFilesInput.setCheckState(QtCore.Qt.Checked if settings.epubIncludeOptionalFiles else QtCore.Qt.Unchecked)
+        self.includeOptionalFilesInput.setCheckState(QtCore.Qt.Checked if settings.epubOutputIncludeOptionalFiles else QtCore.Qt.Unchecked)
 
     def _extendUi(self):
         description = utils.formatTextForTooltip(ebook.Ebook.getOptionDescription("includeOptionalFiles"))
