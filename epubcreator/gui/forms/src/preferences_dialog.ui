@@ -25,7 +25,7 @@
         </sizepolicy>
        </property>
        <property name="currentRow">
-        <number>-1</number>
+        <number>0</number>
        </property>
        <item>
         <property name="text">
@@ -53,11 +53,11 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
-       <widget class="GeneralPreferences" name="page_9"/>
-       <widget class="EpubPreferences" name="page"/>
-       <widget class="DocxPreferences" name="page_10"/>
+       <widget class="GeneralPreferences" name="page_0"/>
+       <widget class="EpubPreferences" name="page_1"/>
+       <widget class="DocxPreferences" name="page_2"/>
       </widget>
      </item>
     </layout>
