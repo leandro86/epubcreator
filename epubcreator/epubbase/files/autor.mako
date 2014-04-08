@@ -6,14 +6,14 @@
 <head>
     <title></title>
     <link href="../Styles/style.css" rel="stylesheet" type="text/css" />
-</head><!-- este documento es opcional, debe eliminarse de ser innecesario junto con el documento autor.jpg de la carpeta de imágenes -->
+</head><!-- este documento es opcional, debe eliminarse de ser innecesario junto con el archivo autor.jpg de la carpeta de imágenes -->
 
 <body>
     % if title:
           <h1 class="oculto" title="${title}"></h1><!-- debe cambiarse a «Autora» o «Autores» de ser necesario -->
     % endif
 
-    <div class="vineta"><img alt="" height="40%" src="../Images/${imageName}" /></div><!-- atención: por compatibilidad, este archivo de imagen no debe exceder los 600px de ancho ni haber sido guardado como jpeg «progresivo» -->
+    <div class="vineta"><img alt="" height="40%" src="../Images/${imageName}" /></div><!-- atención: por compatibilidad, este archivo de imagen no debe ser mayor a 600 px de ancho x 400 de alto, exceder los 300 kb de tamaño ni haber sido guardado como jpeg «progresivo» -->
 
     <div class="autor">
         <% paragraphs = authorBiography.splitlines() %>
