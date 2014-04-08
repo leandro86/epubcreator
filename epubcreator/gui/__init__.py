@@ -3,7 +3,7 @@ import os
 from epubcreator import config
 
 _FORMS_DIR = os.path.join(os.path.dirname(__file__), "forms")
-_RESOURCES_DIR = os.path.join(os.path.dirname(__file__), "resources", "images")
+_IMAGES_DIR = os.path.join(os.path.dirname(__file__), "resources", "images")
 
 
 def compileGui():
@@ -23,7 +23,7 @@ def _findForms():
 
 
 def _findResources():
-    return [os.path.join(_RESOURCES_DIR, f) for f in os.listdir(_RESOURCES_DIR) if f.endswith(".qrc")]
+    return [os.path.join(_IMAGES_DIR, f) for f in os.listdir(_IMAGES_DIR) if f.endswith(".qrc")]
 
 
 def _compileForms():
