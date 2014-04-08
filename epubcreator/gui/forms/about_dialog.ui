@@ -63,7 +63,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="../../resources/images/images.qrc">:/epublibre_logo.png</pixmap>
+          <pixmap resource="../resources/images/images.qrc">:/epublibre_logo.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -213,7 +213,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../../resources/images/images.qrc"/>
+  <include location="../resources/images/images.qrc"/>
  </resources>
  <connections>
   <connection>

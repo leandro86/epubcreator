@@ -173,7 +173,7 @@
          <string>Agregar Autor</string>
         </property>
         <property name="icon">
-         <iconset resource="../../resources/images/images.qrc">
+         <iconset resource="../resources/images/images.qrc">
           <normaloff>:/add_16x16.png</normaloff>:/add_16x16.png</iconset>
         </property>
         <property name="iconSize">
@@ -399,7 +399,7 @@
   <tabstop>synopsisInput</tabstop>
  </tabstops>
  <resources>
-  <include location="../../resources/images/images.qrc"/>
+  <include location="../resources/images/images.qrc"/>
  </resources>
  <connections/>
 </ui>
