@@ -31,7 +31,7 @@ if __name__ == "__main__":
     QtGui.QApplication.setDesktopSettingsAware(True)
 
     app = QtGui.QApplication(sys.argv)
-    app.setWindowIcon(QtGui.QIcon(":/icons/app_icon_512x512.png"))
+    app.setWindowIcon(QtGui.QIcon(":/epublibre_logo.png"))
 
     # Intento cargar las traducciones a español para todos los diálogos, botones, etc., estándares de Qt.
     qtTranslator = QtCore.QTranslator()

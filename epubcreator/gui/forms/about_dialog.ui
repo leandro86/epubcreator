@@ -63,7 +63,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="../../resources/images/images.qrc">:/icons/app_icon_512x512.png</pixmap>
+          <pixmap resource="../../resources/images/images.qrc">:/epublibre_logo.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
