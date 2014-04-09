@@ -14,8 +14,8 @@ def compileGui():
 def _getPathToPyrcc():
     import distutils.sysconfig
 
-    pyqtInstallPath = os.path.join(distutils.sysconfig.get_python_lib(), "PyQt4")
-    return next(os.path.join(pyqtInstallPath, f) for f in os.listdir(pyqtInstallPath) if f.startswith("pyrcc4"))
+    paths = [os.path.join(distutils.sysconfig.get_python_lib(), "PyQt4")] + os.environ["PATH"].split(os.path.pathsep)
+    return next(os.path.join(path, file) for path in paths for file in os.listdir(path) if file.startswith("pyrcc4"))
 
 
 def _findForms():
