@@ -1,0 +1,63 @@
+[
+    {
+        "version": "0.1.4",
+        "date": "15/12/2013",
+        "changes": {
+            "docx": [
+                "Corregido bug en el uso de estilos personalizados de tipo 'Párrafo'."
+            ]
+        }
+    },
+    {
+        "version": "0.1.3",
+        "date": "13/11/2013",
+        "changes": {
+            "docx": [
+                "Corregido bug que provocaba, en algunos casos, que un párrafo se obviara."
+            ]
+        }
+    },
+    {
+        "version": "0.1.2",
+        "date": "01/09/2013",
+        "changes": {
+            "misc": [
+                "Agregado menú acerca de.",
+                "Corregidos algunos tooltips.",
+                "Se muestra un mensaje en la barra de estado informando si el ePub se generó correctamente u ocurrió algún error.",
+                "En linux y mac a veces no se mostraban los mensajes en la barra de estado. Corregido.",
+                "Cuando hay varios autores o ilustradores, en los metadatos se los separa con un '&'."
+            ],
+            "docx": [
+                "Se procesan los estilos vinculados a carácter.",
+                "Si dos o más párrafos consecutivos comparten un mismo estilo, son colocados dentro de un div.",
+                "Se tienen en cuenta los formatos que un estilo tenga aplicado."
+            ]
+        }
+    },
+    {
+        "version": "0.1.1",
+        "date": "27/08/2013",
+        "changes": {
+            "misc": [
+                "Sigil no se abría en mac y daba el siguiente error: 'Permission denied'. Corregido.",
+                "Se genera en la toc la entrada correspondiente al elemento h1 de autor.xhtml.",
+                "Se genera en la toc la entrada correspondiente al elemento h1 de notas.xhtml.",
+                "Se genera en la toc la entrada correspondiente al elemento h1 de titulo.xhtml.",
+                "Si el número de colección tiene ceros a la izquierda, se eliminan en los metadatos de calibre."
+            ],
+            "docx": [
+                "En algunos casos, la numeración de las notas comenzaba desde el dos. Corregido."
+            ]
+        }
+    },
+    {
+        "version": "0.1.0",
+        "date": "17/08/2013",
+        "changes": {
+            "misc": [
+                "Versión inicial."
+            ]
+        }
+    }
+]
