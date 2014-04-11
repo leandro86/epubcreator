@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title/>
+    <link href="../Styles/style.css" rel="stylesheet" type="text/css"/>
+  </head>
+  <body><p>Es posible deshabilitar o desactivar un formato en un docx: esto se hace poniendo el atributo “w:val” en “0”. Según parece, los únicos formatos que admiten esto son la negrita y la cursiva. En estos casos, el formato debe ser ignorado.</p><p>Esto es un texto que tiene negrita (el tag w:b) pero con el atributo w:val = 0, por lo que no debería generarse la etiqueta &lt;strong&gt; en el epub.</p><p>Esto es un texto que tiene itálica (el tag w:i) pero con el atributo w:val = 0, por lo que no debería generarse la etiqueta &lt;em&gt; en el epub.</p></body>
+</html>

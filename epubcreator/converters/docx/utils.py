@@ -34,9 +34,9 @@ def getFormats(node, processSubAndSup=True):
 
     if node is not None:
         for child in node:
-            if child.tag.endswith("}b"):
+            if child.tag.endswith("}b") and xml_utils.getAttr(child, "w:val", NAMESPACES) != "0":
                 formats.append("strong")
-            elif child.tag.endswith("}i"):
+            elif child.tag.endswith("}i") and xml_utils.getAttr(child, "w:val", NAMESPACES) != "0":
                 formats.append("em")
             elif child.tag.endswith("}u"):
                 formats.append("ins")
