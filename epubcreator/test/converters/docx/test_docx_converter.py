@@ -219,6 +219,12 @@ class DocxConverterTest(unittest.TestCase):
         self.assertEqual(len(data.sections), 2)
         self.assertTrue(self._compareSections("footnotes_images.docx", data.sections))
 
+    def test_styles_and_formats_mixed(self):
+        data = self._getOutput("styles_and_formats_mixed.docx")
+
+        self.assertEqual(len(data.sections), 1)
+        self.assertTrue(self._compareSections("styles_and_formats_mixed.docx", data.sections))
+
     def _compareSections(self, docxTestFileName, sections):
         for section in sections:
             expectedOutput = self._readExpectedOutput(docxTestFileName, section.name)

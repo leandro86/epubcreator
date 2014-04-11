@@ -317,8 +317,11 @@ class DocxConverter(converter_base.AbstractConverter):
 
     def _processRun(self, run, previousRunFormats):
         styleId = self._styles.getRunStyleId(run)
-
         runFormats = utils.getRunFormats(run)
+        isLastRun = utils.getNextRun(run) is None
+        needToCloseSpan = False
+        needToOpenSpan = False
+        customStyleName = ""
 
         # Si el run tiene aplicado un estilo, este estilo puede tener asociado formatos, por
         # ejemplo: negrita, cursiva, etc. Proceso también estos formatos.
@@ -326,13 +329,8 @@ class DocxConverter(converter_base.AbstractConverter):
             for f in (f for f in self._styles.getStyleFormats(styleId) if f not in runFormats):
                 runFormats.append(f)
 
-        isLastRun = utils.getNextRun(run) is None
-        needToCloseSpan = False
-
-        self._processRunFormats(runFormats, previousRunFormats)
-
-        if styleId:
             customStyleName = self._styles.getRunCustomStyleName(run)
+
             if customStyleName:
                 previousRunStyleId = None
                 nextRunStyleId = None
@@ -347,10 +345,46 @@ class DocxConverter(converter_base.AbstractConverter):
                     nextRunStyleId = self._styles.getRunStyleId(nextRun)
 
                 if styleId != previousRunStyleId:
-                    self._currentSection.openTag("span", **{"class": customStyleName})
+                    needToOpenSpan = True
 
                 if styleId != nextRunStyleId:
                     needToCloseSpan = True
+
+        # Cada vez que tengo que abrir un span porque es necesario incluir un estilo
+        # propio, entonces cierro absolutamente todos los tags de formato que estén abiertos.
+        # Supongamos que tengo este texto:
+        #   <strong>aaaaa<span>aaaabbbb</span></strong>
+        # Ahora, quiero cerrar el "strong" al comienzo de "bbbb". Para ello tengo dos
+        # opciones:
+        #   1- <strong>aaaaa<span>aaaa</span></strong><span>bbbb</span>
+        #   2- <strong>aaaaa</strong><span><strong>aaaa</strong>bbbb</span>
+        # En la primera, lo que cierro y abro son los spans; en la segunda, son
+        # los strongs. Yo opté implementar la segunda opción.
+        # Ahora bien, puede suceder lo siguiente. Supongamos este texto:
+        #   aaaaaaaaaaa<span>bbbbbbb</span>cccccccccccc
+        # Si ese texto tuviera aplicado negrita desde el comienzo hasta el final, lo
+        # óptimo sería hacer:
+        #   <strong>aaaaaaaaaaa<span>bbbbbbb</span>cccccccccccc</strong>
+        # Sin embargo, dado que cierro todos los tags antes del comienzo de un span, resulta
+        # esto:
+        #   <strong>aaaaaaaaaaa</strong><span><strong>bbbbbbb</strong></span><strong>cccccccccccc</strong>
+        # El problema es que de antemano no puedo saber hasta donde se extiende el strong, porque tal vez
+        # tenga que cerrarlo en medio de un span, como en el ejemplo anterior, y entonces debo cerrar primero
+        # el span, luego el strong, y luego abrir el span de vuelta, para no causar un error de anidamiento.
+        # Creo que está bien dejarlo así (es decir, abrir y cerrar la menor cantidad de spans posiles), porque
+        # de todas maneras es más fácil para el browser procesar varios strongs (o cualquier otro
+        # tag de formato, como em) que varios spans con una clase.
+        if runFormats != previousRunFormats or needToOpenSpan:
+            for f in reversed(previousRunFormats):
+                self._currentSection.closeTag(f)
+
+            # Dado el caso de un run que contenga un estilo y formatos, entonces abro
+            # el span primero, y dentro del span abro los formatos.
+            if needToOpenSpan:
+                self._currentSection.openTag("span", **{"class": customStyleName})
+
+            for f in runFormats:
+                self._currentSection.openTag(f)
 
         for child in run:
             if child.tag.endswith("}t"):
@@ -366,12 +400,26 @@ class DocxConverter(converter_base.AbstractConverter):
             elif child.tag.endswith("}AlternateContent"):
                 self._processAlternateContent(child)
 
-        if isLastRun:
+        if needToCloseSpan:
+            # No puedo simplemente cerrar el span, porque puede haber tags de formato abiertos
+            # dentro del span: necesito cerrar esos tags primero.
+            isSpanClosed = False
+            while not isSpanClosed:
+                try:
+                    self._currentSection.closeTag("span")
+                    isSpanClosed = True
+                except ebook_data.CloseTagMismatchError as e:
+                    self._currentSection.closeTag(e.expected)
+
+            # Dado que cuando abro un span cierro todos los tags de formato, puedo asumir
+            # que todos los tags de formato que cerré arriba eran todos los que estaban en
+            # runFormats. Ahora bien, como al cerrar el span cerré todos los tags de formato, eso
+            # significa que desde el punto de vista del run siguiente, no hay tags de formatos previos
+            # abiertos, por eso debo retornar una lista vacía de formatos.
+            runFormats = []
+        elif isLastRun:
             for f in reversed(runFormats):
                 self._currentSection.closeTag(f)
-
-        if needToCloseSpan:
-            self._currentSection.closeTag("span")
 
         return runFormats
 
@@ -425,14 +473,6 @@ class DocxConverter(converter_base.AbstractConverter):
                 self._currentSection.closeTag("tr")
 
         self._currentSection.closeTag("table")
-
-    def _processRunFormats(self, runFormats, previousRunFormats):
-        if runFormats != previousRunFormats:
-            for f in reversed(previousRunFormats):
-                self._currentSection.closeTag(f)
-
-            for f in runFormats:
-                self._currentSection.openTag(f)
 
     def _processFootnotes(self):
         self._currentSection = ebook_data.NotesSection()

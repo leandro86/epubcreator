@@ -74,12 +74,13 @@ class Section:
         self._textWritePos = Section._TEXT
 
     def closeTag(self, tag):
-        self._writeTextBuffer()
-
-        e = self._openedElements.pop()
+        e = self._openedElements[-1]
 
         if e.tag != tag:
-            raise Exception("Tag mismatch")
+            raise CloseTagMismatchError(e.tag, tag)
+
+        self._writeTextBuffer()
+        self._openedElements.pop()
 
         self._lastElement = e
         self._textWritePos = Section._TAIL
@@ -262,3 +263,12 @@ class Title:
 
     def addTitle(self, title):
         self.childTitles.append(title)
+
+
+class CloseTagMismatchError(Exception):
+    def __init__(self, expected, got):
+        self.expected = expected
+        self.got = got
+
+    def __str__(self):
+        return "Se esperaba tag de cierre '{0}', pero se encontró '{1}'.".format(self.expected, self.got)
