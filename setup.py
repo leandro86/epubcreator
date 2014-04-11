@@ -89,6 +89,7 @@ def freezeApp():
         with open(os.path.join(bundleResourcesDir, "qt.conf"), "w", encoding="utf-8") as file:
             # Deben ser comillas dobles en el path, con las simples no funciona...
             file.write('[Paths]\nPlugins = "MacOS/plugins"\n')
+            file.write('[Paths]\nTranslations = "MacOS/translations"\n')
 
         # Necesito saber todas las librerías que se incluyen en el bundle.
         shippedFiles = os.listdir(bundleMacOsDir)
