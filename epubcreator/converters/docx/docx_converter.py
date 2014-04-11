@@ -326,7 +326,8 @@ class DocxConverter(converter_base.AbstractConverter):
         # Si el run tiene aplicado un estilo, este estilo puede tener asociado formatos, por
         # ejemplo: negrita, cursiva, etc. Proceso también estos formatos.
         if styleId:
-            for f in (f for f in self._styles.getStyleFormats(styleId) if f not in runFormats):
+            formats = runFormats + utils.getRunDisabledFormats(run)
+            for f in (f for f in self._styles.getStyleFormats(styleId) if f not in formats):
                 runFormats.append(f)
 
             className = self._styles.getRunClassName(run)

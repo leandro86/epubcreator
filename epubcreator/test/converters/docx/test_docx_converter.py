@@ -237,6 +237,12 @@ class DocxConverterTest(unittest.TestCase):
         self.assertEqual(len(data.sections), 1)
         self.assertTrue(self._compareSections("disabled_formats.docx", data.sections))
 
+    def test_format_disabled_precedence_over_style_with_format(self):
+        data = self._getOutput("format_disabled_precedence_over_style_with_format.docx")
+
+        self.assertEqual(len(data.sections), 1)
+        self.assertTrue(self._compareSections("format_disabled_precedence_over_style_with_format.docx", data.sections))
+
     def _compareSections(self, docxTestFileName, sections):
         for section in sections:
             expectedOutput = self._readExpectedOutput(docxTestFileName, section.name)

@@ -21,6 +21,21 @@ def getRunFormats(run):
     return getFormats(rpr)
 
 
+def getRunDisabledFormats(run):
+    disabledFormats = []
+
+    rpr = run.find("w:rPr", namespaces=NAMESPACES)
+
+    if rpr is not None:
+        for child in rpr:
+            if child.tag.endswith("}b") and xml_utils.getAttr(child, "w:val", NAMESPACES) == "0":
+                disabledFormats.append("strong")
+            elif child.tag.endswith("}i") and xml_utils.getAttr(child, "w:val", NAMESPACES) == "0":
+                disabledFormats.append("em")
+
+    return disabledFormats
+
+
 def getFormats(node, processSubAndSup=True):
     """
     Dado un nodo w:rPr o w:pPr, convierte los formatos que contiene y los retorna.
