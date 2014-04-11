@@ -238,8 +238,8 @@ class DocxConverter(converter_base.AbstractConverter):
         needToCloseDiv = False
         classValue = []
 
-        customStyleName = self._styles.getParagaphCustomStyleName(paragraph)
-        if customStyleName:
+        className = self._styles.getParagraphClassName(paragraph)
+        if className:
             previousParagraph = self._getPreviousParagraph(paragraph)
             nextParagraph = self._getNextParagraph(paragraph)
 
@@ -254,7 +254,7 @@ class DocxConverter(converter_base.AbstractConverter):
                 nextParagraphStyleId = self._styles.getParagraphStyleId(nextParagraph)
 
             if styleId != previousParagraphStyleId and styleId == nextParagraphStyleId:
-                self._currentSection.openTag("div", **{"class": customStyleName})
+                self._currentSection.openTag("div", **{"class": className})
                 isParagraphInsideDiv = True
             elif styleId == previousParagraphStyleId:
                 if styleId != nextParagraphStyleId:
@@ -265,8 +265,8 @@ class DocxConverter(converter_base.AbstractConverter):
             if not self._options.ignoreEmptyParagraphs and previousEmptyParagraphsCount > 0:
                 classValue.append("salto25" if previousEmptyParagraphsCount > 1 else "salto10")
 
-            if customStyleName and not isParagraphInsideDiv:
-                classValue.append(customStyleName)
+            if className and not isParagraphInsideDiv:
+                classValue.append(className)
 
             attributes = {"class": " ".join(classValue)} if classValue else {}
 
@@ -321,7 +321,7 @@ class DocxConverter(converter_base.AbstractConverter):
         isLastRun = utils.getNextRun(run) is None
         needToCloseSpan = False
         needToOpenSpan = False
-        customStyleName = ""
+        className = ""
 
         # Si el run tiene aplicado un estilo, este estilo puede tener asociado formatos, por
         # ejemplo: negrita, cursiva, etc. Proceso también estos formatos.
@@ -329,9 +329,9 @@ class DocxConverter(converter_base.AbstractConverter):
             for f in (f for f in self._styles.getStyleFormats(styleId) if f not in runFormats):
                 runFormats.append(f)
 
-            customStyleName = self._styles.getRunCustomStyleName(run)
+            className = self._styles.getRunClassName(run)
 
-            if customStyleName:
+            if className:
                 previousRunStyleId = None
                 nextRunStyleId = None
 
@@ -381,7 +381,7 @@ class DocxConverter(converter_base.AbstractConverter):
             # Dado el caso de un run que contenga un estilo y formatos, entonces abro
             # el span primero, y dentro del span abro los formatos.
             if needToOpenSpan:
-                self._currentSection.openTag("span", **{"class": customStyleName})
+                self._currentSection.openTag("span", **{"class": className})
 
             for f in runFormats:
                 self._currentSection.openTag(f)

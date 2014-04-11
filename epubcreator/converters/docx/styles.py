@@ -8,8 +8,9 @@ class Styles:
     def __init__(self, stylesXml):
         # Un diccionario donde:
         # key   ->  id del estilo.
-        # value ->  una tupla de dos elementos: el nombre del estilo y una lista de strings con los formatos que
-        #                                       el estilo tiene aplicado.
+        # value ->  una tupla de tres elementos: el nombre del estilo
+        #                                        el nombre tal como debe ir en el epub al ser usado como clase, si es un estilo custom, sino None
+        #                                        una lista de strings con los formatos que el estilo tiene aplicado
         self._stylesIdToName = self._readStyles(stylesXml)
 
     def hasParagraphHeadingStyle(self, paragraph):
@@ -32,19 +33,36 @@ class Styles:
         styleId = self.getRunStyleId(run)
         return self._stylesIdToName[styleId][0] if styleId else None
 
-    def getParagaphCustomStyleName(self, paragraph):
-        styleName = self.getParagraphStyleName(paragraph)
-        return self._getCustomStyleName(styleName) if styleName else None
+    def getParagraphClassName(self, paragraph):
+        """
+        Retorna, si el w:p pasado como parámetro tiene un estilo asociado y dicho estilo es un
+        estilo custom, el nombre de la clase correspondiente tal como debe ir en el epub. Caso contrario
+        se retorna None.
+        """
+        styleId = self.getParagraphStyleId(paragraph)
+        className = None
 
-    def getRunCustomStyleName(self, run):
-        styleName = self.getRunStyleName(run)
-        return self._getCustomStyleName(styleName) if styleName else None
+        if styleId:
+            className = self._stylesIdToName[styleId][1]
+
+        return className
+
+    def getRunClassName(self, run):
+        """
+        Retorna, si el w:r pasado como parámetro tiene un estilo asociado y dicho estilo es un
+        estilo custom, el nombre de la clase correspondiente tal como debe ir en el epub. Caso contrario
+        se retorna None.
+        """
+        styleId = self.getRunStyleId(run)
+        className = None
+
+        if styleId:
+            className = self._stylesIdToName[styleId][1]
+
+        return className
 
     def getStyleFormats(self, styleId):
-        return self._stylesIdToName[styleId][1]
-
-    def _getCustomStyleName(self, styleName):
-        return styleName[5:] if styleName.startswith("epub_") else None
+        return self._stylesIdToName[styleId][2]
 
     def _readStyles(self, stylesXml):
         xml = etree.fromstring(stylesXml)
@@ -65,6 +83,16 @@ class Styles:
                     # caso particular no debería procesarlos. Podría de alguna manera comprobar si el estilo es el
                     # que word usa para las referencias a las notas, y en ese caso ignorar el formato, pero esto
                     # solo me complicaría las cosas.
-                    styles[styleId] = (styleName, utils.getFormats(formatNode, False))
+                    styles[styleId] = (styleName, self._styleNameToClassName(styleName), utils.getFormats(formatNode, False))
 
         return styles
+
+    def _styleNameToClassName(self, styleName):
+        className = None
+
+        if styleName.startswith("epub_"):
+            # Los estilos de tipo "vinculado" aparecen definido dos veces en styles.xml: una vez
+            # con el nombre normal (párrafo) y la otra con el string " Car" al final (carácter).
+            className = styleName[5:len(styleName) if not styleName.endswith(" Car") else -4]
+
+        return className
