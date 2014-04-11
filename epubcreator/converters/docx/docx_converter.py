@@ -69,7 +69,7 @@ class DocxConverter(converter_base.AbstractConverter):
         # Un objeto EbookData.
         self._ebookData = None
 
-        self._openDocx(inputFilePath)
+        self._openDocx()
 
     def convert(self):
         self._titles = []
@@ -92,8 +92,8 @@ class DocxConverter(converter_base.AbstractConverter):
 
         return docText + footnotesText
 
-    def _openDocx(self, inputFilePath):
-        with zipfile.ZipFile(inputFilePath) as docx:
+    def _openDocx(self):
+        with zipfile.ZipFile(self._inputFilePath) as docx:
             contentTypesXml = etree.fromstring(docx.read("[Content_Types].xml"))
 
             path = '/ct:Types/ct:Override[@ContentType = "{0}"]/@PartName'

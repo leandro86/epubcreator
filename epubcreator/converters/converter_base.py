@@ -7,7 +7,7 @@ class AbstractConverter(epubcreator.misc.options.Options):
     def __init__(self, inputFilePath, **options):
         super().__init__(**options)
 
-        self._inputFile = inputFilePath
+        self._inputFilePath = inputFilePath
 
     def convert(self):
         raise NotImplemented
