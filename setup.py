@@ -40,6 +40,7 @@ def freezeApp():
     if config.IS_RUNNING_ON_LINUX:
         libsPath = "/usr/lib"
         include_files.append((os.path.join(libsPath, "libxml2.so.2"), "libxml2.so.2"))
+        include_files.append((os.path.join(libsPath, "libxslt.so.1"), "libxslt.so.1"))
         include_files.append((os.path.join(libsPath, "libz.so"), "libz.so"))
     else:
         imageFormatsPath = os.path.join(QtCore.QLibraryInfo.location(QtCore.QLibraryInfo.PluginsPath), "imageformats")
