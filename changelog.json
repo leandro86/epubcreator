@@ -1,5 +1,26 @@
 [
     {
+        "version": "0.2.0",
+        "date": "11/04/2014",
+        "changes": {
+            "misc": [
+                "Actualizado a ePub base r1.1.",
+                "Se comprueba que no haya pérdida de texto en una conversión.",
+                "Agregada opción para no incluir los archivos opcionales del ePub base (dedicatoria.xhtml y autor.xhtml) si los campos respectivos no se completaron. La opción se encuentra en 'Preferencias' -> 'Generación de Epub' -> 'Siempre incluir archivos opcionales'.",
+                "Eliminado campo editoral: es siempre 'ePubLibre' por defecto.",
+                "Modificada la pestaña de 'Autores': se puede especificar biografía e imagen de todos los autores ingresados.",
+                "Algunos cambios en la GUI, como por ejemplo, se elimina la ventana del log de conversión: pienso reemplazarlo por algo más adecuado.",
+                "Las secciones del epub generado se numeran comenzando en Section0001.xhtml, en lugar de Section0000.xhtml.",
+                "Varias correciones y mejoras menores, como por ejemplo recordar la carpeta donde se guardó un epub cuando este no tenía asociado ningún docx."
+            ],
+            "docx": [
+                "Corregido en gran parte el problema de los saltos de página, que hacía necesario que estuvieran en su propio párrafo (insertando un salto de línea antes y después) para asegurarse de que el epubcreator cortara las secciones correctamente. Ya no es necesario hacer esto en la gran mayoría de los casos.",
+                "Procesa de manera básica listas y tablas.",
+                "Corregidos varios bugs, el más grave cuando se mezclaban estilos personalizados de tipo 'Carácter' con formatos (negrita, itálica, etc)."
+            ]
+        }
+    },
+    {
         "version": "0.1.4",
         "date": "15/12/2013",
         "changes": {
