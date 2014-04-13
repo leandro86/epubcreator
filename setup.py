@@ -1,10 +1,19 @@
 # Script para generar un ejecutable con cx_freeze en los distintos sistemas operativos.
-# En windows y linux ejecutar así: python3 setup.py build
-# En mac: python3 setup.py bdist_mac --bundle-icon=app_icon.icns
+
+# En windows y linux ejecutar así:
+#   python3 setup.py build
+# En mac:
+#   python3 setup.py bdist_mac --bundle-icon=app_icon.icns
+
 # Notas: en windows y mac se incluyen todas las dependencias necesarias para
 # ejecutar la aplicación, no así en linux, donde no distribuyo las librerías de Qt, y
-# por lo tanto es necesario instalarlas (al menos la versión 4.8).
-# TODO: corregir el problema con Qt y KDE para evitar tener que preinstalar las librerías Qt en linux.
+# por lo tanto es necesario instalarlas (cualquier versión 4.8 sirve). No distribuyo Qt
+# porque puede generarse un conflicto con las librerías Qt que ya vienen instaladas de base
+# en el sistema (me ha pasado con Kubuntu, por ejemplo). Además, incluso si pudiera de alguna
+# manera cargar siempre las librerías Qt que yo distribuyo, ignorando las del sistema, puedo
+# encontrarme con que el look de la aplicación no sea nativo (como pasa con alguna distro basada
+# en KDE). La solución más simple es entonces NO distribuir Qt, y que los usuarios tengan que
+# instalar esa dependencia (lo cual generalmente no es necesario porque ya viene preinstalada).
 
 import sys
 import os
@@ -82,8 +91,7 @@ def freezeApp():
         # en el caso de los plugins es el directorio "plugins".
         with open(os.path.join("build", "epubcreator", "qt.conf"), "w", encoding="utf-8"):
             pass
-
-    if config.IS_RUNNING_ON_MAC:
+    elif config.IS_RUNNING_ON_MAC:
         # El bundle ".app" creado por defecto tiene el nombre de esta forma: name-version.app.
         bundlePath = "build/{0}-{1}.app".format(version.APP_NAME, version.VERSION)
         bundleMacOsDir = os.path.join(bundlePath, "Contents", "MacOS")
