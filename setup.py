@@ -137,6 +137,10 @@ def freezeApp():
 
         # Renombro el bundle, porque no quiero que el nombre incluya la versión.
         os.rename(bundlePath, "build/EpubCreator.app")
+    elif config.IS_RUNNING_ON_LINUX:
+        # No distribuyo Qt en linux, por lo que no necesito estos directorios.
+        shutil.rmtree("build/epubcreator/imageformats", ignore_errors=True)
+        shutil.rmtree("build/epubcreator/plugins", ignore_errors=True)
 
 
 if __name__ == "__main__":
