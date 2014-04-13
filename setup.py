@@ -39,9 +39,12 @@ def freezeApp():
                 "PyQt4.uic"]
     include_files = [("epubcreator/epubbase/files", "files")]
 
-    translationPath = config.getTranslationPath()
-    translationFileName = os.path.split(translationPath)[1]
-    include_files.append((translationPath, "translations/{0}".format(translationFileName)))
+    qtSpanishTranslation = config.getQtSpanishTranslation()
+
+    if not os.path.exists(qtSpanishTranslation):
+        raise Exception("No se encontró el archivo de traducciones.")
+
+    include_files.append((qtSpanishTranslation, "translations/{0}".format(os.path.split(qtSpanishTranslation)[1])))
 
     options["icon"] = "epubcreator/gui/resources/icons/app_icon.ico"
     options["build_exe"] = "build/epubcreator"
