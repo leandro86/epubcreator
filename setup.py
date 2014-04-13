@@ -35,7 +35,7 @@ def freezeApp():
     include_files.append((translationPath, "translations/{0}".format(translationFileName)))
 
     options["icon"] = "epubcreator/gui/resources/icons/app_icon.ico"
-    options["build_exe"] = "bin/epubcreator"
+    options["build_exe"] = "build/epubcreator"
 
     if config.IS_RUNNING_ON_LINUX:
         libsPath = "/usr/lib/i386-linux-gnu"
@@ -66,8 +66,8 @@ def freezeApp():
     options["include_files"] = include_files
     options["include_msvcr"] = True
 
-    if os.path.isdir("bin"):
-        shutil.rmtree("bin", ignore_errors=True)
+    if os.path.isdir("build"):
+        shutil.rmtree("build", ignore_errors=True)
 
     setup(name=version.APP_NAME,
           version=version.VERSION,
@@ -80,12 +80,12 @@ def freezeApp():
     if config.IS_RUNNING_ON_WIN:
         # Necesito el archivo qt.conf vacío. Si está vacío, Qt carga todos los paths por defecto, que
         # en el caso de los plugins es el directorio "plugins".
-        with open(os.path.join("bin", "epubcreator", "qt.conf"), "w", encoding="utf-8"):
+        with open(os.path.join("build", "epubcreator", "qt.conf"), "w", encoding="utf-8"):
             pass
 
     if config.IS_RUNNING_ON_MAC:
         # El bundle ".app" creado por defecto tiene el nombre de esta forma: name-version.app.
-        bundlePath = "bin/{0}-{1}.app".format(version.APP_NAME, version.VERSION)
+        bundlePath = "build/{0}-{1}.app".format(version.APP_NAME, version.VERSION)
         bundleMacOsDir = os.path.join(bundlePath, "Contents", "MacOS")
         bundleResourcesDir = os.path.join(bundlePath, "Contents", "Resources")
 
@@ -125,10 +125,10 @@ def freezeApp():
                     subprocess.call(("install_name_tool", "-change", filename, newfilename, lib))
 
         # Copio el ícono.
-        shutil.copy("gui/resources/icons/app_icon.icns", "bin/{0}-{1}.app/Contents/Resources".format(version.APP_NAME, version.VERSION))
+        shutil.copy("gui/resources/icons/app_icon.icns", "build/{0}-{1}.app/Contents/Resources".format(version.APP_NAME, version.VERSION))
 
         # Renombro el bundle, porque no quiero que el nombre incluya la versión.
-        os.rename(bundlePath, "bin/EpubCreator.app")
+        os.rename(bundlePath, "build/EpubCreator.app")
 
 
 if __name__ == "__main__":
