@@ -136,7 +136,7 @@ def freezeApp():
                     subprocess.call(("install_name_tool", "-change", filename, newfilename, lib))
 
         # Copio el ícono.
-        shutil.copy("gui/resources/icons/app_icon.icns", "build/{0}-{1}.app/Contents/Resources".format(version.APP_NAME, version.VERSION))
+        shutil.copy("epubcreator/gui/resources/icons/app_icon.icns", "build/{0}-{1}.app/Contents/Resources".format(version.APP_NAME, version.VERSION))
 
         # Renombro el bundle, porque no quiero que el nombre incluya la versión.
         os.rename(bundlePath, "build/EpubCreator.app")
