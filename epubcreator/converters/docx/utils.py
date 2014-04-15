@@ -32,6 +32,8 @@ def getRunDisabledFormats(run):
                 disabledFormats.append("strong")
             elif child.tag.endswith("}i") and xml_utils.getAttr(child, "w:val", NAMESPACES) == "0":
                 disabledFormats.append("em")
+            elif child.tag.endswith("}u") and xml_utils.getAttr(child, "w:val", NAMESPACES) == "none":
+                disabledFormats.append("ins")
 
     return disabledFormats
 
@@ -53,7 +55,7 @@ def getFormats(node, processSubAndSup=True):
                 formats.append("strong")
             elif child.tag.endswith("}i") and xml_utils.getAttr(child, "w:val", NAMESPACES) != "0":
                 formats.append("em")
-            elif child.tag.endswith("}u"):
+            elif child.tag.endswith("}u") and xml_utils.getAttr(child, "w:val", NAMESPACES) != "none":
                 formats.append("ins")
             elif child.tag.endswith("}vertAlign") and processSubAndSup:
                 val = xml_utils.getAttr(child, "w:val", NAMESPACES)
