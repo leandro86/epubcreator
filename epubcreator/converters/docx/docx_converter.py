@@ -469,7 +469,20 @@ class DocxConverter(converter_base.AbstractConverter):
 
                 for node in child:
                     if node.tag.endswith("tc"):
-                        self._processMainContent(node, "td")
+                        if utils.hasText(node):
+                            paragraphsCount = xml_utils.xpath(node, "count(w:p)", namespaces=utils.NAMESPACES)
+
+                            # Uso el tag "p" si hay más de un párrafo.
+                            if paragraphsCount > 1:
+                                self._currentSection.openTag("td")
+                                self._processMainContent(node, "p")
+                                self._currentSection.closeTag("td")
+                            else:
+                                self._processMainContent(node, "td")
+                        else:
+                            # No puedo ignorar la celda si no tiene texto!
+                            self._currentSection.openTag("td")
+                            self._currentSection.closeTag("td")
 
                 self._currentSection.closeTag("tr")
 
