@@ -496,6 +496,8 @@ class DocxConverter(converter_base.AbstractConverter):
             if child.tag.endswith("}p"):
                 hasText = utils.hasText(child)
                 self._processParagraph(child, hasText)
+            elif child.tag.endswith("}tbl"):
+                self._processTable(child)
 
         self._currentSection.closeNote()
 

@@ -204,7 +204,7 @@ class DocxConverterTest(unittest.TestCase):
     def test_table(self):
         data = self._getOutput("table.docx")
 
-        self.assertEqual(len(data.sections), 1)
+        self.assertEqual(len(data.sections), 2)
         self.assertTrue(self._compareSections("table.docx", data.sections))
 
     def test_hyperlinks(self):
