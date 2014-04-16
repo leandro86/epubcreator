@@ -75,37 +75,29 @@ class _Templates:
 
     @staticmethod
     def _loadEpubBaseFiles(epubBaseFilesDirPath):
-        fileNames = (epubbase_names.AUTHOR_FILENAME,
-                     epubbase_names.AUTHOR_IMAGE_FILENAME,
-                     epubbase_names.COVER_IMAGE_FILENAME,
-                     epubbase_names.COVER_FILENAME,
+        templates = (epubbase_names.AUTHOR_FILENAME,
                      epubbase_names.DEDICATION_FILENAME,
-                     epubbase_names.EPL_LOGO_FILENAME,
-                     epubbase_names.EX_LIBRIS_FILENAME,
                      epubbase_names.INFO_FILENAME,
-                     epubbase_names.STYLE_FILENAME,
                      epubbase_names.SYNOPSIS_FILENAME,
-                     epubbase_names.TITLE_FILENAME,
-                     epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME)
+                     epubbase_names.TITLE_FILENAME)
 
-        for fileName in fileNames:
+        noTemplates = (epubbase_names.COVER_FILENAME,
+                       epubbase_names.STYLE_FILENAME,
+                       epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME,
+                       epubbase_names.EPL_LOGO_FILENAME,
+                       epubbase_names.EX_LIBRIS_FILENAME,
+                       epubbase_names.AUTHOR_IMAGE_FILENAME,
+                       epubbase_names.COVER_IMAGE_FILENAME)
+
+        for fileName in templates:
             filePath = os.path.join(epubBaseFilesDirPath, fileName)
+            newFilePath = filePath.replace(".xhtml", ".mako")
+            _Templates._files[fileName] = mako.template.Template(filename=newFilePath, input_encoding="utf-8", output_encoding="utf-8")
 
-            # Estos archivos son de texto común, y no necesito hacer nada especial
-            # para abrirlos.
-            textFiles = (epubbase_names.COVER_FILENAME,
-                         epubbase_names.STYLE_FILENAME,
-                         epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME)
-
-            if fileName.endswith(".png") or fileName.endswith(".jpg"):
-                with open(filePath, "rb") as file:
-                    _Templates._files[fileName] = file.read()
-            elif fileName in textFiles:
-                with open(filePath, encoding="utf-8") as file:
-                    _Templates._files[fileName] = file.read()
-            else:
-                newFilePath = filePath.replace(".xhtml", ".mako")
-                _Templates._files[fileName] = mako.template.Template(filename=newFilePath, input_encoding="utf-8", output_encoding="utf-8")
+        for fileName in noTemplates:
+            filePath = os.path.join(epubBaseFilesDirPath, fileName)
+            with open(filePath, "rb") as file:
+                _Templates._files[fileName] = file.read()
 
 
 class Ebook(Options):
