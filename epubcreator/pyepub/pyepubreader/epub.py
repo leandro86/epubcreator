@@ -22,11 +22,11 @@ class EpubReader:
         # En el directorio donde esté ubicado content.opf, es donde se encuentran
         # el resto de los archivos.
         self._rootDir = os.path.split(pathToOpf)[0]
-        self._opf = opf.Opf(self._epub.read(pathToOpf))
+        self._opf = opf.Opf(self._epub.open(pathToOpf))
 
         # No puedo hacer un os.path.join, porque imperiosamente necesito usar esta barra: "/" y
         # no esta "\".
-        self._toc = toc.Toc(self._epub.read("/".join(("OEBPS", self._opf.getPathToToc()))))
+        self._toc = toc.Toc(self._epub.open("/".join(("OEBPS", self._opf.getPathToToc()))))
 
     def getHtmlFileNamesReadingOrder(self):
         """
@@ -86,18 +86,14 @@ class EpubReader:
     def getSubject(self):
         return self._opf.getSubject()
 
-    def read(self, fileName):
-        """
-        Lee el contenido de un archivo.
+    def open(self, name):
+        return self._epub.open(name)
 
-        @param fileName: el archivo a leer.
-
-        @return: un string con el contenido.
-        """
-        return self._epub.read(fileName)
+    def read(self, name):
+        return self._epub.read(name)
 
     def _getPathToOpf(self):
-        container = etree.fromstring(self._epub.read("META-INF/container.xml"))
+        container = etree.parse(self._epub.open("META-INF/container.xml"))
         return container.xpath("/inf:container/inf:rootfiles/inf:rootfile/@full-path",
                                namespaces={"inf": "urn:oasis:names:tc:opendocument:xmlns:container"})[0]
 

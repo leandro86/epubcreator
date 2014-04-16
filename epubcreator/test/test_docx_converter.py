@@ -21,8 +21,17 @@ def makeTest(docxFilePath, outputFolder, **options):
         converter = docx_converter.DocxConverter(docxFilePath, **options)
         ebookData = converter.convert()
 
+        # import shutil
+        # outputDir = os.path.join("L:\\", "Temp", "tests_output", os.path.split(outputFolder)[1])
+        # if os.path.exists(outputDir):
+        #     shutil.rmtree(outputDir, ignore_errors=True)
+        # os.makedirs(outputDir)
+        # for section in ebookData.sections:
+        #     with open(os.path.join(outputDir, section.name), "wb") as file:
+        #         file.write(section.toHtml())
+
         for section in ebookData.sections:
-            with open(os.path.join(outputFolder, section.name), encoding="utf-8") as file:
+            with open(os.path.join(outputFolder, section.name), mode="rb") as file:
                 utils.assertXhtmlsAreEqual(section.toHtml(), file.read())
 
     return test

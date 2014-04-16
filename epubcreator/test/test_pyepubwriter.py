@@ -109,7 +109,7 @@ class PyEpubWriterTest(unittest.TestCase):
         self._generateEpub()
 
         toc = self._getToc()
-        opf = etree.fromstring(self._resultingEpub.read("OEBPS/content.opf"))
+        opf = etree.parse(self._resultingEpub.open("OEBPS/content.opf"))
 
         self.assertEqual(len(self._xpath(toc, "/toc:ncx[@version = '2005-1']")), 1)
 
@@ -204,13 +204,13 @@ class PyEpubWriterTest(unittest.TestCase):
 
     def _getToc(self):
         try:
-            return etree.fromstring(self._resultingEpub.read("OEBPS/toc.ncx"))
+            return etree.parse(self._resultingEpub.open("OEBPS/toc.ncx"))
         except KeyError as e:
             self.fail(e)
 
     def _getOpf(self):
         try:
-            return etree.fromstring(self._resultingEpub.read("OEBPS/content.opf"))
+            return etree.parse(self._resultingEpub.open("OEBPS/content.opf"))
         except KeyError as e:
             self.fail(e)
 

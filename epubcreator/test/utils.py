@@ -4,8 +4,9 @@ import pprint
 
 
 def assertXhtmlsAreEqual(xml1, xml2):
-    normal1 = re.sub(r"\n\s*<", "<", xml1).strip()
-    normal2 = re.sub(r"\n\s*<", "<", xml2).strip()
+    # Elimino indentación.
+    normal1 = re.sub(r"\n\s*<", "<", xml1.decode()).strip()
+    normal2 = re.sub(r"\n\s*<", "<", xml2.decode()).strip()
 
     if normal1 != normal2:
         lines1 = re.sub(r"(</\w+>)", r"\1\n", normal1).splitlines()

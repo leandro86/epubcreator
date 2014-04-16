@@ -65,10 +65,10 @@ class Styles:
         return self._stylesIdToName[styleId][2]
 
     def _readStyles(self, stylesXml):
-        xml = etree.fromstring(stylesXml)
+        xml = etree.parse(stylesXml)
         styles = {}
 
-        for child in xml:
+        for child in xml.getroot():
             if child.tag.endswith("}style"):
                 attr = xml_utils.getAttr(child, "w:type", utils.NAMESPACES)
                 if attr == "paragraph" or attr == "character":

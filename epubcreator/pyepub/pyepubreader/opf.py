@@ -5,11 +5,8 @@ class Opf:
     _OPF_NS = "http://www.idpf.org/2007/opf"
     DC_NS = "http://purl.org/dc/elements/1.1/"
 
-    def __init__(self, opfContent):
-        """
-        @param opfContent: un string con el contenido de content.opf.
-        """
-        self._opf = etree.fromstring(opfContent)
+    def __init__(self, opf):
+        self._opf = etree.parse(opf)
 
     def getSpineItems(self):
         return self._xpath(self._opf, "/opf:package/opf:spine/opf:itemref/@idref")

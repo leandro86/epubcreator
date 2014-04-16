@@ -94,16 +94,16 @@ class DocxConverter(converter_base.AbstractConverter):
 
     def _openDocx(self):
         with zipfile.ZipFile(self._inputFilePath) as docx:
-            contentTypesXml = etree.fromstring(docx.read("[Content_Types].xml"))
+            contentTypesXml = etree.parse(docx.open("[Content_Types].xml"))
 
             path = '/ct:Types/ct:Override[@ContentType = "{0}"]/@PartName'
 
             docPath = xml_utils.xpath(contentTypesXml, path.format(DocxConverter._DOCUMENT_CONTENT_TYPE), namespaces=utils.NAMESPACES)[0]
             docPath = docPath.strip("/")
-            self._documentXml = etree.fromstring(docx.read(docPath))
+            self._documentXml = etree.parse(docx.open(docPath))
 
             stylesPath = xml_utils.xpath(contentTypesXml, path.format(DocxConverter._STYLES_CONTENT_TYPE), namespaces=utils.NAMESPACES)[0]
-            self._styles = styles.Styles(docx.read(stylesPath.strip("/")))
+            self._styles = styles.Styles(docx.open(stylesPath.strip("/")))
 
             footnotesPath = xml_utils.xpath(contentTypesXml, path.format(DocxConverter._FOOTNOTES_CONTENT_TYPE), namespaces=utils.NAMESPACES)
             if footnotesPath:
@@ -113,17 +113,17 @@ class DocxConverter(converter_base.AbstractConverter):
                 footnotesRelsPath = footnotesDir + "/_rels/" + footnoteFileName + ".rels"
 
                 try:
-                    footnotesRels = docx.read(footnotesRelsPath)
+                    footnotesRels = docx.open(footnotesRelsPath)
                 except KeyError:
                     footnotesRels = None
 
-                self._footnotes = footnotes.Footnotes(docx.read(footnotesPath), footnotesRels)
+                self._footnotes = footnotes.Footnotes(docx.open(footnotesPath), footnotesRels)
 
             docDir, docFileName = os.path.split(docPath)
             docRelsPath = docDir + "/_rels/" + docFileName + ".rels"
 
             try:
-                self._documentRelsXml = etree.fromstring(docx.read(docRelsPath))
+                self._documentRelsXml = etree.parse(docx.open(docRelsPath))
             except KeyError:
                 self._documentRelsXml = None
 

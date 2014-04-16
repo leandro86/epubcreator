@@ -101,7 +101,7 @@ class Section:
         self.closeTag("img")
 
     def toHtml(self):
-        return etree.tostring(self._html, xml_declaration=True, pretty_print=True, encoding="utf-8", doctype=Section._DOCTYPE).decode()
+        return etree.tostring(self._html, xml_declaration=True, pretty_print=True, encoding="utf-8", doctype=Section._DOCTYPE)
 
     def toRawText(self):
         text = self._html.xpath("//text()")
