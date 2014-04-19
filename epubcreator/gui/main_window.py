@@ -71,7 +71,7 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
             eebook = ebook.Ebook(data, metadata, **settings.getAllSettingsForEbook())
 
             if data:
-                self._checkForMissingText(data.sections, rawText)
+                self._checkForMissingText(data, rawText)
 
             # Por defecto guardo el epub en el mismo directorio donde se encuentra
             # el archivo de origen.
@@ -179,8 +179,8 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
 
         return data, rawText
 
-    def _checkForMissingText(self, sections, rawText):
-        sectionsText = "".join((s.toRawText() for s in sections))
+    def _checkForMissingText(self, data, rawText):
+        sectionsText = "".join((s.toRawText() for s in data.iterAllSections()))
 
         # Elimino absolutamente todos los espacios (espacios, tabs, non breaking spaces, etc) al comparar el texto.
         # No solo lo hago porque principalemente lo único que me importa es que no se haya perdido texto en la

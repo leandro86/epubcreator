@@ -30,7 +30,7 @@ def makeTest(docxFilePath, outputFolder, **options):
         #     with open(os.path.join(outputDir, section.name), "wb") as file:
         #         file.write(section.toHtml())
 
-        for section in ebookData.sections:
+        for section in ebookData.iterAllSections():
             with open(os.path.join(outputFolder, section.name), mode="rb") as file:
                 utils.assertXhtmlsAreEqual(section.toHtml(), file.read())
 

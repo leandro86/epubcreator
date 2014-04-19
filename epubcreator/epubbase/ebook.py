@@ -111,16 +111,8 @@ class Ebook(Options):
     def __init__(self, ebookData, metadata=None, **options):
         super().__init__(**options)
 
-        # Debería hacer una copia profunda de ebookData también técnicamente, ya que más adelante
-        # modifico su objecto toc. Esto es prohibitivo, dado que estaría creando una copia de todas
-        # las secciones inútilmente. Lo que podría hacer es generar una copia de la toc aparte, ya
-        # que es lo único que necesito modificar.
         self._ebookData = ebookData or ebook_data.EbookData()
         self._metadata = copy.deepcopy(metadata) if metadata else ebook_metadata.Metadata()
-
-        # Guardo una referencia a la sección de notas, si la hay, para facilitarme luego alguas comprobaciones.
-        self._notesSection = self._ebookData.sections[-1] if (self._ebookData.sections and
-                                                              type(self._ebookData.sections[-1]) == ebook_data.NotesSection) else None
 
         # Hay algunos datos que indefectiblemente deben estar en el epub, por más
         # que el usuario no los haya especificado.
@@ -139,10 +131,9 @@ class Ebook(Options):
         outputEpub = epub.EpubWriter()
 
         self._addEpubBaseFiles(outputEpub)
-        self._addSections(outputEpub)
+        self._addSectionsAndToc(outputEpub)
         self._addImages(outputEpub)
         self._addMetadata(outputEpub)
-        self._setupToc(outputEpub)
 
         epubName = self._getOutputFileName()
 
@@ -196,23 +187,59 @@ class Ebook(Options):
         outputEpub.addStyleData(epubbase_names.STYLE_FILENAME, Ebook._epubBase.getCss())
         outputEpub.addMetaFile(epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME, Ebook._epubBase.getIBooksDisplayOptionsFile())
 
-    def _addSections(self, outputEpub):
-        for section in self._ebookData.sections[:-1] if self._notesSection else self._ebookData.sections:
-            outputEpub.addHtmlData(section.name, section.toHtml())
+    def _addSectionsAndToc(self, outputEpub):
+        def processSections(sections):
+            navPoints = []
+            previousLevel = "1"
 
-        authorsWithBiographyOrImage = (a for a in self._metadata.authors if a.biography or a.image)
-        for i, author in enumerate(authorsWithBiographyOrImage):
-            title = self._getTocTitleForAuthorFile() if i == 0 else None
-            imageName = epubbase_names.generateAuthorImageFileName(i)
+            for section in sections:
+                outputEpub.addHtmlData(section.name, section.toHtml())
+                hs = section.xpath("//h1 | //h2 | //h3 | //h4 | //h5 | //h6")
 
-            authorContent = Ebook._epubBase.getAuthor(author.biography, title, imageName)
-            outputEpub.addHtmlData(epubbase_names.generateAuthorFileName(i), authorContent)
+                for h in hs:
+                    currentLevel = h.tag[-1]
 
-        if self._notesSection:
-            outputEpub.addHtmlData(self._notesSection.name, self._notesSection.toHtml())
+                    titleText = "".join(h.xpath("descendant::text()"))
+                    titleId = h.get("id")
+                    titleSrc = "{0}{1}".format(section.name, "#" + titleId if titleId else "")
+
+                    if currentLevel == "1":
+                        navPoints.append(outputEpub.addNavPoint(titleSrc, titleText))
+                    else:
+                        if currentLevel < previousLevel:
+                            for i in range(int(previousLevel) - int(currentLevel) + 1):
+                                navPoints.pop()
+                        elif currentLevel == previousLevel:
+                            navPoints.pop()
+
+                        childNavPoint = navPoints[-1].addNavPoint(titleSrc, titleText)
+                        navPoints.append(childNavPoint)
+
+                    previousLevel = currentLevel
+
+        # La cubierta debe ser la primera entrada en la toc.
+        outputEpub.addNavPoint(epubbase_names.COVER_FILENAME, "Cubierta")
+
+        # El título del libro debe ser la segunda entrada en la toc.
+        outputEpub.addNavPoint(epubbase_names.TITLE_FILENAME, self._metadata.title)
+
+        processSections(self._ebookData.iterTextSections())
+
+        authorsWithBiographyOrImage = [a for a in self._metadata.authors if a.biography or a.image]
+        if authorsWithBiographyOrImage:
+            outputEpub.addNavPoint(epubbase_names.AUTHOR_FILENAME, self._getTocTitleForAuthorFile())
+
+            for i, author in enumerate(authorsWithBiographyOrImage):
+                title = self._getTocTitleForAuthorFile() if i == 0 else None
+                imageName = epubbase_names.generateAuthorImageFileName(i)
+
+                authorContent = Ebook._epubBase.getAuthor(author.biography, title, imageName)
+                outputEpub.addHtmlData(epubbase_names.generateAuthorFileName(i), authorContent)
+
+        processSections(self._ebookData.iterNotesSections())
 
     def _addImages(self, outputEpub):
-        for image in self._ebookData.images:
+        for image in self._ebookData.iterImages():
             outputEpub.addImageData(image.name, image.content)
 
     def _addMetadata(self, outputEpub):
@@ -278,33 +305,6 @@ class Ebook(Options):
 
             outputEpub.addCustomMetadata("calibre:series", calibreSeries)
             outputEpub.addCustomMetadata("calibre:series_index", series_index)
-
-    def _setupToc(self, outputEpub):
-        """
-        Crea la tabla de contenidos del epub.
-        
-        @param outputEpub: el epub donde está la toc.
-        """
-        # La cubierta debe ser la primera entrada en la toc.
-        outputEpub.addNavPoint(epubbase_names.COVER_FILENAME, "Cubierta")
-
-        # El título del libro debe ser la segunda entrada en la toc.
-        outputEpub.addNavPoint(epubbase_names.TITLE_FILENAME, self._metadata.title)
-
-        if any(a for a in self._metadata.authors if a.biography or a.image):
-            self._ebookData.toc.addFirstLevelTitle(epubbase_names.AUTHOR_FILENAME, self._getTocTitleForAuthorFile(), False)
-
-        if self._notesSection:
-            self._ebookData.toc.addFirstLevelTitle(epubbase_names.NOTES_FILENAME, "Notas", False)
-
-        def addTitlesToToc(navPoint, titles):
-            for childTitle in titles:
-                childNavPoint = navPoint.addNavPoint(childTitle.titleLocation, childTitle.text)
-                addTitlesToToc(childNavPoint, childTitle.childTitles)
-
-        for title in self._ebookData.toc.titles:
-            rootNavPoint = outputEpub.addNavPoint(title.titleLocation, title.text)
-            addTitlesToToc(rootNavPoint, title.childTitles)
 
     def _getOutputFileName(self):
         fileName = []
