@@ -13,7 +13,11 @@ TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "test_data", "converters
 
 
 class DocxConverterTest(unittest.TestCase):
-    pass
+    def test_images_were_added(self):
+        converter = docx_converter.DocxConverter(os.path.join(TEST_DATA_DIR, "images.docx"))
+        ebookData = converter.convert()
+
+        self.assertEqual(len(list(ebookData.iterImages())), 9)
 
 
 def makeTest(docxFilePath, outputFolder, **options):
