@@ -1,5 +1,3 @@
-from epubcreator.misc import xml_utils
-
 NAMESPACES = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
               "wp": "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing",
               "a": "http://schemas.openxmlformats.org/drawingml/2006/main",
@@ -17,22 +15,22 @@ NO_PAGE_BREAK = 2
 
 
 def getRunFormats(run):
-    rpr = run.find("w:rPr", namespaces=NAMESPACES)
+    rpr = find(run, "w:rPr")
     return getFormats(rpr)
 
 
 def getRunDisabledFormats(run):
     disabledFormats = []
 
-    rpr = run.find("w:rPr", namespaces=NAMESPACES)
+    rpr = find(run, "w:rPr")
 
     if rpr is not None:
         for child in rpr:
-            if child.tag.endswith("}b") and xml_utils.getAttr(child, "w:val", NAMESPACES) == "0":
+            if child.tag.endswith("}b") and getAttr(child, "w:val") == "0":
                 disabledFormats.append("strong")
-            elif child.tag.endswith("}i") and xml_utils.getAttr(child, "w:val", NAMESPACES) == "0":
+            elif child.tag.endswith("}i") and getAttr(child, "w:val") == "0":
                 disabledFormats.append("em")
-            elif child.tag.endswith("}u") and xml_utils.getAttr(child, "w:val", NAMESPACES) == "none":
+            elif child.tag.endswith("}u") and getAttr(child, "w:val") == "none":
                 disabledFormats.append("ins")
 
     return disabledFormats
@@ -51,14 +49,14 @@ def getFormats(node, processSubAndSup=True):
 
     if node is not None:
         for child in node:
-            if child.tag.endswith("}b") and xml_utils.getAttr(child, "w:val", NAMESPACES) != "0":
+            if child.tag.endswith("}b") and getAttr(child, "w:val") != "0":
                 formats.append("strong")
-            elif child.tag.endswith("}i") and xml_utils.getAttr(child, "w:val", NAMESPACES) != "0":
+            elif child.tag.endswith("}i") and getAttr(child, "w:val") != "0":
                 formats.append("em")
-            elif child.tag.endswith("}u") and xml_utils.getAttr(child, "w:val", NAMESPACES) != "none":
+            elif child.tag.endswith("}u") and getAttr(child, "w:val") != "none":
                 formats.append("ins")
             elif child.tag.endswith("}vertAlign") and processSubAndSup:
-                val = xml_utils.getAttr(child, "w:val", NAMESPACES)
+                val = getAttr(child, "w:val")
                 if val == "superscript":
                     formats.append("sup")
                 elif val == "subscript":
@@ -68,15 +66,15 @@ def getFormats(node, processSubAndSup=True):
 
 
 def getPageBreakPosition(paragraph):
-    if xml_utils.xpath(paragraph, "w:pPr/w:pageBreakBefore", NAMESPACES):
+    if xpath(paragraph, "w:pPr/w:pageBreakBefore"):
         return PAGE_BREAK_ON_BEGINNING
 
-    runWithBreak = xml_utils.xpath(paragraph, "w:r[w:br/@w:type = 'page']", NAMESPACES)
+    runWithBreak = xpath(paragraph, "w:r[w:br/@w:type = 'page']")
     if runWithBreak:
         # Compruebo si arriba del run hay texto. De ser así, entiendo entonces que el salto de página se
         # encuentra al final del párrafo. Caso contrario (si no hay texto arriba del run), el salto de página
         # se encuentra al principio del párrafo.
-        if xml_utils.xpath(runWithBreak[0], "preceding-sibling::*[descendant::w:t[normalize-space(text()) != '']]", NAMESPACES):
+        if xpath(runWithBreak[0], "preceding-sibling::*[descendant::w:t[normalize-space(text()) != '']]"):
             return PAGE_BREAK_ON_END
         else:
             return PAGE_BREAK_ON_BEGINNING
@@ -85,34 +83,54 @@ def getPageBreakPosition(paragraph):
 
 
 def getNextParagraph(paragraph):
-    nextParagraph = xml_utils.xpath(paragraph, "following-sibling::w:p[1]", NAMESPACES)
+    nextParagraph = xpath(paragraph, "following-sibling::w:p[1]")
     return nextParagraph[0] if nextParagraph else None
 
 
 def getPreviousParagraph(paragraph):
-    previousParagraph = xml_utils.xpath(paragraph, "preceding-sibling::w:p[1]", NAMESPACES)
+    previousParagraph = xpath(paragraph, "preceding-sibling::w:p[1]")
     return previousParagraph[0] if previousParagraph else None
 
 
 def getNextRun(run):
-    nextRun = xml_utils.xpath(run, "following-sibling::w:r[1]", NAMESPACES)
+    nextRun = xpath(run, "following-sibling::w:r[1]")
     return nextRun[0] if nextRun else None
 
 
 def getPreviousRun(run):
-    previousRun = xml_utils.xpath(run, "preceding-sibling::w:r[1]", NAMESPACES)
+    previousRun = xpath(run, "preceding-sibling::w:r[1]")
     return previousRun[0] if previousRun else None
 
 
 def getListLevel(paragraph):
-    level = xml_utils.xpath(paragraph, "w:pPr/w:numPr/w:ilvl/@w:val", NAMESPACES)
+    level = xpath(paragraph, "w:pPr/w:numPr/w:ilvl/@w:val")
     return int(level[0]) if level else -1
 
 
 def getImagesId(node):
-    return xml_utils.xpath(node, "descendant::pic:pic/pic:blipFill/a:blip/@r:embed | descendant::v:imagedata/@r:id", NAMESPACES)
+    return xpath(node, "descendant::pic:pic/pic:blipFill/a:blip/@r:embed | descendant::v:imagedata/@r:id")
 
 
 def hasText(node):
-    t = xml_utils.xpath(node, "descendant::w:t[normalize-space() != ''][1]", NAMESPACES)
+    t = xpath(node, "descendant::w:t[normalize-space() != ''][1]")
     return True if t else False
+
+
+### ######################################################################################### ###
+### Algunas funciones que facilitan el utilizar expresiones xpath con los namespaces del docx ###
+### ######################################################################################### ###
+def getAttr(node, attr):
+    ns, name = attr.split(":")
+    return node.get("{{{0}}}{1}".format(NAMESPACES.get(ns), name))
+
+
+def xpath(node, path):
+    return node.xpath(path, namespaces=NAMESPACES)
+
+
+def find(node, path):
+    return node.find(path, namespaces=NAMESPACES)
+
+
+def getAllText(node):
+    return "".join(xpath(node, "descendant::text()"))

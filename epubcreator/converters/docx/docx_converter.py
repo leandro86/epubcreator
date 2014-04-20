@@ -4,7 +4,6 @@ import os
 from lxml import etree
 
 from epubcreator.converters import converter_base
-from epubcreator.misc import xml_utils
 from epubcreator.epubbase import ebook_data
 from epubcreator.converters.docx import utils, styles, footnotes
 from epubcreator.misc.options import Option
@@ -86,7 +85,7 @@ class DocxConverter(converter_base.AbstractConverter):
         return self._ebookData
 
     def getRawText(self):
-        docText = "".join(xml_utils.xpath(self._documentXml, "//w:t/text()", namespaces=utils.NAMESPACES))
+        docText = "".join(utils.xpath(self._documentXml, "//w:t/text()"))
         footnotesText = "".join(self._footnotes.getRawText()) if self._footnotes else ""
 
         return docText + footnotesText
@@ -97,14 +96,14 @@ class DocxConverter(converter_base.AbstractConverter):
 
             path = '/ct:Types/ct:Override[@ContentType = "{0}"]/@PartName'
 
-            docPath = xml_utils.xpath(contentTypesXml, path.format(DocxConverter._DOCUMENT_CONTENT_TYPE), namespaces=utils.NAMESPACES)[0]
+            docPath = utils.xpath(contentTypesXml, path.format(DocxConverter._DOCUMENT_CONTENT_TYPE))[0]
             docPath = docPath.strip("/")
             self._documentXml = etree.parse(docx.open(docPath))
 
-            stylesPath = xml_utils.xpath(contentTypesXml, path.format(DocxConverter._STYLES_CONTENT_TYPE), namespaces=utils.NAMESPACES)[0]
+            stylesPath = utils.xpath(contentTypesXml, path.format(DocxConverter._STYLES_CONTENT_TYPE))[0]
             self._styles = styles.Styles(docx.open(stylesPath.strip("/")))
 
-            footnotesPath = xml_utils.xpath(contentTypesXml, path.format(DocxConverter._FOOTNOTES_CONTENT_TYPE), namespaces=utils.NAMESPACES)
+            footnotesPath = utils.xpath(contentTypesXml, path.format(DocxConverter._FOOTNOTES_CONTENT_TYPE))
             if footnotesPath:
                 footnotesPath = footnotesPath[0].strip("/")
 
@@ -132,7 +131,7 @@ class DocxConverter(converter_base.AbstractConverter):
     def _processDocument(self):
         self._currentSection = self._ebookData.createTextSection()
 
-        body = xml_utils.find(self._documentXml, "w:body", utils.NAMESPACES)
+        body = utils.find(self._documentXml, "w:body")
         self._processMainContent(body)
 
         self._currentSection.save()
@@ -386,7 +385,7 @@ class DocxConverter(converter_base.AbstractConverter):
             if child.tag.endswith("}t"):
                 self._currentSection.appendText(child.text)
             elif child.tag.endswith("}footnoteReference"):
-                footnoteId = xml_utils.xpath(run, "w:footnoteReference/@w:id", utils.NAMESPACES)[0]
+                footnoteId = utils.xpath(run, "w:footnoteReference/@w:id")[0]
                 self._footnotesIdSection.append((footnoteId, self._currentSection.name))
                 self._currentSection.insertNoteReference(len(self._footnotesIdSection))
             elif child.tag.endswith("}drawing") or child.tag.endswith("}pict"):
@@ -465,7 +464,7 @@ class DocxConverter(converter_base.AbstractConverter):
                 for node in child:
                     if node.tag.endswith("tc"):
                         if utils.hasText(node):
-                            paragraphsCount = xml_utils.xpath(node, "count(w:p)", namespaces=utils.NAMESPACES)
+                            paragraphsCount = utils.xpath(node, "count(w:p)")
 
                             # Uso el tag "p" si hay más de un párrafo.
                             if paragraphsCount > 1:
@@ -518,12 +517,12 @@ class DocxConverter(converter_base.AbstractConverter):
 
     def _processAlternateContent(self, alternateContent):
         pathToTxbxContent = "mc:Choice/w:drawing/wp:inline/a:graphic/a:graphicData/wps:wsp/wps:txbx/w:txbxContent"
-        txbxContent = xml_utils.find(alternateContent, pathToTxbxContent, utils.NAMESPACES)
+        txbxContent = utils.find(alternateContent, pathToTxbxContent)
         self._processMainContent(txbxContent, "span")
 
     def _getImageName(self, rId):
         if not self._isProcessingFootnotes:
-            imagePath = xml_utils.xpath(self._documentRelsXml, "rels:Relationship[@Id = '{0}']/@Target".format(rId), utils.NAMESPACES)[0]
+            imagePath = utils.xpath(self._documentRelsXml, "rels:Relationship[@Id = '{0}']/@Target".format(rId))[0]
             return os.path.split(imagePath)[1]
         else:
             return self._footnotes.getImageName(rId)

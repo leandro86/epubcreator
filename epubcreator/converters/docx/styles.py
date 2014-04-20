@@ -1,6 +1,5 @@
 from lxml import etree
 
-from epubcreator.misc import xml_utils
 from epubcreator.converters.docx import utils
 
 
@@ -18,11 +17,11 @@ class Styles:
         return styleId and (self._stylesIdToName[styleId][0].startswith("heading") or self._stylesIdToName[styleId][0].startswith("Encabezado"))
 
     def getParagraphStyleId(self, paragraph):
-        styleId = xml_utils.xpath(paragraph, "w:pPr/w:pStyle/@w:val", utils.NAMESPACES)
+        styleId = utils.xpath(paragraph, "w:pPr/w:pStyle/@w:val")
         return styleId[0] if styleId else None
 
     def getRunStyleId(self, run):
-        styleId = xml_utils.xpath(run, "w:rPr/w:rStyle/@w:val", utils.NAMESPACES)
+        styleId = utils.xpath(run, "w:rPr/w:rStyle/@w:val")
         return styleId[0] if styleId else None
 
     def getParagraphStyleName(self, paragraph):
@@ -70,12 +69,12 @@ class Styles:
 
         for child in xml.getroot():
             if child.tag.endswith("}style"):
-                attr = xml_utils.getAttr(child, "w:type", utils.NAMESPACES)
+                attr = utils.getAttr(child, "w:type")
                 if attr == "paragraph" or attr == "character":
-                    styleId = xml_utils.getAttr(child, "w:styleId", utils.NAMESPACES)
-                    styleName = xml_utils.xpath(child, "w:name/@w:val", utils.NAMESPACES)[0]
+                    styleId = utils.getAttr(child, "w:styleId")
+                    styleName = utils.xpath(child, "w:name/@w:val")[0]
 
-                    formatNode = xml_utils.find(child, "w:rPr" if attr == "character" else "w:pPr", utils.NAMESPACES)
+                    formatNode = utils.find(child, "w:rPr" if attr == "character" else "w:pPr")
                     # En los estilos, ignoro si tienen aplicado el formato subíndice o superíndice. Una de las
                     # razones es que abby finereader no parece utilizar este mecanismo al utilizar subs o sups, sino
                     # que utiliza directamente las etiquetas de formato en el run. Pero el motivo principal es que
