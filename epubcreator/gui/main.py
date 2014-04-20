@@ -4,14 +4,14 @@ import sip
 
 from PyQt4 import QtGui, QtCore
 
-from epubcreator.gui.misc import utils
+from epubcreator.misc import gui_utils
 from epubcreator.gui import main_window
 from epubcreator import config, version
 
 
 def handleUnknownException(exc_type, exc_value, exc_traceback):
     exceptionMessage = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
-    utils.displayExceptionErrorDialog(exceptionMessage)
+    gui_utils.displayExceptionErrorDialog(exceptionMessage)
 
 
 if __name__ == "__main__":

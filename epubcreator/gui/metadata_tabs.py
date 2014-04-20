@@ -2,7 +2,7 @@ import datetime
 
 from PyQt4 import QtGui, QtCore
 
-from epubcreator.gui.misc import language, utils
+from epubcreator.misc import language, gui_utils
 from epubcreator.gui.forms import basic_metadata_widget_ui, additional_metadata_widget_ui, author_metadata_widget_ui
 from epubcreator.epubbase import ebook_metadata
 
@@ -79,7 +79,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
     def _populateCoverModificationOptions(self):
         for i, option in enumerate(ebook_metadata.Metadata.COVER_MODIFICATION_OPTIONS):
             self.coverModificationInput.addItem(option[0])
-            self.coverModificationInput.setItemData(i, utils.formatTextForTooltip(option[1]), QtCore.Qt.ToolTipRole)
+            self.coverModificationInput.setItemData(i, gui_utils.formatTextForTooltip(option[1]), QtCore.Qt.ToolTipRole)
 
     def _populateLanguages(self):
         for languageName in language.Language.getSortedLanguagesNames():
@@ -265,11 +265,11 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget_ui.Ui_Additio
 
         for i, genre in enumerate(genres):
             self.genreGenreInput.addItem(genre[0])
-            self.genreGenreInput.setItemData(i, utils.formatTextForTooltip(genre[1]), QtCore.Qt.ToolTipRole)
+            self.genreGenreInput.setItemData(i, gui_utils.formatTextForTooltip(genre[1]), QtCore.Qt.ToolTipRole)
 
         for i, subGenre in enumerate(subGenres):
             self.genreSubGenreInput.addItem(subGenre[0])
-            self.genreSubGenreInput.setItemData(i, utils.formatTextForTooltip(subGenre[1]), QtCore.Qt.ToolTipRole)
+            self.genreSubGenreInput.setItemData(i, gui_utils.formatTextForTooltip(subGenre[1]), QtCore.Qt.ToolTipRole)
 
     def _addTranslatorToList(self):
         name = self.translatorInput.text().strip()

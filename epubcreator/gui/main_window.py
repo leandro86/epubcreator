@@ -6,7 +6,7 @@ from PyQt4 import QtGui
 
 from epubcreator.epubbase import ebook
 from epubcreator.converters import converter_factory
-from epubcreator.gui.misc import settings_store, utils
+from epubcreator.misc import settings_store, gui_utils
 from epubcreator.gui.forms import main_window_ui
 from epubcreator.gui import preferences, about
 from epubcreator import version, config
@@ -97,7 +97,7 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
 
                     self._showMessageOnStatusBar(statusBarMsg, 5000)
                 except IOError as e:
-                    utils.displayStdErrorDialog("Ocurrió un error al intentar guardar el epub.", str(e))
+                    gui_utils.displayStdErrorDialog("Ocurrió un error al intentar guardar el epub.", str(e))
                     self._showMessageOnStatusBar("No se pudo generar el ePub.")
 
     def _openInSigil(self, sigilPath, fileName):
@@ -118,7 +118,7 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
                 subprocess.Popen([sigilPath, fileName])
             return True
         except Exception as e:
-            utils.displayStdErrorDialog("Sigil no pudo abrirse. Compruebe que la ruta sea correcta.", str(e))
+            gui_utils.displayStdErrorDialog("Sigil no pudo abrirse. Compruebe que la ruta sea correcta.", str(e))
             return False
 
     def _showMessageOnStatusBar(self, message, duration=0):
@@ -190,8 +190,8 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
         isTextMissing = re.sub(r"\s+", "", rawText) != re.sub(r"\s+", "", sectionsText)
 
         if isTextMissing:
-            utils.displayStdErrorDialog("Se ha perdido texto en la conversión. Por favor, repórtalo a los desarrolladores y adjunta "
-                                        "el documento fuente.")
+            gui_utils.displayStdErrorDialog("Se ha perdido texto en la conversión. Por favor, repórtalo a los desarrolladores y adjunta "
+                                            "el documento fuente.")
 
     def _close(self):
         QtGui.qApp.closeAllWindows()

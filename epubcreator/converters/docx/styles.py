@@ -1,6 +1,6 @@
 from lxml import etree
 
-from epubcreator.converters import xml_utils
+from epubcreator.misc import xml_utils
 from epubcreator.converters.docx import utils
 
 

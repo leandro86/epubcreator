@@ -3,7 +3,7 @@ import unittest
 import sys
 
 from epubcreator.converters.docx import docx_converter
-from epubcreator.test import utils
+from epubcreator.misc import utils
 
 TESTS_WITH_CUSTOM_OPTIONS = {"character_styles": dict(ignoreEmptyParagraphs=False),
                              "empty_paragraphs_conversion": dict(ignoreEmptyParagraphs=False),

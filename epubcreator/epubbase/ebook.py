@@ -5,7 +5,7 @@ import mako.template
 from epubcreator.pyepub.pyepubwriter import epub
 
 from epubcreator.epubbase import ebook_metadata, ebook_data, epubbase_names
-from epubcreator.epubbase.misc import utils
+from epubcreator.misc import utils
 from epubcreator import config
 from epubcreator.misc.options import Options, Option
 

@@ -3,7 +3,7 @@ import platform
 from PyQt4 import QtGui, QtCore
 
 from epubcreator.gui.forms import preferences_general_widget_ui, preferences_docx_widget_ui, preferences_epub_widget_ui
-from epubcreator.gui.misc import settings_store, utils
+from epubcreator.misc import settings_store, gui_utils
 from epubcreator.converters.docx import docx_converter
 from epubcreator.epubbase import ebook
 
@@ -51,9 +51,9 @@ class GeneralPreferences(PreferencesAbstract, preferences_general_widget_ui.Ui_G
             self.sigilPathInput.setText(fileName)
 
     def _extendUi(self):
-        self.editorInput.setToolTip(utils.formatTextForTooltip("El alias del editor."))
-        self.sigilPathInput.setToolTip(utils.formatTextForTooltip("Si se desea abrir automáticamente con Sigil el epub generado, entonces "
-                                                                  "completar este campo con la ruta hacia el ejecutable."))
+        self.editorInput.setToolTip(gui_utils.formatTextForTooltip("El alias del editor."))
+        self.sigilPathInput.setToolTip(gui_utils.formatTextForTooltip("Si se desea abrir automáticamente con Sigil el epub generado, entonces "
+                                                                      "completar este campo con la ruta hacia el ejecutable."))
 
 
 class DocxPreferences(PreferencesAbstract, preferences_docx_widget_ui.Ui_DocxPreferences):
@@ -75,7 +75,7 @@ class DocxPreferences(PreferencesAbstract, preferences_docx_widget_ui.Ui_DocxPre
         self.ignoreEmptyParagraphsInput.setCheckState(QtCore.Qt.Checked if settings.docxIgnoreEmptyParagraphs else QtCore.Qt.Unchecked)
 
     def _extendUi(self):
-        description = utils.formatTextForTooltip(docx_converter.DocxConverter.getOptionDescription("ignoreEmptyParagraphs"))
+        description = gui_utils.formatTextForTooltip(docx_converter.DocxConverter.getOptionDescription("ignoreEmptyParagraphs"))
         self.ignoreEmptyParagraphsInput.setToolTip(description)
 
 
@@ -98,5 +98,5 @@ class EpubPreferences(PreferencesAbstract, preferences_epub_widget_ui.Ui_EpubBas
         self.includeOptionalFilesInput.setCheckState(QtCore.Qt.Checked if settings.epubOutputIncludeOptionalFiles else QtCore.Qt.Unchecked)
 
     def _extendUi(self):
-        description = utils.formatTextForTooltip(ebook.Ebook.getOptionDescription("includeOptionalFiles"))
+        description = gui_utils.formatTextForTooltip(ebook.Ebook.getOptionDescription("includeOptionalFiles"))
         self.includeOptionalFilesInput.setToolTip(description)
