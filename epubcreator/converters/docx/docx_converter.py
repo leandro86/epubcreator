@@ -38,10 +38,8 @@ class DocxConverter(converter_base.AbstractConverter):
         # El objeto Section actual en el cual estoy escribiendo.
         self._currentSection = None
 
-        # Una lista de tuplas de dos elementos: un objeto Title, y un número con el nivel de heading. Utilizo
-        # esta lista para formatear correctamente la toc.
-        # En todoo momento, siempre el último elemento de la lista (la cima de la pila) contiene el último título
-        # leído.
+        # Una lista de números con los niveles de heading. Utilizo esta lista para corregir el anidamiento de headings
+        # en el docx. En todoo momento, siempre el último elemento de la lista (la cima de la pila) contiene el último título leído.
         self._titles = None
 
         # Representa cuál es, en un momento dado, el nivel de heading de primer nivel, es decir, el que vendría a ser
@@ -131,12 +129,12 @@ class DocxConverter(converter_base.AbstractConverter):
                 self._mediaFiles[os.path.split(imgPath)[1]] = docx.read(imgPath)
 
     def _processDocument(self):
-        self._currentSection = ebook_data.TextSection(1)
+        self._currentSection = self._ebookData.createTextSection()
 
         body = xml_utils.find(self._documentXml, "w:body", utils.NAMESPACES)
         self._processMainContent(body)
 
-        self._saveCurrentSection()
+        self._currentSection.save()
 
     def _processMainContent(self, node, tag="p"):
         """
@@ -153,7 +151,8 @@ class DocxConverter(converter_base.AbstractConverter):
                 pageBreakPosition = utils.getPageBreakPosition(child)
 
                 if pageBreakPosition == utils.PAGE_BREAK_ON_BEGINNING:
-                    self._saveCurrentSection()
+                    self._currentSection.save()
+                    self._currentSection = self._ebookData.createTextSection()
 
                 if self._styles.hasParagraphHeadingStyle(child):
                     self._processHeading(child, hasParagraphText)
@@ -165,7 +164,8 @@ class DocxConverter(converter_base.AbstractConverter):
                         self._processParagraph(child, hasParagraphText, tag, previousEmptyParagraphsCount)
 
                 if pageBreakPosition == utils.PAGE_BREAK_ON_END:
-                    self._saveCurrentSection()
+                    self._currentSection.save()
+                    self._currentSection = self._ebookData.createTextSection()
 
                 if hasParagraphText or pageBreakPosition != utils.NO_PAGE_BREAK:
                     previousEmptyParagraphsCount = 0
@@ -185,16 +185,12 @@ class DocxConverter(converter_base.AbstractConverter):
                 # Los títulos en un docx no necesariamente está correctamente anidados: se puede tener un Título 1
                 # seguido de un Titulo 3, por ejemplo. A medida que genero la toc, corrijo estos títulos, de manera
                 # tal que en el ejemplo anterior, el Título 3 sea convertido a Título 2.
-
-                titleText = xml_utils.getAllText(paragraph)
-
                 if headingLevel < self._headingLevelBase:
                     self._headingLevelBase = headingLevel
 
                 # Si es un heading de primer nivel, entonces ésta es una entrada en la toc de primer nivel.
                 if headingLevel == self._headingLevelBase:
                     self._titles.clear()
-                    title, titleId = self._ebookData.toc.addFirstLevelTitle(self._currentSection.name, titleText)
                 else:
                     # Si el nivel de título actual es menor al anterior, debo sacar los títulos necesarios
                     # de mi pila para poner el título actual en el nivel que corresponde. Ejemplo:
@@ -207,8 +203,8 @@ class DocxConverter(converter_base.AbstractConverter):
                     # título 2 sea menor o igual al que se encuentra en la pila, debo hacer un pop.
                     # De esta manera me queda en la cima de la pila el título padre en el cual debo insertar mi
                     # título 2 hijo.
-                    if headingLevel < self._titles[-1][1]:
-                        while headingLevel <= self._titles[-1][1]:
+                    if headingLevel < self._titles[-1]:
+                        while headingLevel <= self._titles[-1]:
                             self._titles.pop()
                     # Si el nivel de título actual es igual al anterior procesado, significa que los títulos tienen el
                     # mismo padre, por lo que me basta hacer un solo pop en la pila para insertarlo en el lugar
@@ -217,19 +213,17 @@ class DocxConverter(converter_base.AbstractConverter):
                     #                       5
                     # Si tengo que insertar un nuevo título 5 en la toc de arriba, debo sacar el título 5 de la
                     # cima de la pila para que quede el título 4 en la cima.
-                    elif headingLevel == self._titles[-1][1]:
+                    elif headingLevel == self._titles[-1]:
                         self._titles.pop()
 
-                    title, titleId = self._ebookData.toc.addTitleToParent(self._titles[-1][0], self._currentSection.name, titleText)
-
-                self._titles.append((title, headingLevel))
+                self._titles.append(headingLevel)
 
                 # Dado que en la pila no tengo títulos repetidos (si el último título insertado era de nivel 4 y ahora
                 # debo insertar otro de nivel 4, entonces hago un pop del título anterior e inserto el nuevo) la
                 # cantidad de títulos que hay en la pila me da el nivel de anidamiento correcto para el título actual.
                 fixedHeadingNumber = len(self._titles)
 
-                self._currentSection.openHeading(fixedHeadingNumber, titleId)
+                self._currentSection.openHeading(fixedHeadingNumber)
                 self._processParagraphContent(paragraph)
                 self._currentSection.closeHeading(fixedHeadingNumber)
 
@@ -489,7 +483,7 @@ class DocxConverter(converter_base.AbstractConverter):
         self._currentSection.closeTag("table")
 
     def _processFootnotes(self):
-        self._currentSection = ebook_data.NotesSection()
+        self._currentSection = self._ebookData.createNotesSection()
 
         for footnoteId, footnoteSection in self._footnotesIdSection:
             footnote = self._footnotes.getFootnote(footnoteId)
@@ -500,7 +494,7 @@ class DocxConverter(converter_base.AbstractConverter):
             # de una nota.
             self._processFootnote(footnote, footnoteSection)
 
-        self._saveCurrentSection()
+        self._currentSection.save()
 
     def _processFootnote(self, footnote, footnoteSection):
         self._currentSection.openNote(footnoteSection)
@@ -518,17 +512,13 @@ class DocxConverter(converter_base.AbstractConverter):
         imageName = self._getImageName(imageId)
         self._currentSection.appendImg(imageName)
 
-        if imageName not in (img.name for img in self._ebookData.images):
+        if not any(i for i in self._ebookData.iterImages() if i.name == imageName):
             self._ebookData.addImage(imageName, self._mediaFiles[imageName])
 
     def _processAlternateContent(self, alternateContent):
         pathToTxbxContent = "mc:Choice/w:drawing/wp:inline/a:graphic/a:graphicData/wps:wsp/wps:txbx/w:txbxContent"
         txbxContent = xml_utils.find(alternateContent, pathToTxbxContent, utils.NAMESPACES)
         self._processMainContent(txbxContent, "span")
-
-    def _saveCurrentSection(self):
-        self._ebookData.addSection(self._currentSection)
-        self._currentSection = ebook_data.TextSection(len(self._ebookData.sections) + 1)
 
     def _getImageName(self, rId):
         if not self._isProcessingFootnotes:

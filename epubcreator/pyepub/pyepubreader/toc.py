@@ -1,3 +1,4 @@
+import os
 from lxml import etree
 
 
@@ -8,15 +9,21 @@ class Toc:
         self._toc = etree.parse(toc)
 
     def getTitles(self):
+        def addTitles(parentNavPoint):
+            titles = []
+
+            childNavPoints = self._xpath(parentNavPoint, "toc:navPoint")
+            for navPoint in childNavPoints:
+                text = self._xpath(navPoint, "toc:navLabel/toc:text/text()")[0]
+                src = os.path.split(self._xpath(navPoint, "toc:content/@src")[0])[1]
+
+                childTitles = addTitles(navPoint)
+                titles.append((text, src, childTitles))
+
+            return titles
+
         navMap = self._xpath(self._toc, "/toc:ncx/toc:navMap")[0]
-        titles = []
-
-        for navPoint in navMap:
-            text = self._xpath(navPoint, "toc:navLabel/toc:text/text()")[0]
-            src = self._xpath(navPoint, "toc:content/@src")[0]
-            titles.append((text, src))
-
-        return titles
+        return addTitles(navMap)
 
     def _xpath(self, element, xpath):
         return element.xpath(xpath, namespaces={"toc": Toc._TOC_NS})

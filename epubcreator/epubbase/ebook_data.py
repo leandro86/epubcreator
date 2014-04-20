@@ -1,3 +1,5 @@
+import itertools
+
 from lxml import etree
 
 from epubcreator.epubbase import epubbase_names
@@ -5,20 +7,53 @@ from epubcreator.epubbase import epubbase_names
 
 class EbookData:
     def __init__(self):
-        # Lista de Section.
-        self.sections = []
+        self._textSections = []
+        self._notesSections = []
+        self._images = []
+        self._headingsCount = 0
 
-        # Lista de Image.
-        self.images = []
+    def createTextSection(self):
+        return TextSection(self)
 
-        # Un objeto Toc.
-        self.toc = Toc()
-
-    def addSection(self, section):
-        self.sections.append(section)
+    def createNotesSection(self):
+        return NotesSection(self)
 
     def addImage(self, imageName, imageContent):
-        self.images.append(Image(imageName, imageContent))
+        self._images.append(Image(imageName, imageContent))
+
+    def iterTextSections(self):
+        for section in self._textSections:
+            yield section
+
+    def iterNotesSections(self):
+        for section in self._notesSections:
+            yield section
+
+    def iterAllSections(self):
+        return itertools.chain(self.iterTextSections(), self.iterNotesSections())
+
+    def iterImages(self):
+        for image in self._images:
+            yield image
+
+    def countTextSections(self):
+        return len(self._textSections)
+
+    def countNotesSections(self):
+        return len(self._notesSections)
+
+    ### #################################################################################### ###
+    ### Métodos visibles solamente a este módulo, con el único fin de ser usados por Section ###
+    ### #################################################################################### ###
+    def _addTextSection(self, section):
+        self._textSections.append(section)
+
+    def _addNotesSection(self, section):
+        self._notesSections.append(section)
+
+    def _getHeadingId(self):
+        self._headingsCount += 1
+        return "heading_id_{0}".format(self._headingsCount)
 
 
 class Section:
@@ -28,9 +63,10 @@ class Section:
     _TEXT = 0
     _TAIL = 1
 
-    def __init__(self, sectionNumber):
-        self.name = self._generateSectionName(sectionNumber)
+    def __init__(self, ebookData):
+        self._ebookData = ebookData
 
+        self.name = self._generateSectionName()
         self._html = etree.Element("html", xmlns="http://www.w3.org/1999/xhtml")
 
         head = etree.Element("head")
@@ -85,10 +121,10 @@ class Section:
         self._lastElement = e
         self._textWritePos = Section._TAIL
 
-    def openHeading(self, level, headingId=None):
+    def openHeading(self, level, hasIdAttr=True):
         tag = "h{0}".format(level)
-        if headingId:
-            self.openTag(tag, id=headingId)
+        if hasIdAttr:
+            self.openTag(tag, id=self._ebookData._getHeadingId())
         else:
             self.openTag(tag)
 
@@ -100,6 +136,9 @@ class Section:
         self.openTag("img", alt="", src="../Images/{0}".format(imageName))
         self.closeTag("img")
 
+    def xpath(self, expr):
+        return self._html.xpath(expr)
+
     def toHtml(self):
         return etree.tostring(self._html, xml_declaration=True, pretty_print=True, encoding="utf-8", doctype=Section._DOCTYPE)
 
@@ -107,7 +146,10 @@ class Section:
         text = self._html.xpath("//text()")
         return "".join(text)
 
-    def _generateSectionName(self, sectionNumber):
+    def save(self):
+        raise NotImplemented
+
+    def _generateSectionName(self):
         raise NotImplemented
 
     def _writeTextBuffer(self):
@@ -122,8 +164,8 @@ class Section:
 
 
 class TextSection(Section):
-    def __init__(self, sectionNumber):
-        super().__init__(sectionNumber)
+    def __init__(self, ebookData):
+        super().__init__(ebookData)
 
     def insertNoteReference(self, noteNumber):
         self.openTag("a", id="rf{0}".format(noteNumber), href="../Text/notas.xhtml#nt{0}".format(noteNumber))
@@ -132,24 +174,27 @@ class TextSection(Section):
         self.closeTag("sup")
         self.closeTag("a")
 
+    def save(self):
+        self._ebookData._addTextSection(self)
+
     def toRawText(self):
         # Debo ignorar las referencias a las notas al pie.
         text = self._html.xpath("//*[not(self::sup[parent::a[starts-with(@id, 'rf')]])]/text()")
         return "".join(text)
 
-    def _generateSectionName(self, sectionNumber):
-        return epubbase_names.generateTextSectionName(sectionNumber)
+    def _generateSectionName(self):
+        return epubbase_names.generateTextSectionName(self._ebookData.countTextSections() + 1)
 
 
 class NotesSection(Section):
-    def __init__(self, sectionNumber=0):
-        super().__init__(sectionNumber)
+    def __init__(self, ebookData):
+        super().__init__(ebookData)
 
         self._footnotesCount = 0
         self._currentFootnoteSection = ""
         self._hasCurrentFootnoteContent = True
 
-        self.openHeading(1)
+        self.openHeading(1, hasIdAttr=False)
         self.appendText("Notas")
         self.closeHeading(1)
 
@@ -199,6 +244,9 @@ class NotesSection(Section):
         self._lastElement.append(anchor)
         self.closeTag("div")
 
+    def save(self):
+        self._ebookData._addNotesSection(self)
+
     def toRawText(self):
         # Debo obviar el título "Notas", el texto del primer superíndice y el texto del link de retorno.
         text = self._html.xpath("//*[not(self::a) and "
@@ -206,7 +254,7 @@ class NotesSection(Section):
                                 ". != /html/body/child::*[1]]/text()")
         return "".join(text)
 
-    def _generateSectionName(self, sectionNumber):
+    def _generateSectionName(self):
         return epubbase_names.NOTES_FILENAME
 
 
@@ -215,54 +263,8 @@ class Image:
         self.name = name
         self.content = content
 
-
-class Toc:
-    def __init__(self):
-        self.titles = []
-        self._titlesCount = 0
-
-    def addFirstLevelTitle(self, sectionName, titleText, generateId=True):
-        self._titlesCount += 1
-
-        title, titleId = self._createTitle(sectionName, titleText, generateId)
-        self.titles.append(title)
-
-        return title, titleId
-
-    def addTitleToParent(self, parentTitle, sectionName, titleText, generateId=True):
-        self._titlesCount += 1
-
-        title, titleId = self._createTitle(sectionName, titleText, generateId)
-        parentTitle.addTitle(title)
-
-        return title, titleId
-
-    def getTotalTitlesCount(self):
-        return self._titlesCount
-
-    def getFirstLevelTitlesCount(self):
-        return len(self.titles)
-
-    def _createTitle(self, sectionName, titleText, generateId=True):
-        titleLocation = sectionName
-        titleId = None
-
-        if generateId:
-            titleId = "heading_id_{0}".format(self._titlesCount)
-            titleLocation += "#{0}".format(titleId)
-
-        title = Title(titleLocation, titleText)
-        return title, titleId
-
-
-class Title:
-    def __init__(self, titleLocation, titleText):
-        self.titleLocation = titleLocation
-        self.text = titleText
-        self.childTitles = []
-
-    def addTitle(self, title):
-        self.childTitles.append(title)
+    def __str__(self):
+        return self.name
 
 
 class CloseTagMismatchError(Exception):

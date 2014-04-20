@@ -67,11 +67,11 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
             settings = settings_store.SettingsStore()
             metadata.editor = settings.editor
 
-            data, rawText = self._prepareEbook()
-            eebook = ebook.Ebook(data, metadata, **settings.getAllSettingsForEbook())
+            ebookData, rawText = self._prepareEbook()
+            eebook = ebook.Ebook(ebookData, metadata, **settings.getAllSettingsForEbook())
 
-            if data:
-                self._checkForMissingText(data.sections, rawText)
+            if ebookData:
+                self._checkForMissingText(ebookData, rawText)
 
             # Por defecto guardo el epub en el mismo directorio donde se encuentra
             # el archivo de origen.
@@ -165,7 +165,7 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
     def _prepareEbook(self):
         settings = settings_store.SettingsStore()
 
-        data = None
+        ebookData = None
         rawText = None
 
         if self._workingFilePath:
@@ -174,13 +174,13 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
 
             converter = converter_factory.ConverterFactory.getConverter(self._workingFilePath, **options)
 
-            data = converter.convert()
+            ebookData = converter.convert()
             rawText = converter.getRawText()
 
-        return data, rawText
+        return ebookData, rawText
 
-    def _checkForMissingText(self, sections, rawText):
-        sectionsText = "".join((s.toRawText() for s in sections))
+    def _checkForMissingText(self, ebookData, rawText):
+        sectionsText = "".join((s.toRawText() for s in ebookData.iterAllSections()))
 
         # Elimino absolutamente todos los espacios (espacios, tabs, non breaking spaces, etc) al comparar el texto.
         # No solo lo hago porque principalemente lo único que me importa es que no se haya perdido texto en la

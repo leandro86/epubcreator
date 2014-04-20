@@ -663,7 +663,10 @@ class AuthorTest(unittest.TestCase):
         self.assertEqual(htmlFiles[-1], "autor.xhtml")
 
     def test_author_file_is_second_to_last_in_play_order_when_epub_contains_notes(self):
-        self._common.generateEbook([ebook_data.NotesSection()])
+        ebookData = ebook_data.EbookData()
+        ebookData.createNotesSection().save()
+
+        self._common.generateEbook(ebookData)
 
         htmlFiles = self._common.outputEpub.getHtmlFileNamesReadingOrder()
         self.assertEqual(htmlFiles[-2], "autor.xhtml")
@@ -958,9 +961,9 @@ class TocTest(unittest.TestCase):
 
         self._common.generateEbook()
 
-        titles = [t[0] for t in self._common.outputEpub.getTitles()]
+        titles = self._common.outputEpub.getTitles()
 
-        self.assertEqual(titles[-1], "Autor")
+        self.assertEqual(titles[-1], ("Autor", "autor.xhtml", []))
 
     def test_author_entry_when_male_author(self):
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla"))
@@ -995,17 +998,17 @@ class TocTest(unittest.TestCase):
 
         titles = self._common.outputEpub.getTitles()
 
-        self.assertEqual([t[0] for t in titles], ["Cubierta", "Título"])
-        self.assertTrue(titles[0][1].endswith("cubierta.xhtml"))
-        self.assertTrue(titles[1][1].endswith("titulo.xhtml"))
+        self.assertEqual(titles, [("Cubierta", "cubierta.xhtml", []), ("Título", "titulo.xhtml", [])])
 
     def test_notes_entry_exists_when_epub_contains_notes(self):
-        self._common.generateEbook([ebook_data.NotesSection()])
+        ebookData = ebook_data.EbookData()
+        ebookData.createNotesSection().save()
+
+        self._common.generateEbook(ebookData)
 
         titles = self._common.outputEpub.getTitles()
 
-        self.assertEqual(titles[-1][0], "Notas")
-        self.assertTrue(titles[-1][1].endswith("notas.xhtml"))
+        self.assertEqual(titles[-1], ("Notas", "notas.xhtml", []))
 
     def test_title_entry(self):
         self._common.metadata.title = "El título del libro"
@@ -1015,6 +1018,132 @@ class TocTest(unittest.TestCase):
         titles = [t[0] for t in self._common.outputEpub.getTitles()]
 
         self.assertEqual(titles[1], "El título del libro")
+
+    def test_simple_toc(self):
+        ebookData = ebook_data.EbookData()
+        section = ebookData.createTextSection()
+
+        for i in (1, 1, 2, 3, 1, 2):
+            section.openHeading(i)
+            section.appendText(str(i))
+            section.closeHeading(i)
+
+        section.save()
+
+        self._common.generateEbook(ebookData, includeOptionalFiles=False)
+
+        # Salteo los títulos de cubierta.xhtml y titulo.xhtml.
+        titles = self._common.outputEpub.getTitles()[2:]
+        self.assertEqual(titles,
+                         [("1", "Section0001.xhtml#heading_id_1", []),
+                          ("1", "Section0001.xhtml#heading_id_2", [
+                              ("2", "Section0001.xhtml#heading_id_3", [
+                                  ("3", "Section0001.xhtml#heading_id_4", [])])]),
+                          ("1", "Section0001.xhtml#heading_id_5", [
+                              ("2", "Section0001.xhtml#heading_id_6", [])])])
+
+    def test_complex_toc(self):
+        ebookData = ebook_data.EbookData()
+        section = ebookData.createTextSection()
+
+        for i in (1, 2, 3, 4, "N", 2, 2, 3, "N", 4, 1, "N", 2, 2, 3, 2, 3, 4, 5, "N", 6, 5, 5, 4, "N", 3, "N", 3, 4, 5, 3):
+            if i == "N":
+                section.save()
+                section = ebookData.createTextSection()
+            else:
+                section.openHeading(i)
+                section.appendText(str(i))
+                section.closeHeading(i)
+
+        section.save()
+
+        self._common.generateEbook(ebookData, includeOptionalFiles=False)
+
+        # Salteo título de cubierta.xhtml y titulo.xhtml.
+        titles = self._common.outputEpub.getTitles()[2:]
+        self.assertEqual(titles,
+                         [("1", "Section0001.xhtml#heading_id_1", [
+                             ("2", "Section0001.xhtml#heading_id_2", [
+                                 ("3", "Section0001.xhtml#heading_id_3", [
+                                     ("4", "Section0001.xhtml#heading_id_4", [])
+                                 ])
+                             ]),
+                             ("2", "Section0002.xhtml#heading_id_5", []),
+                             ("2", "Section0002.xhtml#heading_id_6", [
+                                 ("3", "Section0002.xhtml#heading_id_7", [
+                                     ("4", "Section0003.xhtml#heading_id_8", [])
+                                 ])
+                             ])]),
+                          ("1", "Section0003.xhtml#heading_id_9", [
+                              ("2", "Section0004.xhtml#heading_id_10", []),
+                              ("2", "Section0004.xhtml#heading_id_11", [
+                                  ("3", "Section0004.xhtml#heading_id_12", [])
+                              ]),
+                              ("2", "Section0004.xhtml#heading_id_13", [
+                                  ("3", "Section0004.xhtml#heading_id_14", [
+                                      ("4", "Section0004.xhtml#heading_id_15", [
+                                          ("5", "Section0004.xhtml#heading_id_16", [
+                                              ("6", "Section0005.xhtml#heading_id_17", [])
+                                          ]),
+                                          ("5", "Section0005.xhtml#heading_id_18", []),
+                                          ("5", "Section0005.xhtml#heading_id_19", [])
+                                      ]),
+                                      ("4", "Section0005.xhtml#heading_id_20", [])
+                                  ]),
+                                  ("3", "Section0006.xhtml#heading_id_21", []),
+                                  ("3", "Section0007.xhtml#heading_id_22", [
+                                      ("4", "Section0007.xhtml#heading_id_23", [
+                                          ("5", "Section0007.xhtml#heading_id_24", [])
+                                      ])
+                                  ]),
+                                  ("3", "Section0007.xhtml#heading_id_25", [])
+                              ])
+                          ])])
+
+    def test_strip_tags_from_title_text(self):
+        ebookData = ebook_data.EbookData()
+        section = ebookData.createTextSection()
+
+        section.openHeading(1)
+        section.openTag("em")
+        section.appendText("Este es el título 1")
+        section.closeTag("em")
+        section.closeHeading(1)
+
+        section.openHeading(1)
+        section.appendText("Este es el ")
+        section.openTag("em")
+        section.appendText("título ")
+        section.closeTag("em")
+        section.openTag("strong")
+        section.appendText("2")
+        section.closeTag("strong")
+        section.closeHeading(1)
+
+        section.openHeading(1)
+        section.appendText("Este ")
+        section.openTag("span")
+        section.appendText("es ")
+        section.openTag("em")
+        section.appendText("el título ")
+        section.closeTag("em")
+        section.openTag("strong")
+        section.appendText("3")
+        section.closeTag("strong")
+        section.closeTag("span")
+        section.closeHeading(1)
+
+        section.openHeading(1)
+        section.appendText("Título sin tags")
+        section.closeHeading(1)
+
+        section.save()
+
+        self._common.generateEbook(ebookData, includeOptionalFiles=False)
+
+        # Salteo los títulos de cubierta.xhtml y titulo.xhtml.
+        titles = [t[0] for t in self._common.outputEpub.getTitles()[2:]]
+        self.assertEqual(titles, ["Este es el título 1", "Este es el título 2", "Este es el título 3", "Título sin tags"])
 
 
 class EpubFileNameTest(unittest.TestCase):
@@ -1240,12 +1369,8 @@ class Common:
     def xpath(self, element, xpath):
         return element.xpath(xpath, namespaces=Common.NAMESPACES)
 
-    def generateEbook(self, sections=None, includeOptionalFiles=True):
-        ebookData = ebook_data.EbookData()
-
-        if sections:
-            for section in sections:
-                ebookData.addSection(section)
+    def generateEbook(self, ebookData=None, includeOptionalFiles=True):
+        ebookData = ebookData or ebook_data.EbookData()
 
         eebook = ebook.Ebook(ebookData, self.metadata, includeOptionalFiles=includeOptionalFiles)
         fileName = eebook.save(self._outputFile)

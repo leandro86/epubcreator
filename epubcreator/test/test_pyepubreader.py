@@ -52,11 +52,11 @@ class PyEpubReaderTest(unittest.TestCase):
         self.assertFalse(self._epub.hasFile("no_existe.xhtml"))
 
     def test_get_titles(self):
-        self.assertEqual(self._epub.getTitles(), [("Cubierta", "Text/cubierta.xhtml"),
-                                                  ("Título", "Text/titulo.xhtml"),
-                                                  ("Capítulo 1", "Text/Section0001.xhtml"),
-                                                  ("Autor", "Text/autor.xhtml"),
-                                                  ("Notas", "Text/notas.xhtml")])
+        self.assertEqual(self._epub.getTitles(), [("Cubierta", "cubierta.xhtml", []),
+                                                  ("Título", "titulo.xhtml", []),
+                                                  ("Capítulo 1", "Section0001.xhtml", []),
+                                                  ("Autor", "autor.xhtml", []),
+                                                  ("Notas", "notas.xhtml", [])])
 
     def test_get_full_path_to_file(self):
         self.assertEqual(self._epub.getFullPathToFile("cubierta.xhtml"), "OEBPS/Text/cubierta.xhtml")

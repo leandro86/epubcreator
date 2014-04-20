@@ -13,7 +13,11 @@ TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "test_data", "converters
 
 
 class DocxConverterTest(unittest.TestCase):
-    pass
+    def test_images_were_added(self):
+        converter = docx_converter.DocxConverter(os.path.join(TEST_DATA_DIR, "images.docx"))
+        ebookData = converter.convert()
+
+        self.assertEqual(len(list(ebookData.iterImages())), 9)
 
 
 def makeTest(docxFilePath, outputFolder, **options):
@@ -30,7 +34,7 @@ def makeTest(docxFilePath, outputFolder, **options):
         #     with open(os.path.join(outputDir, section.name), "wb") as file:
         #         file.write(section.toHtml())
 
-        for section in ebookData.sections:
+        for section in ebookData.iterAllSections():
             with open(os.path.join(outputFolder, section.name), mode="rb") as file:
                 utils.assertXhtmlsAreEqual(section.toHtml(), file.read())
 
