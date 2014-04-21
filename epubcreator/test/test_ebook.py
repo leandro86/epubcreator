@@ -1145,6 +1145,36 @@ class TocTest(unittest.TestCase):
         titles = [t[0] for t in self._common.outputEpub.getTitles()[2:]]
         self.assertEqual(titles, ["Este es el título 1", "Este es el título 2", "Este es el título 3", "Título sin tags"])
 
+    def test_replace_br_with_space(self):
+        ebookData = ebook_data.EbookData()
+        section = ebookData.createTextSection()
+
+        section.openHeading(1)
+        section.appendText("Título con un")
+        section.openTag("br")
+        section.closeTag("br")
+        section.appendText("salto de línea manual")
+        section.closeHeading(1)
+
+        section.openHeading(1)
+        section.appendText("Título con")
+        section.openTag("strong")
+        section.openTag("br")
+        section.closeTag("br")
+        section.appendText("dos saltos de")
+        section.closeTag("strong")
+        section.openTag("br")
+        section.closeTag("br")
+        section.appendText("líneas manuales")
+        section.closeHeading(1)
+        section.save()
+
+        self._common.generateEbook(ebookData, includeOptionalFiles=False)
+
+        # Salteo los títulos de cubierta.xhtml y titulo.xhtml.
+        titles = [t[0] for t in self._common.outputEpub.getTitles()[2:]]
+        self.assertEqual(titles, ["Título con un salto de línea manual", "Título con dos saltos de líneas manuales"])
+
 
 class EpubFileNameTest(unittest.TestCase):
     def setUp(self):

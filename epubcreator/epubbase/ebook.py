@@ -2,8 +2,9 @@ import os
 import copy
 
 import mako.template
-from epubcreator.pyepub.pyepubwriter import epub
+from lxml import etree
 
+from epubcreator.pyepub.pyepubwriter import epub
 from epubcreator.epubbase import ebook_metadata, ebook_data, names
 from epubcreator.misc import utils
 from epubcreator import config
@@ -186,7 +187,7 @@ class Ebook(Options):
                 for h in hs:
                     currentLevel = h.tag[-1]
 
-                    titleText = "".join(h.xpath("descendant::text()"))
+                    titleText = self._getTitleText(h)
                     titleId = h.get("id")
                     titleSrc = "{0}{1}".format(section.name, "#" + titleId if titleId else "")
 
@@ -378,3 +379,20 @@ class Ebook(Options):
             return "Autor"
         else:
             return "Autores" if len(authors) > 1 else "Autora"
+
+    def _getTitleText(self, h):
+        """
+        Retorna el texto de un título, reemplazando los tags "br" por un espacio.
+        """
+        if h.xpath("descendant::br"):
+            # No puedo modificar el element "h" directamente, sino que necesito
+            # trabajar sobre una copia. Una deep copy es otra opción, pero creo
+            # que va a terminar copiando todoo el tree...
+            h = etree.fromstring(etree.tostring(h))
+
+            for br in h.xpath("descendant::br"):
+                br.text = " "
+
+            etree.strip_tags(h, "br")
+
+        return "".join(h.xpath("descendant::text()"))
