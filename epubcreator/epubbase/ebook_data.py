@@ -52,9 +52,9 @@ class EbookData:
     def _addNotesSection(self, section):
         self._notesSections.append(section)
 
-    def _getHeadingId(self):
+    def _countHeadings(self):
         self._headingsCount += 1
-        return "heading_id_{0}".format(self._headingsCount)
+        return self._headingsCount
 
     def _addNoteReference(self, sectionName):
         self._notesReferences.append(sectionName)
@@ -134,7 +134,7 @@ class Section:
     def openHeading(self, level, hasIdAttr=True):
         tag = "h{0}".format(level)
         if hasIdAttr:
-            self.openTag(tag, id=self._ebookData._getHeadingId())
+            self.openTag(tag, id="heading_id_{0}".format(self._ebookData._countHeadings()))
         else:
             self.openTag(tag)
 
