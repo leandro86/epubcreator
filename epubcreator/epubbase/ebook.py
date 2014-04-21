@@ -4,7 +4,7 @@ import copy
 import mako.template
 from epubcreator.pyepub.pyepubwriter import epub
 
-from epubcreator.epubbase import ebook_metadata, ebook_data, epubbase_names
+from epubcreator.epubbase import ebook_metadata, ebook_data, names
 from epubcreator.misc import utils
 from epubcreator import config
 from epubcreator.misc.options import Options, Option
@@ -18,63 +18,63 @@ class _Templates:
             _Templates._loadEpubBaseFiles(epubBaseFilesDirPath)
 
     def getCover(self):
-        return _Templates._files[epubbase_names.COVER_FILENAME]
+        return _Templates._files[names.COVER_FILENAME]
 
     def getSynopsis(self, synopsis):
-        template = _Templates._files[epubbase_names.SYNOPSIS_FILENAME]
+        template = _Templates._files[names.SYNOPSIS_FILENAME]
         return template.render(synopsis=synopsis)
 
     def getTitle(self, author, title, subtitle, editor, collectionName, subCollectionName, collectionVolume):
-        template = _Templates._files[epubbase_names.TITLE_FILENAME]
+        template = _Templates._files[names.TITLE_FILENAME]
         return template.render(author=author, title=title, subtitle=subtitle, editor=editor, collectionName=collectionName,
                                subCollectionName=subCollectionName, collectionVolume=collectionVolume)
 
     def getInfo(self, originalTitle, author, publicationYear, translator, ilustrator, coverDesigner, coverModification, editor):
-        template = _Templates._files[epubbase_names.INFO_FILENAME]
+        template = _Templates._files[names.INFO_FILENAME]
         return template.render(originalTitle=originalTitle, author=author, publicationYear=publicationYear, translator=translator,
                                ilustrator=ilustrator, coverDesigner=coverDesigner, coverModification=coverModification, editor=editor)
 
     def getDedication(self, dedication):
-        template = _Templates._files[epubbase_names.DEDICATION_FILENAME]
+        template = _Templates._files[names.DEDICATION_FILENAME]
         return template.render(dedication=dedication)
 
     def getAuthor(self, authorBiography, title, imageName):
-        template = _Templates._files[epubbase_names.AUTHOR_FILENAME]
+        template = _Templates._files[names.AUTHOR_FILENAME]
         return template.render(authorBiography=authorBiography, title=title, imageName=imageName)
 
     def getEplLogoImage(self):
-        return _Templates._files[epubbase_names.EPL_LOGO_FILENAME]
+        return _Templates._files[names.EPL_LOGO_FILENAME]
 
     def getExLibrisImage(self):
-        return _Templates._files[epubbase_names.EX_LIBRIS_FILENAME]
+        return _Templates._files[names.EX_LIBRIS_FILENAME]
 
     def getCss(self):
-        return _Templates._files[epubbase_names.STYLE_FILENAME]
+        return _Templates._files[names.STYLE_FILENAME]
 
     def getCoverImage(self):
-        return _Templates._files[epubbase_names.COVER_IMAGE_FILENAME]
+        return _Templates._files[names.COVER_IMAGE_FILENAME]
 
     def getAuthorImage(self):
-        return _Templates._files[epubbase_names.AUTHOR_IMAGE_FILENAME]
+        return _Templates._files[names.AUTHOR_IMAGE_FILENAME]
 
     def getIBooksDisplayOptionsFile(self):
-        return _Templates._files[epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME]
+        return _Templates._files[names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME]
 
     @staticmethod
     def _loadEpubBaseFiles(epubBaseFilesDirPath):
-        templates = (epubbase_names.AUTHOR_FILENAME,
-                     epubbase_names.DEDICATION_FILENAME,
-                     epubbase_names.INFO_FILENAME,
-                     epubbase_names.SYNOPSIS_FILENAME,
-                     epubbase_names.TITLE_FILENAME)
+        templates = (names.AUTHOR_FILENAME,
+                     names.DEDICATION_FILENAME,
+                     names.INFO_FILENAME,
+                     names.SYNOPSIS_FILENAME,
+                     names.TITLE_FILENAME)
 
-        noTemplates = (epubbase_names.COVER_FILENAME,
-                       epubbase_names.STYLE_FILENAME,
-                       epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME,
-                       epubbase_names.EPL_LOGO_FILENAME,
-                       epubbase_names.EX_LIBRIS_FILENAME,
-                       epubbase_names.AUTHOR_IMAGE_FILENAME,
-                       epubbase_names.COVER_IMAGE_FILENAME)
+        noTemplates = (names.COVER_FILENAME,
+                       names.STYLE_FILENAME,
+                       names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME,
+                       names.EPL_LOGO_FILENAME,
+                       names.EX_LIBRIS_FILENAME,
+                       names.AUTHOR_IMAGE_FILENAME,
+                       names.COVER_IMAGE_FILENAME)
 
         for fileName in templates:
             filePath = os.path.join(epubBaseFilesDirPath, fileName)
@@ -141,16 +141,16 @@ class Ebook(Options):
         ilustrator = self._getPersonsListAsText(self._metadata.ilustrators)[0]
 
         # Agrego los xhtml requeridos, excepto autor.xhtml, que debe ir despúes de las secciones.
-        outputEpub.addHtmlData(epubbase_names.COVER_FILENAME, Ebook._epubBase.getCover())
-        outputEpub.addHtmlData(epubbase_names.SYNOPSIS_FILENAME, Ebook._epubBase.getSynopsis(self._metadata.synopsis))
-        outputEpub.addHtmlData(epubbase_names.TITLE_FILENAME, Ebook._epubBase.getTitle(author,
+        outputEpub.addHtmlData(names.COVER_FILENAME, Ebook._epubBase.getCover())
+        outputEpub.addHtmlData(names.SYNOPSIS_FILENAME, Ebook._epubBase.getSynopsis(self._metadata.synopsis))
+        outputEpub.addHtmlData(names.TITLE_FILENAME, Ebook._epubBase.getTitle(author,
                                                                                        self._metadata.title,
                                                                                        self._metadata.subtitle,
                                                                                        self._metadata.editor,
                                                                                        self._metadata.collectionName,
                                                                                        self._metadata.subCollectionName,
                                                                                        self._metadata.collectionVolume))
-        outputEpub.addHtmlData(epubbase_names.INFO_FILENAME, Ebook._epubBase.getInfo(self._metadata.originalTitle,
+        outputEpub.addHtmlData(names.INFO_FILENAME, Ebook._epubBase.getInfo(self._metadata.originalTitle,
                                                                                      author,
                                                                                      publicationYear,
                                                                                      translator,
@@ -160,19 +160,19 @@ class Ebook(Options):
                                                                                      self._metadata.editor))
 
         if self._metadata.dedication or self._options.includeOptionalFiles:
-            outputEpub.addHtmlData(epubbase_names.DEDICATION_FILENAME, Ebook._epubBase.getDedication(self._metadata.dedication))
+            outputEpub.addHtmlData(names.DEDICATION_FILENAME, Ebook._epubBase.getDedication(self._metadata.dedication))
 
-        outputEpub.addImageData(epubbase_names.COVER_IMAGE_FILENAME, self._metadata.coverImage)
+        outputEpub.addImageData(names.COVER_IMAGE_FILENAME, self._metadata.coverImage)
 
         authorsWithBiographyOrImage = (a for a in self._metadata.authors if a.biography or a.image)
         for i, author in enumerate(authorsWithBiographyOrImage):
-            outputEpub.addImageData(epubbase_names.generateAuthorImageFileName(i), author.image)
+            outputEpub.addImageData(names.generateAuthorImageFileName(i), author.image)
 
         # Agrego el resto de los archivos del epubbase.
-        outputEpub.addImageData(epubbase_names.EPL_LOGO_FILENAME, Ebook._epubBase.getEplLogoImage())
-        outputEpub.addImageData(epubbase_names.EX_LIBRIS_FILENAME, Ebook._epubBase.getExLibrisImage())
-        outputEpub.addStyleData(epubbase_names.STYLE_FILENAME, Ebook._epubBase.getCss())
-        outputEpub.addMetaFile(epubbase_names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME, Ebook._epubBase.getIBooksDisplayOptionsFile())
+        outputEpub.addImageData(names.EPL_LOGO_FILENAME, Ebook._epubBase.getEplLogoImage())
+        outputEpub.addImageData(names.EX_LIBRIS_FILENAME, Ebook._epubBase.getExLibrisImage())
+        outputEpub.addStyleData(names.STYLE_FILENAME, Ebook._epubBase.getCss())
+        outputEpub.addMetaFile(names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME, Ebook._epubBase.getIBooksDisplayOptionsFile())
 
     def _addSectionsAndToc(self, outputEpub):
         def processSections(sections):
@@ -205,23 +205,23 @@ class Ebook(Options):
                     previousLevel = currentLevel
 
         # La cubierta debe ser la primera entrada en la toc.
-        outputEpub.addNavPoint(epubbase_names.COVER_FILENAME, "Cubierta")
+        outputEpub.addNavPoint(names.COVER_FILENAME, "Cubierta")
 
         # El título del libro debe ser la segunda entrada en la toc.
-        outputEpub.addNavPoint(epubbase_names.TITLE_FILENAME, self._metadata.title)
+        outputEpub.addNavPoint(names.TITLE_FILENAME, self._metadata.title)
 
         processSections(self._ebookData.iterTextSections())
 
         authorsWithBiographyOrImage = [a for a in self._metadata.authors if a.biography or a.image]
         if authorsWithBiographyOrImage:
-            outputEpub.addNavPoint(epubbase_names.AUTHOR_FILENAME, self._getTocTitleForAuthorFile())
+            outputEpub.addNavPoint(names.AUTHOR_FILENAME, self._getTocTitleForAuthorFile())
 
             for i, author in enumerate(authorsWithBiographyOrImage):
                 title = self._getTocTitleForAuthorFile() if i == 0 else None
-                imageName = epubbase_names.generateAuthorImageFileName(i)
+                imageName = names.generateAuthorImageFileName(i)
 
                 authorContent = Ebook._epubBase.getAuthor(author.biography, title, imageName)
-                outputEpub.addHtmlData(epubbase_names.generateAuthorFileName(i), authorContent)
+                outputEpub.addHtmlData(names.generateAuthorFileName(i), authorContent)
 
         processSections(self._ebookData.iterNotesSections())
 
@@ -233,10 +233,10 @@ class Ebook(Options):
         author = self._getPersonsListAsText(self._metadata.authors)
 
         # Agrego semántica a cubierta.xhtml.
-        outputEpub.addReference(epubbase_names.COVER_FILENAME, "Cover", "cover")
+        outputEpub.addReference(names.COVER_FILENAME, "Cover", "cover")
 
         # Es necesario agregarle semántica a cover.jpg, sino algunos ereaders no la reconocen como imagen de portada.
-        outputEpub.addCustomMetadata("cover", epubbase_names.COVER_IMAGE_FILENAME)
+        outputEpub.addCustomMetadata("cover", names.COVER_IMAGE_FILENAME)
 
         outputEpub.addTitle(self._metadata.title)
         outputEpub.addAuthor(author[0], author[1])

@@ -2,7 +2,7 @@ import itertools
 
 from lxml import etree
 
-from epubcreator.epubbase import epubbase_names
+from epubcreator.epubbase import names
 
 
 class EbookData:
@@ -196,7 +196,7 @@ class TextSection(Section):
         return "".join(text)
 
     def _generateSectionName(self):
-        return epubbase_names.generateTextSectionName(self._ebookData.countTextSections() + 1)
+        return names.generateTextSectionName(self._ebookData.countTextSections() + 1)
 
 
 class NotesSection(Section):
@@ -274,7 +274,7 @@ class NotesSection(Section):
         return "".join(text)
 
     def _generateSectionName(self):
-        return epubbase_names.NOTES_FILENAME
+        return names.NOTES_FILENAME
 
 
 class Image:
