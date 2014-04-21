@@ -4,7 +4,7 @@ from PyQt4 import QtGui, QtCore
 
 from epubcreator.misc import language, gui_utils
 from epubcreator.gui.forms import basic_metadata_widget_ui, additional_metadata_widget_ui, author_metadata_widget_ui
-from epubcreator.epubbase import ebook_metadata
+from epubcreator.epubbase import ebook_metadata, images
 
 
 class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
@@ -12,15 +12,8 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
         super().__init__(parent)
         self.setupUi(self)
 
-        # Necesito guardarme los bytes de la imagen. Si obtengo los bytes directamente del qlabel, al hacer un
-        # qlabel.pixmap().save() no obtengo exactamente los mismos bytes, ya que debo especificar el formato
-        # al guardar la imagen, y dependiendo del tipo de compresión y demás, no obtengo los bytes originales. Esto
-        # es obviamente un problema cuando el usuario especificó que no quiere que se haga ningún procesamiento a
-        # las imágenes.
-        # Una posibilidad era convertir el QPixmap en QImage, y de ahí obtener los bytes, pero no es nada fácil, ya
-        # desde el QImage solamente puedo obtener un puntero hacia el primer byte, y de allí en más debo ir
-        # iterando por todos los bytes, teniendo en cuenta el formato de la imagen y cómo están alineados los bytes.
-        self._coverImageBytes = None
+        # Un objeto CoverImage.
+        self._coverImage = None
 
         self._populateCoverModificationOptions()
         self._populateLanguages()
@@ -74,7 +67,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
 
         @return: los bytes de la imagen.
         """
-        return self._coverImageBytes
+        return self._coverImage.toBytes()
 
     def _populateCoverModificationOptions(self):
         for i, option in enumerate(ebook_metadata.Metadata.COVER_MODIFICATION_OPTIONS):
@@ -88,12 +81,18 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
     def _changeCoverImage(self):
         imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen", filter="Imágenes (*.jpg)")
         if imageName:
-            with open(imageName, "rb") as file:
-                self._coverImageBytes = file.read()
+            try:
+                self._coverImage = images.CoverImage(imageName)
+            except images.InvalidDimensionsError as e:
+                gui_utils.displayStdErrorDialog("La imagen de cubierta seleccionada no tiene las dimensiones requeridas, que deben ser "
+                                                "de: {0}px de ancho y {1}px de alto.".format(images.CoverImage.WIDTH, images.CoverImage.HEIGHT))
+                return
+            except images.MaxSizeExceededError:
+                gui_utils.displayStdErrorDialog("La imagen de cubierta excede el tamaño máximo permitido, que debe "
+                                                "ser de: {0}kb.".format(images.CoverImage.MAX_SIZE_IN_KB))
+                return
 
-            pixmap = QtGui.QPixmap()
-            pixmap.loadFromData(self._coverImageBytes)
-            self.coverImage.setPixmap(pixmap)
+            self.coverImage.setPixmap(self._coverImage.toPixMap())
 
     def _addAuthorToList(self):
         name = self.authorInput.text().strip()
