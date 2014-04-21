@@ -56,10 +56,8 @@ class DocxConverter(converter_base.AbstractConverter):
         # no tenga h1, sino que absolutamente todos los títulos estén corridos.
         self._headingLevelBase = -1
 
-        # Una lista de tuplas de dos elementos: el id de la nota en el docx (que utilizo luego para
-        # obtener el contenido de la nota en footnotes.xml), y el nombre de la sección donde se hace
-        # referencia a la nota.
-        self._footnotesIdSection = None
+        # Una lista con los ids de las notas en el docx (que utilizo luego para obtener el contenido de la nota en footnotes.xml).
+        self._footnotesId = None
 
         # Indica si se está procesando el contenido de todas las notas al pie o el del documento principal.
         self._isProcessingFootnotes = False
@@ -72,13 +70,13 @@ class DocxConverter(converter_base.AbstractConverter):
     def convert(self):
         self._titles = []
         self._headingLevelBase = DocxConverter._MAX_HEADING_NUMBER + 1
-        self._footnotesIdSection = []
+        self._footnotesId = []
         self._ebookData = ebook_data.EbookData()
         self._isProcessingFootnotes = False
 
         self._processDocument()
 
-        if self._footnotesIdSection:
+        if self._footnotesId:
             self._isProcessingFootnotes = True
             self._processFootnotes()
 
@@ -386,8 +384,8 @@ class DocxConverter(converter_base.AbstractConverter):
                 self._currentSection.appendText(child.text)
             elif child.tag.endswith("}footnoteReference"):
                 footnoteId = utils.xpath(run, "w:footnoteReference/@w:id")[0]
-                self._footnotesIdSection.append((footnoteId, self._currentSection.name))
-                self._currentSection.insertNoteReference(len(self._footnotesIdSection))
+                self._footnotesId.append(footnoteId)
+                self._currentSection.insertNoteReference()
             elif child.tag.endswith("}drawing") or child.tag.endswith("}pict"):
                 imagesId = utils.getImagesId(child)
                 if imagesId:
@@ -485,19 +483,19 @@ class DocxConverter(converter_base.AbstractConverter):
     def _processFootnotes(self):
         self._currentSection = self._ebookData.createNotesSection()
 
-        for footnoteId, footnoteSection in self._footnotesIdSection:
+        for footnoteId in self._footnotesId:
             footnote = self._footnotes.getFootnote(footnoteId)
 
             # Si bien dentro de una nota se encuentran párrafos y tablas y por lo tanto podría llamar
             # directamente al método processMainContent, estaría haciendo chequeos y comprobaciones innecesarias, ya
             # que, por ejemplo, una nota no puede tener saltos de página, ni tampoco necesito procesar títulos dentro
             # de una nota.
-            self._processFootnote(footnote, footnoteSection)
+            self._processFootnote(footnote)
 
         self._currentSection.save()
 
-    def _processFootnote(self, footnote, footnoteSection):
-        self._currentSection.openNote(footnoteSection)
+    def _processFootnote(self, footnote):
+        self._currentSection.openNote()
 
         for child in footnote:
             if child.tag.endswith("}p"):
