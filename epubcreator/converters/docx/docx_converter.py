@@ -416,9 +416,6 @@ class DocxConverter(converter_base.AbstractConverter):
 
         return runFormats
 
-    def _processText(self, node):
-        self._currentSection.appendText(node.text)
-
     def _processList(self, paragraph, listLevel):
         previousParagraph = self._getPreviousParagraph(paragraph)
         nextParagraph = self._getNextParagraph(paragraph)
