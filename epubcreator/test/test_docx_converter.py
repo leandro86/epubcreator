@@ -57,8 +57,7 @@ def generateTests():
 
 def load_tests(loader, tests, pattern):
     generateTests()
-    tests.addTest(loader.loadTestsFromTestCase(DocxConverterTest))
-    return tests
+    return loader.loadTestsFromTestCase(DocxConverterTest)
 
 
 if __name__ == '__main__':
