@@ -390,6 +390,9 @@ class DocxConverter(converter_base.AbstractConverter):
                 imagesId = utils.getImagesId(child)
                 if imagesId:
                     self._processImage(imagesId[0])
+            elif child.tag.endswith("}br") and not child.attrib:
+                self._currentSection.openTag("br")
+                self._currentSection.closeTag("br")
             elif child.tag.endswith("}AlternateContent"):
                 self._processAlternateContent(child)
 

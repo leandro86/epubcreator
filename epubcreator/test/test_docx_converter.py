@@ -30,7 +30,7 @@ def makeTest(docxFilePath, outputFolder, **options):
         # if os.path.exists(outputDir):
         #     shutil.rmtree(outputDir, ignore_errors=True)
         # os.makedirs(outputDir)
-        # for section in ebookData.sections:
+        # for section in ebookData.iterAllSections():
         #     with open(os.path.join(outputDir, section.name), "wb") as file:
         #         file.write(section.toHtml())
 
