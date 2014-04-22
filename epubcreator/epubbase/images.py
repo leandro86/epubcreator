@@ -1,4 +1,5 @@
 import imghdr
+import zipfile
 
 from PyQt4 import QtGui, QtCore
 
@@ -19,6 +20,20 @@ class CoverImage:
     _SAFE_FORMATS = tuple([f[0] for f in SUPPORTED_FORMATS if not f[1]])
 
     def __init__(self, image, allowProcessing=True):
+        """
+        Clase para procesar la imagen de cubierta, redimensionarla según las medidas que
+        indica el epub base, insertarle el logo, etc.
+
+        @param image: un string con el path de la imagen, o los bytes de la misma.
+        @param allowProcessing: indica si se permite modificar la imagen. De no permitirse, entonces
+                                no puede aplicársele ningún tipo de procesamiento, lo que significa
+                                que solo se va a admitir como formato de la imagen a abrir un jpg.
+
+        @raise MaxSizeExceededError: cuando la imagen supera el tamaño máximo permitido, y solo cuando
+                                     allowProcessing es False.
+        @raise InvalidDimensionsError: cuando la imagen no tiene las dimensiones requeridas, y solo cuando
+                                       allowProcessing es False.
+        """
         if isinstance(image, str):
             with open(image, "rb") as f:
                 self._originalImageBytes = f.read()
