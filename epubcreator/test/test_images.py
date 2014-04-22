@@ -69,11 +69,11 @@ class CoverImageTest(unittest.TestCase):
 
         buffer = QtCore.QBuffer()
         image.save(buffer, "BMP")
-        self.assertRaises(Exception, lambda: images.CoverImage(buffer.data().data(), allowProcessing=False))
+        self.assertRaises(ValueError, lambda: images.CoverImage(buffer.data().data(), allowProcessing=False))
 
         buffer = QtCore.QBuffer()
         image.save(buffer, "PNG")
-        self.assertRaises(Exception, lambda: images.CoverImage(buffer.data().data(), allowProcessing=False))
+        self.assertRaises(ValueError, lambda: images.CoverImage(buffer.data().data(), allowProcessing=False))
 
         buffer = QtCore.QBuffer()
         image.save(buffer, "JPG")

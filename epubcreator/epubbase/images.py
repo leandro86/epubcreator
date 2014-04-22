@@ -42,7 +42,7 @@ class CoverImage:
 
         imageFormat = imghdr.what("", h=self._originalImageBytes)
         if imageFormat not in CoverImage._SAFE_FORMATS and not allowProcessing:
-            raise Exception("Debe permitirse el preprocesamiento para abrir una imagen de tipo '{0}'.".format(imageFormat))
+            raise ValueError("Debe permitirse el preprocesamiento para abrir una imagen de tipo '{0}'.".format(imageFormat))
 
         self._image = QtGui.QImage.fromData(self._originalImageBytes)
         self._allowProcessing = allowProcessing
