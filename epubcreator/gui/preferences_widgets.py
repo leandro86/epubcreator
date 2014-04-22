@@ -31,12 +31,14 @@ class GeneralPreferences(PreferencesAbstract, preferences_general_widget_ui.Ui_G
 
         settings.editor = self.editorInput.text().strip()
         settings.sigilPath = self.sigilPathInput.text().strip()
+        settings.allowImageProcessing = self.allowImageProcessingInput.isChecked()
 
     def _loadSettings(self):
         settings = settings_store.SettingsStore()
 
         self.editorInput.setText(settings.editor)
         self.sigilPathInput.setText(settings.sigilPath)
+        self.allowImageProcessingInput.setCheckState(QtCore.Qt.Checked if settings.allowImageProcessing else QtCore.Qt.Unchecked)
 
     def _changeSigilPath(self):
         dialogFilter = "Sigil (sigil.exe)"

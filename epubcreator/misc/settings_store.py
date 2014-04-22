@@ -29,7 +29,8 @@ class SettingsStore(QtCore.QSettings):
     # Key = nombre de atributo.
     # Value = valor por defecto.
     _SETTINGS = dict(editor="",
-                     sigilPath="")
+                     sigilPath="",
+                     allowImageProcessing=True)
 
     # Agrego todas las opciones posibles de todos los converters.
     _SETTINGS.update({c.FILE_TYPE + o.name[0].upper() + o.name[1:]: o.value for c in ConverterFactory.getAllConverters() for o in c.OPTIONS})

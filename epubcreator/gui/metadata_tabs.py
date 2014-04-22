@@ -2,7 +2,7 @@ import datetime
 
 from PyQt4 import QtGui, QtCore
 
-from epubcreator.misc import language, gui_utils
+from epubcreator.misc import language, gui_utils, settings_store
 from epubcreator.gui.forms import basic_metadata_widget_ui, additional_metadata_widget_ui, author_metadata_widget_ui
 from epubcreator.epubbase import ebook_metadata, images
 
@@ -79,11 +79,15 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
             self.languageInput.addItem(languageName)
 
     def _changeCoverImage(self):
-        imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen", filter="Imágenes (*.jpg)")
+        imgFilter = "Imágenes ({0})".format(" ".join(("*.{0}".format(f[0]) for f in images.CoverImage.SUPPORTED_FORMATS if not f[1])))
+        imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen", filter=imgFilter)
+
         if imageName:
+            settings = settings_store.SettingsStore()
+
             try:
-                self._coverImage = images.CoverImage(imageName)
-            except images.InvalidDimensionsError as e:
+                self._coverImage = images.CoverImage(imageName, allowProcessing=settings.allowImageProcessing)
+            except images.InvalidDimensionsError:
                 gui_utils.displayStdErrorDialog("La imagen de cubierta seleccionada no tiene las dimensiones requeridas, que deben ser "
                                                 "de: {0}px de ancho y {1}px de alto.".format(images.CoverImage.WIDTH, images.CoverImage.HEIGHT))
                 return
@@ -92,7 +96,9 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
                                                 "ser de: {0}kb.".format(images.CoverImage.MAX_SIZE_IN_KB))
                 return
 
-            self.coverImage.setPixmap(self._coverImage.toPixMap())
+            pixmap = QtGui.QPixmap()
+            pixmap.loadFromData(self._coverImage.toBytes())
+            self.coverImage.setPixmap(pixmap)
 
     def _addAuthorToList(self):
         name = self.authorInput.text().strip()
