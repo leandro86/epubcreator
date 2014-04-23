@@ -68,6 +68,9 @@ class CoverImage:
         self._image = self._image.scaled(CoverImage.WIDTH, CoverImage.HEIGHT, QtCore.Qt.IgnoreAspectRatio)
 
     def _compress(self, quality):
+        if not self._allowProcessing:
+            raise ValueError("Debe permitirse el procesamiento de la imagen para poder comprimirla.")
+        
         buffer = QtCore.QBuffer()
         self._image.save(buffer, "JPG", quality)
         self._image = QtGui.QImage.fromData(buffer.data().data())
