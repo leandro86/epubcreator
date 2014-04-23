@@ -1,5 +1,4 @@
 import imghdr
-import zipfile
 
 from PyQt4 import QtGui, QtCore
 
@@ -7,7 +6,7 @@ from PyQt4 import QtGui, QtCore
 class CoverImage:
     WIDTH = 600
     HEIGHT = 900
-    MAX_SIZE_IN_KB = 300
+    MAX_SIZE_IN_BYTES = 300 * 1000
 
     # Contiene los formatos de imágenes soportados. El primer elemento de cada tupla
     # indica el formato, y el segundo si es necesario realizarle un preprocesamiento para
@@ -47,7 +46,7 @@ class CoverImage:
         self._image = QtGui.QImage.fromData(self._originalImageBytes)
         self._allowProcessing = allowProcessing
 
-        if not self._allowProcessing and len(self._originalImageBytes) / 1000 > CoverImage.MAX_SIZE_IN_KB:
+        if not self._allowProcessing and len(self._originalImageBytes) > CoverImage.MAX_SIZE_IN_BYTES:
             raise MaxSizeExceededError()
 
         if self._image.width() != CoverImage.WIDTH or self._image.height() != CoverImage.HEIGHT:
@@ -58,14 +57,31 @@ class CoverImage:
 
     def toBytes(self):
         if self._allowProcessing:
+            quality = self._findBestQuality()
             buffer = QtCore.QBuffer()
-            self._image.save(buffer, "JPG")
+            self._image.save(buffer, "JPG", quality)
             return buffer.data()
         else:
             return self._originalImageBytes
 
     def _scale(self):
         self._image = self._image.scaled(CoverImage.WIDTH, CoverImage.HEIGHT, QtCore.Qt.IgnoreAspectRatio)
+
+    def _compress(self, quality):
+        buffer = QtCore.QBuffer()
+        self._image.save(buffer, "JPG", quality)
+        self._image = QtGui.QImage.fromData(buffer.data().data())
+
+    def _findBestQuality(self):
+        for quality in range(100, -1, -1):
+            buffer = QtCore.QBuffer()
+            self._image.save(buffer, "JPG", quality)
+
+            if len(buffer.data().data()) <= CoverImage.MAX_SIZE_IN_BYTES:
+                return quality
+
+        raise Exception("Esto no debería pasar: no se encontró un nivel de compresión en el rango 0-100 capaz de reducir "
+                        "lo suficiente el tamaño de la imagen.")
 
 
 class InvalidDimensionsError(Exception):

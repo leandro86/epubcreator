@@ -93,7 +93,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
                 return
             except images.MaxSizeExceededError:
                 gui_utils.displayStdErrorDialog("La imagen de cubierta excede el tamaño máximo permitido, que debe "
-                                                "ser de: {0}kb.".format(images.CoverImage.MAX_SIZE_IN_KB))
+                                                "ser de: {0}kB.".format(images.CoverImage.MAX_SIZE_IN_BYTES / 1000))
                 return
 
             pixmap = QtGui.QPixmap()

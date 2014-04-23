@@ -1,4 +1,5 @@
 import unittest
+import random
 import sys
 
 from PyQt4 import QtGui, QtCore
@@ -27,7 +28,7 @@ class CoverImageTest(unittest.TestCase):
 
         for y in range(900):
             for x in range(600):
-                image.setPixel(x, y, y * x)
+                image.setPixel(x, y, QtGui.qRgb(0, 0, random.randint(0, 255)))
 
         buffer = QtCore.QBuffer()
         image.save(buffer, "JPG", 100)
@@ -119,6 +120,21 @@ class CoverImageTest(unittest.TestCase):
         buffer = QtCore.QBuffer()
         image.save(buffer, "JPEG")
         self.assertEqual(type(images.CoverImage(buffer.data().data())), images.CoverImage)
+
+    def test_image_is_compressed_when_size_exceeds_max_size_and_allow_processing_is_true(self):
+        # Necesito esta línea para que se cargue el plugin que me permite guardar en formato jpg.
+        app = QtCore.QCoreApplication(sys.argv)
+
+        image = QtGui.QImage(600, 600, QtGui.QImage.Format_ARGB32)
+
+        for y in range(600):
+            for x in range(600):
+                image.setPixel(x, y, QtGui.qRgb(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
+
+        buffer = QtCore.QBuffer()
+        image.save(buffer, "JPG", 100)
+
+        self.assertLessEqual(len(images.CoverImage(buffer.data().data()).toBytes()), images.CoverImage.MAX_SIZE_IN_BYTES)
 
 
 if __name__ == '__main__':
