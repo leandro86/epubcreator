@@ -73,6 +73,9 @@ class CoverImage:
         else:
             return len(self._originalImageBytes)
 
+    def quality(self):
+        return self._quality
+
     def toBytes(self):
         if self._allowProcessing:
             if self.size() > CoverImage.MAX_SIZE_IN_BYTES:
