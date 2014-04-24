@@ -45,6 +45,7 @@ class CoverImage:
 
         self._image = QtGui.QImage.fromData(self._originalImageBytes)
         self._allowProcessing = allowProcessing
+        self._quality = 100
 
         if not self._allowProcessing and len(self._originalImageBytes) > CoverImage.MAX_SIZE_IN_BYTES:
             raise MaxSizeExceededError()
@@ -55,25 +56,37 @@ class CoverImage:
             else:
                 raise InvalidDimensionsError()
 
+    def compress(self, quality):
+        if not self._allowProcessing:
+            raise ValueError("Debe permitirse el procesamiento de la imagen para poder comprimirla.")
+
+        buffer = QtCore.QBuffer()
+        self._image.save(buffer, "JPG", quality)
+        self._image = QtGui.QImage.fromData(buffer.data().data())
+        self._quality = quality
+
+    def size(self):
+        if self._allowProcessing:
+            buffer = QtCore.QBuffer()
+            self._image.save(buffer, "JPG", self._quality)
+            return len(buffer.data().data())
+        else:
+            return len(self._originalImageBytes)
+
     def toBytes(self):
         if self._allowProcessing:
-            quality = self._findBestQuality()
+            if self.size() > CoverImage.MAX_SIZE_IN_BYTES:
+                self._quality = self._findBestQuality()
+
             buffer = QtCore.QBuffer()
-            self._image.save(buffer, "JPG", quality)
-            return buffer.data()
+            self._image.save(buffer, "JPG", self._quality)
+
+            return buffer.data().data()
         else:
             return self._originalImageBytes
 
     def _scale(self):
         self._image = self._image.scaled(CoverImage.WIDTH, CoverImage.HEIGHT, QtCore.Qt.IgnoreAspectRatio)
-
-    def _compress(self, quality):
-        if not self._allowProcessing:
-            raise ValueError("Debe permitirse el procesamiento de la imagen para poder comprimirla.")
-        
-        buffer = QtCore.QBuffer()
-        self._image.save(buffer, "JPG", quality)
-        self._image = QtGui.QImage.fromData(buffer.data().data())
 
     def _findBestQuality(self):
         for quality in range(100, -1, -1):

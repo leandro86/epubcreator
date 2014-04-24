@@ -136,6 +136,23 @@ class CoverImageTest(unittest.TestCase):
 
         self.assertLessEqual(len(images.CoverImage(buffer.data().data()).toBytes()), images.CoverImage.MAX_SIZE_IN_BYTES)
 
+    def test_image_is_not_automatically_compressed_when_was_already_manually_compressed_and_its_size_is_below_max_size_and_allow_processing_is_true(self):
+        # Necesito esta línea para que se cargue el plugin que me permite guardar en formato jpg.
+        app = QtCore.QCoreApplication(sys.argv)
+
+        image = QtGui.QImage(50, 50, QtGui.QImage.Format_ARGB32)
+
+        for y in range(50):
+            for x in range(50):
+                image.setPixel(x, y, QtGui.qRgb(0, 0, random.randint(0, 255)))
+
+        buffer = QtCore.QBuffer()
+        image.save(buffer, "JPG", 100)
+
+        coverImage = images.CoverImage(buffer.data().data())
+        coverImage.compress(20)
+        self.assertEqual(coverImage.size(), len(coverImage.toBytes()))
+
 
 if __name__ == '__main__':
     unittest.main()
