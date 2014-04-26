@@ -7,16 +7,15 @@ from lxml import etree
 from epubcreator.pyepub.pyepubwriter import epub
 from epubcreator.epubbase import ebook_metadata, ebook_data, names
 from epubcreator.misc import utils
-from epubcreator import config
 from epubcreator.misc.options import Options, Option
 
 
 class _Templates:
     _files = {}
 
-    def __init__(self, epubBaseFilesDirPath):
+    def __init__(self):
         if not _Templates._files:
-            _Templates._loadEpubBaseFiles(epubBaseFilesDirPath)
+            _Templates._loadEpubBaseFiles()
 
     def getCover(self):
         return _Templates._files[names.COVER_FILENAME]
@@ -62,7 +61,7 @@ class _Templates:
         return _Templates._files[names.IBOOKS_DISPLAY_OPTIONS_FILE_NAME]
 
     @staticmethod
-    def _loadEpubBaseFiles(epubBaseFilesDirPath):
+    def _loadEpubBaseFiles():
         templates = (names.AUTHOR_FILENAME,
                      names.DEDICATION_FILENAME,
                      names.INFO_FILENAME,
@@ -78,12 +77,12 @@ class _Templates:
                        names.COVER_IMAGE_FILENAME)
 
         for fileName in templates:
-            filePath = os.path.join(epubBaseFilesDirPath, fileName)
+            filePath = names.getFullPathToFile(fileName)
             newFilePath = filePath.replace(".xhtml", ".mako")
             _Templates._files[fileName] = mako.template.Template(filename=newFilePath, input_encoding="utf-8", output_encoding="utf-8")
 
         for fileName in noTemplates:
-            filePath = os.path.join(epubBaseFilesDirPath, fileName)
+            filePath = names.getFullPathToFile(fileName)
             with open(filePath, "rb") as file:
                 _Templates._files[fileName] = file.read()
 
@@ -94,7 +93,7 @@ class Ebook(Options):
                       description="Indica si los archivos opcionales (dedicatoria.xhtml y autor.xhtml) deben incluirse en el epub "
                                   "incluso si los respectivos campos no fueron ingresados.")]
 
-    _epubBase = _Templates(config.EPUBBASE_FILES_DIR_PATH)
+    _epubBase = _Templates()
 
     def __init__(self, ebookData, metadata=None, **options):
         super().__init__(**options)
@@ -145,20 +144,20 @@ class Ebook(Options):
         outputEpub.addHtmlData(names.COVER_FILENAME, Ebook._epubBase.getCover())
         outputEpub.addHtmlData(names.SYNOPSIS_FILENAME, Ebook._epubBase.getSynopsis(self._metadata.synopsis))
         outputEpub.addHtmlData(names.TITLE_FILENAME, Ebook._epubBase.getTitle(author,
-                                                                                       self._metadata.title,
-                                                                                       self._metadata.subtitle,
-                                                                                       self._metadata.editor,
-                                                                                       self._metadata.collectionName,
-                                                                                       self._metadata.subCollectionName,
-                                                                                       self._metadata.collectionVolume))
+                                                                              self._metadata.title,
+                                                                              self._metadata.subtitle,
+                                                                              self._metadata.editor,
+                                                                              self._metadata.collectionName,
+                                                                              self._metadata.subCollectionName,
+                                                                              self._metadata.collectionVolume))
         outputEpub.addHtmlData(names.INFO_FILENAME, Ebook._epubBase.getInfo(self._metadata.originalTitle,
-                                                                                     author,
-                                                                                     publicationYear,
-                                                                                     translator,
-                                                                                     ilustrator,
-                                                                                     self._metadata.coverDesigner,
-                                                                                     self._metadata.coverModification,
-                                                                                     self._metadata.editor))
+                                                                            author,
+                                                                            publicationYear,
+                                                                            translator,
+                                                                            ilustrator,
+                                                                            self._metadata.coverDesigner,
+                                                                            self._metadata.coverModification,
+                                                                            self._metadata.editor))
 
         if self._metadata.dedication or self._options.includeOptionalFiles:
             outputEpub.addHtmlData(names.DEDICATION_FILENAME, Ebook._epubBase.getDedication(self._metadata.dedication))
