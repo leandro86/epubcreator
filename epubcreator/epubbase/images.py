@@ -45,7 +45,6 @@ class CoverImage:
 
         self._image = QtGui.QImage.fromData(self._originalImageBytes)
         self._allowProcessing = allowProcessing
-        self._quality = 100
 
         if not self._allowProcessing and len(self._originalImageBytes) > CoverImage.MAX_SIZE_IN_BYTES:
             raise MaxSizeExceededError()
@@ -56,47 +55,63 @@ class CoverImage:
             else:
                 raise InvalidDimensionsError()
 
+        self._quality = 100
+        self._imageBytesWithNoCompression = self._getImageBytes(self._quality) if self._allowProcessing else self._originalImageBytes
+
     def compress(self, quality):
         if not self._allowProcessing:
             raise ValueError("Debe permitirse el procesamiento de la imagen para poder comprimirla.")
 
+        image = QtGui.QImage.fromData(self._imageBytesWithNoCompression)
         buffer = QtCore.QBuffer()
-        self._image.save(buffer, "JPG", quality)
+        image.save(buffer, "JPG", quality)
         self._image = QtGui.QImage.fromData(buffer.data().data())
         self._quality = quality
 
     def size(self):
-        if self._allowProcessing:
-            buffer = QtCore.QBuffer()
-            self._image.save(buffer, "JPG", self._quality)
-            return len(buffer.data().data())
-        else:
-            return len(self._originalImageBytes)
+        return len(self._getImageBytes(self.quality()))
 
     def quality(self):
         return self._quality
 
-    def toBytes(self):
+    def toBytes(self, compressIfNeeded=True):
+        """
+        Retorna los bytes de la imagen.
+
+        @param compressIfNeeded: indica si la imagen debe comprimirse (usando la mejor calidad posible) en
+                                 caso de que el tamaño exceda el máximo permitido.
+        """
         if self._allowProcessing:
-            if self.size() > CoverImage.MAX_SIZE_IN_BYTES:
+            if compressIfNeeded and self.size() > CoverImage.MAX_SIZE_IN_BYTES:
                 self._quality = self._findBestQuality()
-
-            buffer = QtCore.QBuffer()
-            self._image.save(buffer, "JPG", self._quality)
-
-            return buffer.data().data()
+            return self._getImageBytes(self.quality())
         else:
             return self._originalImageBytes
+
+    def clone(self):
+        coverImage = CoverImage(self._originalImageBytes, self._allowProcessing)
+
+        if self._allowProcessing and self.quality() != 100:
+            coverImage.compress(self.quality())
+
+        return coverImage
 
     def _scale(self):
         self._image = self._image.scaled(CoverImage.WIDTH, CoverImage.HEIGHT, QtCore.Qt.IgnoreAspectRatio)
 
-    def _findBestQuality(self):
-        for quality in range(100, -1, -1):
+    def _getImageBytes(self, quality=100):
+        if self._allowProcessing:
             buffer = QtCore.QBuffer()
             self._image.save(buffer, "JPG", quality)
+            return buffer.data().data()
+        else:
+            return len(self._originalImageBytes)
 
-            if len(buffer.data().data()) <= CoverImage.MAX_SIZE_IN_BYTES:
+    def _findBestQuality(self):
+        for quality in range(100, -1, -1):
+            imageBytes = self._getImageBytes(quality)
+
+            if len(imageBytes) <= CoverImage.MAX_SIZE_IN_BYTES:
                 return quality
 
         raise Exception("Esto no debería pasar: no se encontró un nivel de compresión en el rango 0-100 capaz de reducir "

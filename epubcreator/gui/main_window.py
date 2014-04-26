@@ -1,3 +1,4 @@
+import copy
 import os
 import subprocess
 import re
@@ -8,7 +9,7 @@ from epubcreator.epubbase import ebook
 from epubcreator.converters import converter_factory
 from epubcreator.misc import settings_store, gui_utils
 from epubcreator.gui.forms import main_window_ui
-from epubcreator.gui import preferences, about
+from epubcreator.gui import preferences, about, cover_edit
 from epubcreator import version, config
 
 
@@ -193,15 +194,38 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
             gui_utils.displayStdErrorDialog("Se ha perdido texto en la conversión. Por favor, repórtalo a los desarrolladores y adjunta "
                                             "el documento fuente.")
 
+    def _editCoverImage(self):
+        coverImage = self.metadataTabManager.basicMetadata.getCoverImage()
+        clonedCoverImage = coverImage.clone()
+
+        if cover_edit.CoverEdit(clonedCoverImage, self).exec() == QtGui.QDialog.Accepted:
+            self.metadataTabManager.basicMetadata.setCoverImage(clonedCoverImage)
+
     def _close(self):
         QtGui.qApp.closeAllWindows()
         QtGui.qApp.quit()
 
+    def _showPreferencesDialog(self):
+        settings = settings_store.SettingsStore()
+        previousAllowImageProcessing = settings.allowImageProcessing
+
+        if preferences.Preferences(self).exec() == QtGui.QDialog.Accepted:
+            if previousAllowImageProcessing != settings.allowImageProcessing:
+                wasCoverImageSet = self.metadataTabManager.basicMetadata.getCoverImage() is not None
+                self.metadataTabManager.basicMetadata.setCoverImage(None)
+                self.editCoverImageAction.setEnabled(wasCoverImageSet and settings.allowImageProcessing)
+
+                if wasCoverImageSet:
+                    gui_utils.displayInformationDialog("La opción para permitir el procesamiento de las imágenes del ePub base ha cambiado de "
+                                                       "valor. Debe cargar nuevamente la imagen de cubierta.")
+
     def _connectSignals(self):
         self.openFileAction.triggered.connect(self._openFile)
         self.generateEpubAction.triggered.connect(self._generateEpub)
-        self.preferencesAction.triggered.connect(lambda: preferences.Preferences(self).exec())
+        self.preferencesAction.triggered.connect(self._showPreferencesDialog)
         self.toggleToolBarAction.triggered.connect(self.toolBar.setVisible)
         self.toolBar.visibilityChanged.connect(self.toggleToolBarAction.setChecked)
         self.quitAction.triggered.connect(self._close)
         self.aboutAction.triggered.connect(lambda: about.About(self).exec())
+        self.editCoverImageAction.triggered.connect(self._editCoverImage)
+        self.metadataTabManager.basicMetadata.coverImageChanged.connect(lambda coverImg: self.editCoverImageAction.setEnabled(coverImg is not None))

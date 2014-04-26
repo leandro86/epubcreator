@@ -1,6 +1,6 @@
 import datetime
 
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui, QtCore, Qt
 
 from epubcreator.misc import language, gui_utils, settings_store
 from epubcreator.gui.forms import basic_metadata_widget_ui, additional_metadata_widget_ui, author_metadata_widget_ui
@@ -8,12 +8,22 @@ from epubcreator.epubbase import ebook_metadata, images
 
 
 class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
+    # Lo correcto sería poner CoverImage como parámetro de pyqtsignal en lugar de object. El
+    # problema es que necesito poder emitir la señal pasándole None como parámetro, y qt genera
+    # una excepción cuando eso pasa.
+    coverImageChanged = Qt.pyqtSignal(object)
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
 
         # Un objeto CoverImage.
         self._coverImage = None
+
+        # Una vez cargada una imagen en el label, no puedo recuperar el texto de información
+        # que tenía, por eso me lo guardo en caso de que al método setCoverImage se le pase
+        # None como parámetro.
+        self._coverImageText = self.coverImage.text()
 
         self._populateCoverModificationOptions()
         self._populateLanguages()
@@ -63,11 +73,24 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
 
     def getCoverImage(self):
         """
-        Retorna la imagen de portada.
-
-        @return: los bytes de la imagen.
+        Retorna un objeto CoverImage.
         """
-        return self._coverImage.toBytes()
+        return self._coverImage
+
+    def setCoverImage(self, coverImage):
+        """
+        Setea la imagen de cubierta.
+
+        @param coverImage: un objeto CoverImage.
+        """
+        self._coverImage = coverImage
+
+        if coverImage:
+            self._refreshCoverImage()
+        else:
+            self.coverImage.setText(self._coverImageText)
+
+        self.coverImageChanged.emit(self._coverImage)
 
     def _populateCoverModificationOptions(self):
         for i, option in enumerate(ebook_metadata.Metadata.COVER_MODIFICATION_OPTIONS):
@@ -89,16 +112,24 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
                 self._coverImage = images.CoverImage(imageName, allowProcessing=settings.allowImageProcessing)
             except images.InvalidDimensionsError:
                 gui_utils.displayStdErrorDialog("La imagen de cubierta seleccionada no tiene las dimensiones requeridas, que deben ser "
-                                                "de: {0}px de ancho y {1}px de alto.".format(images.CoverImage.WIDTH, images.CoverImage.HEIGHT))
+                                                "de {0}px de ancho y {1}px de alto. Si desea que la imagen se redimensione "
+                                                "automáticamente, habilite la opción para permitir el procesamiento de las imágenes, desde el "
+                                                "menú Preferencias.".format(images.CoverImage.WIDTH, images.CoverImage.HEIGHT))
                 return
             except images.MaxSizeExceededError:
                 gui_utils.displayStdErrorDialog("La imagen de cubierta excede el tamaño máximo permitido, que debe "
-                                                "ser de: {0}kB.".format(images.CoverImage.MAX_SIZE_IN_BYTES / 1000))
+                                                "ser de {0} kB. Si desea que la calidad de la imagen se ajuste automáticamente para reducir su "
+                                                "tamaño, habilite la opción para permitir el procesamiento de las imágenes, desde el menú "
+                                                "Preferencias.".format(images.CoverImage.MAX_SIZE_IN_BYTES // 1000))
                 return
 
-            pixmap = QtGui.QPixmap()
-            pixmap.loadFromData(self._coverImage.toBytes())
-            self.coverImage.setPixmap(pixmap)
+            self._refreshCoverImage()
+            self.coverImageChanged.emit(self._coverImage)
+
+    def _refreshCoverImage(self):
+        pixmap = QtGui.QPixmap()
+        pixmap.loadFromData(self._coverImage.toBytes())
+        self.coverImage.setPixmap(pixmap)
 
     def _addAuthorToList(self):
         name = self.authorInput.text().strip()

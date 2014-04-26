@@ -34,6 +34,20 @@ def displayExceptionErrorDialog(exceptionMessage):
     msgBox.exec()
 
 
+def displayInformationDialog(message):
+    msgBox = QtGui.QMessageBox(QtGui.QApplication.activeWindow())
+    msgBox.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
+    msgBox.setModal(True)
+    msgBox.setIcon(QtGui.QMessageBox.Information)
+    msgBox.setWindowTitle(version.APP_NAME)
+
+    # Agrego algunos espacios porque sino el diálogo es muy chico.
+    msgBox.setText(message)
+
+    msgBox.setStandardButtons(QtGui.QMessageBox.Ok)
+    msgBox.exec()
+
+
 def formatTextForTooltip(text, every=100):
     """
     Inserta saltos de línea en un string para que el ancho del tooltip sea razonable.

@@ -31,7 +31,9 @@ class MetadataTabManager(QtGui.QWidget, metadata_tab_manager_widget_ui.Ui_Metada
     def _populateBasicMetadata(self, metadata):
         isValid = True
 
-        metadata.coverImage = self.basicMetadata.getCoverImage()
+        coverImage = self.basicMetadata.getCoverImage()
+
+        metadata.coverImage = coverImage.toBytes() if coverImage else None
         metadata.title = self.basicMetadata.getTitle()
         metadata.language = self.basicMetadata.getLanguageCode()
         metadata.bookId = self.basicMetadata.getBookId()

@@ -135,6 +135,27 @@ class CoverImageTest(unittest.TestCase):
         self.assertEqual(coverImage.size(), len(coverImage.toBytes()))
         self.assertEqual(coverImage.quality(), quality)
 
+    def test_manually_compress_the_image_always_operates_in_original_image(self):
+        # Necesito esta línea para que se cargue el plugin que me permite guardar en formato jpg.
+        app = QtCore.QCoreApplication(sys.argv)
+
+        image = self._createImage(50, 50)
+
+        for y in range(50):
+            for x in range(50):
+                image.setPixel(x, y, QtGui.qRgb(0, 0, random.randint(0, 255)))
+
+        imgBytes = self._getBytes(image)
+        coverImage1 = images.CoverImage(imgBytes)
+        coverImage2 = images.CoverImage(imgBytes)
+
+        coverImage1.compress(50)
+        coverImage1.compress(10)
+
+        coverImage2.compress(10)
+
+        self.assertEqual(len(coverImage1.toBytes()), len(coverImage2.toBytes()))
+
     def _createImage(self, width, height):
         return QtGui.QImage(width, height, QtGui.QImage.Format_ARGB32)
 
