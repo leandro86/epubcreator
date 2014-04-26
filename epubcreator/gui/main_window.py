@@ -213,7 +213,6 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
             if previousAllowImageProcessing != settings.allowImageProcessing:
                 wasCoverImageSet = self.metadataTabManager.basicMetadata.getCoverImage() is not None
                 self.metadataTabManager.basicMetadata.setCoverImage(None)
-                self.editCoverImageAction.setEnabled(wasCoverImageSet and settings.allowImageProcessing)
 
                 if wasCoverImageSet:
                     gui_utils.displayInformationDialog("La opción para permitir el procesamiento de las imágenes del ePub base ha cambiado de "
@@ -228,4 +227,6 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
         self.quitAction.triggered.connect(self._close)
         self.aboutAction.triggered.connect(lambda: about.About(self).exec())
         self.editCoverImageAction.triggered.connect(self._editCoverImage)
-        self.metadataTabManager.basicMetadata.coverImageChanged.connect(lambda coverImg: self.editCoverImageAction.setEnabled(coverImg is not None))
+
+        f = lambda coverImg: self.editCoverImageAction.setEnabled(coverImg is not None and settings_store.SettingsStore().allowImageProcessing)
+        self.metadataTabManager.basicMetadata.coverImageChanged.connect(f)
