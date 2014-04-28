@@ -1,168 +1,153 @@
 import unittest
 import random
-import sys
+import io
 
-from PyQt4 import QtGui, QtCore
+from PIL import Image
 
 from epubcreator.epubbase import images
 
 
 class CoverImageTest(unittest.TestCase):
     def test_can_load_image_when_dimensions_and_size_are_ok_and_allow_processing_is_false(self):
-        # Necesito esta línea para que se cargue el plugin que me permite guardar en formato jpg.
-        app = QtCore.QCoreApplication(sys.argv)
-
-        imgBytes = self._getBytes(self._createImage(600, 900))
-        coverImage = images.CoverImage(imgBytes, allowProcessing=False)
+        imageBytes = self._saveImage(self._createImage(600, 900))
+        coverImage = images.CoverImage(imageBytes, allowProcessing=False)
 
         self.assertEqual(type(coverImage), images.CoverImage)
 
     def test_image_size_too_big_raises_exception_when_allow_processing_is_false(self):
-        # Necesito esta línea para que se cargue el plugin que me permite guardar en formato jpg.
-        app = QtCore.QCoreApplication(sys.argv)
-
         image = self._createImage(600, 900)
 
-        for y in range(900):
-            for x in range(600):
-                image.setPixel(x, y, QtGui.qRgb(0, 0, random.randint(0, 255)))
+        data = image.load()
 
-        imgBytes = self._getBytes(image)
+        # Modifico los pixeles con diferentes colores para incrementar de tamaño la imagen.
+        for y in range(image.size[1]):
+            for x in range(image.size[0]):
+                data[x, y] = (0, 0, random.randint(0, 255))
 
-        self.assertRaises(images.MaxSizeExceededError, lambda: images.CoverImage(imgBytes, allowProcessing=False))
+        imageBytes = self._saveImage(image)
+
+        self.assertRaises(images.MaxSizeExceededError, lambda: images.CoverImage(imageBytes, allowProcessing=False))
 
     def test_image_with_wrong_dimensions_raises_exception_when_allow_processing_is_false(self):
-        # Necesito esta línea para que se cargue el plugin que me permite guardar en formato jpg.
-        app = QtCore.QCoreApplication(sys.argv)
+        imageBytes = self._saveImage(self._createImage(50, 50))
 
-        imgBytes = self._getBytes(self._createImage(50, 50))
-
-        self.assertRaises(images.InvalidDimensionsError, lambda: images.CoverImage(imgBytes, allowProcessing=False))
+        self.assertRaises(images.InvalidDimensionsError, lambda: images.CoverImage(imageBytes, allowProcessing=False))
 
     def test_image_is_not_modified_when_allow_processing_is_false(self):
-        # Necesito esta línea para que se cargue el plugin que me permite guardar en formato jpg.
-        app = QtCore.QCoreApplication(sys.argv)
-
         image = self._createImage(600, 900)
-        image.setPixel(10, 10, 255)
-        image.setPixel(100, 255, 120)
-        image.setPixel(500, 766, 23)
-        image.setPixel(120, 364, 214)
+        data = image.load()
 
-        originalImageBytes = self._getBytes(image)
+        data[0, 0] = (123, 21, 90)
+        data[0, 1] = (150, 232, 9)
+        data[0, 2] = (111, 13, 45)
+        data[0, 3] = (8, 214, 78)
 
-        self.assertEqual(originalImageBytes, images.CoverImage(originalImageBytes, allowProcessing=False).toBytes())
+        imageBytes = self._saveImage(image)
+
+        self.assertEqual(imageBytes, images.CoverImage(imageBytes, allowProcessing=False).toBytes())
 
     def test_can_only_load_jpg_images_when_allow_processing_is_false(self):
-        # Necesito esta línea para que se cargue el plugin que me permite guardar en formato jpg.
-        app = QtCore.QCoreApplication(sys.argv)
-
         image = self._createImage(600, 900)
 
-        imgBytes = self._getBytes(image, "BMP")
-        self.assertRaises(ValueError, lambda: images.CoverImage(imgBytes, allowProcessing=False))
+        imageBytes = self._saveImage(image, "BMP")
+        self.assertRaises(ValueError, lambda: images.CoverImage(imageBytes, allowProcessing=False))
 
-        imgBytes = self._getBytes(image, "PNG")
-        self.assertRaises(ValueError, lambda: images.CoverImage(imgBytes, allowProcessing=False))
+        imageBytes = self._saveImage(image, "PNG")
+        self.assertRaises(ValueError, lambda: images.CoverImage(imageBytes, allowProcessing=False))
 
-        imgBytes = self._getBytes(image, "JPG")
-        self.assertEqual(type(images.CoverImage(imgBytes, allowProcessing=False)), images.CoverImage)
-
-        imgBytes = self._getBytes(image, "JPEG")
-        self.assertEqual(type(images.CoverImage(imgBytes, allowProcessing=False)), images.CoverImage)
+        imageBytes = self._saveImage(image, "JPEG")
+        self.assertEqual(type(images.CoverImage(imageBytes, allowProcessing=False)), images.CoverImage)
 
     def test_image_with_wrong_dimensions_is_scaled_when_allow_processing_is_true(self):
-        # Necesito esta línea para que se cargue el plugin que me permite guardar en formato jpg.
-        app = QtCore.QCoreApplication(sys.argv)
+        imageBytes = self._saveImage(self._createImage(500, 480))
 
-        imgBytes = self._getBytes(self._createImage(500, 480))
+        coverImage = images.CoverImage(imageBytes)
+        resizedCoverImage = Image.open(io.BytesIO(coverImage.toBytes()))
 
-        coverImage = images.CoverImage(imgBytes)
-
-        resizedCoverImage = QtGui.QImage.fromData(coverImage.toBytes())
-        self.assertEqual(resizedCoverImage.width(), 600)
-        self.assertEqual(resizedCoverImage.height(), 900)
+        self.assertEqual(resizedCoverImage.size, (600, 900))
 
     def test_can_load_any_supported_image_format_when_allow_processing_is_true(self):
-        # Necesito esta línea para que se cargue el plugin que me permite guardar en formato jpg.
-        app = QtCore.QCoreApplication(sys.argv)
-
         image = self._createImage(600, 900)
 
-        imgBytes = self._getBytes(image, "BMP")
-        self.assertEqual(type(images.CoverImage(imgBytes)), images.CoverImage)
+        imageBytes = self._saveImage(image, "BMP")
+        self.assertEqual(type(images.CoverImage(imageBytes)), images.CoverImage)
 
-        imgBytes = self._getBytes(image, "PNG")
-        self.assertEqual(type(images.CoverImage(imgBytes)), images.CoverImage)
+        imageBytes = self._saveImage(image, "PNG")
+        self.assertEqual(type(images.CoverImage(imageBytes)), images.CoverImage)
 
-        imgBytes = self._getBytes(image, "JPG")
-        self.assertEqual(type(images.CoverImage(imgBytes)), images.CoverImage)
+        imageBytes = self._saveImage(image, "JPEG")
+        self.assertEqual(type(images.CoverImage(imageBytes)), images.CoverImage)
 
-        imgBytes = self._getBytes(image, "JPEG")
-        self.assertEqual(type(images.CoverImage(imgBytes)), images.CoverImage)
-
-    def test_image_is_compressed_when_size_exceeds_max_size_and_allow_processing_is_true(self):
-        # Necesito esta línea para que se cargue el plugin que me permite guardar en formato jpg.
-        app = QtCore.QCoreApplication(sys.argv)
-
+    def test_image_quality_is_automatically_lowered_when_size_exceeds_max_size_and_allow_processing_is_true(self):
         image = self._createImage(600, 600)
 
-        for y in range(600):
-            for x in range(600):
-                image.setPixel(x, y, QtGui.qRgb(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
+        data = image.load()
 
-        imgBytes = self._getBytes(image)
+        # Modifico los pixeles con diferentes colores para incrementar de tamaño la imagen.
+        for y in range(image.size[1]):
+            for x in range(image.size[0]):
+                data[x, y] = (0, 0, random.randint(0, 255))
 
-        coverImage = images.CoverImage(imgBytes)
+        imageBytes = self._saveImage(image)
+        coverImage = images.CoverImage(imageBytes)
+
         self.assertLessEqual(len(coverImage.toBytes()), images.CoverImage.MAX_SIZE_IN_BYTES)
         self.assertNotEqual(coverImage.quality(), 100)
 
-    def test_image_is_not_compressed_when_was_already_manually_compressed_and_its_size_is_below_max_size_and_allow_processing_is_true(self):
-        # Necesito esta línea para que se cargue el plugin que me permite guardar en formato jpg.
-        app = QtCore.QCoreApplication(sys.argv)
-
+    def test_image_quality_is_not_automatically_lowered_when_was_manually_set_and_its_size_is_below_max_size_and_allow_processing_is_true(self):
         image = self._createImage(50, 50)
 
-        for y in range(50):
-            for x in range(50):
-                image.setPixel(x, y, QtGui.qRgb(0, 0, random.randint(0, 255)))
+        data = image.load()
 
-        imgBytes = self._getBytes(image)
-        coverImage = images.CoverImage(imgBytes)
+        # Modifico los pixeles con diferentes colores para incrementar de tamaño la imagen.
+        for y in range(image.size[1]):
+            for x in range(image.size[0]):
+                data[x, y] = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
-        coverImage.compress(20)
+        imageBytes = self._saveImage(image)
+        coverImage = images.CoverImage(imageBytes)
+        coverImage.setQuality(20)
         quality = coverImage.quality()
+
         self.assertEqual(coverImage.size(), len(coverImage.toBytes()))
         self.assertEqual(coverImage.quality(), quality)
 
-    def test_manually_compress_the_image_always_operates_in_original_image(self):
-        # Necesito esta línea para que se cargue el plugin que me permite guardar en formato jpg.
-        app = QtCore.QCoreApplication(sys.argv)
-
+    def test_change_image_quality_always_operates_in_original_image(self):
         image = self._createImage(50, 50)
 
-        for y in range(50):
-            for x in range(50):
-                image.setPixel(x, y, QtGui.qRgb(0, 0, random.randint(0, 255)))
+        data = image.load()
 
-        imgBytes = self._getBytes(image)
-        coverImage1 = images.CoverImage(imgBytes)
-        coverImage2 = images.CoverImage(imgBytes)
+        # Modifico los pixeles con diferentes colores para incrementar de tamaño la imagen.
+        for y in range(image.size[1]):
+            for x in range(image.size[0]):
+                data[x, y] = (0, 0, random.randint(0, 255))
 
-        coverImage1.compress(50)
-        coverImage1.compress(10)
+        imageBytes = self._saveImage(image)
+        coverImage1 = images.CoverImage(imageBytes)
+        coverImage2 = images.CoverImage(imageBytes)
+        coverImage1.setQuality(50)
+        coverImage1.setQuality(10)
+        coverImage2.setQuality(10)
 
-        coverImage2.compress(10)
+        self.assertEqual(coverImage1.toBytes(), coverImage2.toBytes())
 
-        self.assertEqual(len(coverImage1.toBytes()), len(coverImage2.toBytes()))
+    def test_logo_insertion(self):
+        imageBytes = self._saveImage(self._createImage(100, 100))
+
+        coverImage = images.CoverImage(imageBytes)
+        coverImageWithNoLogoBytes = coverImage.toBytes()
+        coverImage.insertLogo(images.CoverImage.BLACK_LOGO)
+        coverImageWithLogoBytes = coverImage.toBytes()
+
+        self.assertNotEqual(coverImageWithLogoBytes, coverImageWithNoLogoBytes)
 
     def _createImage(self, width, height):
-        return QtGui.QImage(width, height, QtGui.QImage.Format_ARGB32)
+        return Image.new("RGB", (width, height))
 
-    def _getBytes(self, image, imgFormat="JPG"):
-        buffer = QtCore.QBuffer()
-        image.save(buffer, imgFormat, 100)
-        return buffer.data().data()
+    def _saveImage(self, image, imageFormat="JPEG"):
+        buffer = io.BytesIO()
+        image.save(buffer, imageFormat, quality=100)
+        return buffer.getvalue()
 
 
 if __name__ == '__main__':

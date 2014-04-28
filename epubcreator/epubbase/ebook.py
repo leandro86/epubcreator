@@ -1,11 +1,10 @@
 import os
-import copy
 
 import mako.template
 from lxml import etree
 
 from epubcreator.pyepub.pyepubwriter import epub
-from epubcreator.epubbase import ebook_metadata, ebook_data, names
+from epubcreator.epubbase import ebook_metadata, ebook_data, names, images
 from epubcreator.misc import utils
 from epubcreator.misc.options import Options, Option
 
@@ -99,7 +98,7 @@ class Ebook(Options):
         super().__init__(**options)
 
         self._ebookData = ebookData or ebook_data.EbookData()
-        self._metadata = copy.deepcopy(metadata) if metadata else ebook_metadata.Metadata()
+        self._metadata = metadata.clone() if metadata else ebook_metadata.Metadata()
 
         # Hay algunos datos que indefectiblemente deben estar en el epub, por más
         # que el usuario no los haya especificado.
@@ -162,7 +161,7 @@ class Ebook(Options):
         if self._metadata.dedication or self._options.includeOptionalFiles:
             outputEpub.addHtmlData(names.DEDICATION_FILENAME, Ebook._epubBase.getDedication(self._metadata.dedication))
 
-        outputEpub.addImageData(names.COVER_IMAGE_FILENAME, self._metadata.coverImage)
+        outputEpub.addImageData(names.COVER_IMAGE_FILENAME, self._metadata.coverImage.toBytes())
 
         authorsWithBiographyOrImage = (a for a in self._metadata.authors if a.biography or a.image)
         for i, author in enumerate(authorsWithBiographyOrImage):
@@ -347,7 +346,7 @@ class Ebook(Options):
             self._metadata.coverModification = ebook_metadata.Metadata.DEFAULT_COVER_MODIFICATION
 
         if not self._metadata.coverImage:
-            self._metadata.coverImage = Ebook._epubBase.getCoverImage()
+            self._metadata.coverImage = images.CoverImage(Ebook._epubBase.getCoverImage())
 
         if not self._metadata.authors:
             self._metadata.authors.append(ebook_metadata.Person(ebook_metadata.Metadata.DEFAULT_AUTHOR, ebook_metadata.Metadata.DEFAULT_AUTHOR))

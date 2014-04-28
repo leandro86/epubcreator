@@ -21,7 +21,7 @@ class CoverEdit(QtGui.QDialog, cover_edit_dialog_ui.Ui_Dialog):
         self._connectSignals()
 
     def _compressImage(self, quality):
-        self._coverImage.compress(quality)
+        self._coverImage.setQuality(quality)
         self._updateImage()
 
     def _updateImage(self, compressIfNecessary=False):

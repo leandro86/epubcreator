@@ -1,4 +1,5 @@
 import datetime
+import copy
 import math
 
 
@@ -171,6 +172,8 @@ class Metadata:
         self.coverDesigner = ""
         self.language = ""
         self.dedication = ""
+
+        # Un objeto CoverImage.
         self.coverImage = None
 
     # Un date con la fecha de publicación en el idioma original.
@@ -184,6 +187,17 @@ class Metadata:
             self._publicationDate = value
         else:
             raise ValueError("Date expected.")
+
+    def clone(self):
+        clonedMetadata = Metadata()
+
+        for k, v in ((k, v) for (k, v) in self.__dict__.items() if k != "coverImage"):
+            setattr(clonedMetadata, k, copy.deepcopy(v))
+
+        if self.coverImage is not None:
+            clonedMetadata.coverImage = self.coverImage.clone()
+
+        return clonedMetadata
 
     @staticmethod
     def convertNameToFileAsFormat(name):
