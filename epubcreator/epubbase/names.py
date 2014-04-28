@@ -15,6 +15,12 @@ EPL_LOGO_FILENAME = "EPL_logo.png"
 EX_LIBRIS_FILENAME = "ex_libris.png"
 STYLE_FILENAME = "style.css"
 IBOOKS_DISPLAY_OPTIONS_FILE_NAME = "com.apple.ibooks.display-options.xml"
+BLACK_LOGO_FOR_COVER = "black_logo_for_cover.png"
+WHITE_LOGO_FOR_COVER = "white_logo_for_cover.png"
+GLOW_LOGO_FOR_COVER = "glow_logo_for_cover.png"
+BLACK_LOGO_PREVIEW = "black_logo_preview.png"
+WHITE_LOGO_PREVIEW = "white_logo_preview.png"
+GLOW_LOGO_PREVIEW = "glow_logo_preview.png"
 
 
 def generateTextSectionName(sectionNumber):

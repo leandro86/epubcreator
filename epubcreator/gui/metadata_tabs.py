@@ -113,13 +113,13 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
             except images.InvalidDimensionsError:
                 gui_utils.displayStdErrorDialog("La imagen de cubierta seleccionada no tiene las dimensiones requeridas, que deben ser "
                                                 "de {0}px de ancho y {1}px de alto. Si desea que la imagen se redimensione "
-                                                "automáticamente, habilite la opción para permitir el procesamiento de las imágenes, desde el "
+                                                "automáticamente, habilite la opción para permitir el procesamiento de las imágenes desde el "
                                                 "menú Preferencias.".format(images.CoverImage.WIDTH, images.CoverImage.HEIGHT))
                 return
             except images.MaxSizeExceededError:
                 gui_utils.displayStdErrorDialog("La imagen de cubierta excede el tamaño máximo permitido, que debe "
                                                 "ser de {0} kB. Si desea que la calidad de la imagen se ajuste automáticamente para reducir su "
-                                                "tamaño, habilite la opción para permitir el procesamiento de las imágenes, desde el menú "
+                                                "tamaño, habilite la opción para permitir el procesamiento de las imágenes desde el menú "
                                                 "Preferencias.".format(images.CoverImage.MAX_SIZE_IN_BYTES // 1000))
                 return
 
