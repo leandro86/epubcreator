@@ -78,14 +78,7 @@
     </property>
     <addaction name="aboutAction"/>
    </widget>
-   <widget class="QMenu" name="menuHerramientas">
-    <property name="title">
-     <string>Herramientas</string>
-    </property>
-    <addaction name="editCoverImageAction"/>
-   </widget>
    <addaction name="menuArchivo"/>
-   <addaction name="menuHerramientas"/>
    <addaction name="menuVer"/>
    <addaction name="menuAyuda"/>
   </widget>

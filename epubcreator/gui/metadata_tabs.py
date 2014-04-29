@@ -1,18 +1,14 @@
 import datetime
 
-from PyQt4 import QtGui, QtCore, Qt
+from PyQt4 import QtGui, QtCore
 
 from epubcreator.misc import language, gui_utils, settings_store
 from epubcreator.gui.forms import basic_metadata_widget_ui, additional_metadata_widget_ui, author_metadata_widget_ui
 from epubcreator.epubbase import ebook_metadata, images
+from epubcreator.gui import image_edit
 
 
 class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
-    # Lo correcto sería poner CoverImage como parámetro de pyqtsignal en lugar de object. El
-    # problema es que necesito poder emitir la señal pasándole None como parámetro, y qt genera
-    # una excepción cuando eso pasa.
-    coverImageChanged = Qt.pyqtSignal(object)
-
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
@@ -89,8 +85,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
             self._refreshCoverImage()
         else:
             self.coverImage.setText(self._coverImageText)
-
-        self.coverImageChanged.emit(self._coverImage)
+            self.editCoverImageButton.setEnabled(False)
 
     def _populateCoverModificationOptions(self):
         for i, option in enumerate(ebook_metadata.Metadata.COVER_MODIFICATION_OPTIONS):
@@ -109,7 +104,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
             settings = settings_store.SettingsStore()
 
             try:
-                self._coverImage = images.CoverImage(imageName, allowProcessing=settings.allowImageProcessing)
+                image = images.CoverImage(imageName, allowProcessing=settings.allowImageProcessing)
             except images.InvalidDimensionsError:
                 gui_utils.displayStdErrorDialog("La imagen de cubierta seleccionada no tiene las dimensiones requeridas, que deben ser "
                                                 "de {0}px de ancho y {1}px de alto. Si desea que la imagen se redimensione "
@@ -128,13 +123,21 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
                                                 "imágenes desde el menú Preferencias.")
                 return
 
-            self._refreshCoverImage()
-            self.coverImageChanged.emit(self._coverImage)
+            self.setCoverImage(image)
+
+            if settings.allowImageProcessing:
+                self.editCoverImageButton.setEnabled(True)
 
     def _refreshCoverImage(self):
         pixmap = QtGui.QPixmap()
         pixmap.loadFromData(self._coverImage.toBytes())
         self.coverImage.setPixmap(pixmap)
+
+    def _editCoverImage(self):
+        clonedCoverImage = self._coverImage.clone()
+
+        if image_edit.ImageEdit(clonedCoverImage, parent=self).exec() == QtGui.QDialog.Accepted:
+            self.setCoverImage(clonedCoverImage)
 
     def _addAuthorToList(self):
         name = self.authorInput.text().strip()
@@ -170,13 +173,13 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
 
     def _connectSignals(self):
         self.coverImage.clicked.connect(self._changeCoverImage)
-
         self.addAuthorButton.clicked.connect(self._addAuthorToList)
         self.authorsList.deleteKeyPressed.connect(self._removeSelectedAuthorFromList)
         self.authorsList.currentItemChanged.connect(self._populateCurrentAuthorData)
         self.authorInput.textChanged.connect(self._updateAuthorFileAs)
         self.authorInput.returnPressed.connect(self._addAuthorToList)
         self.authorFileAsInput.returnPressed.connect(self._addAuthorToList)
+        self.editCoverImageButton.clicked.connect(self._editCoverImage)
 
 
 class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget_ui.Ui_AdditionalMetadata):

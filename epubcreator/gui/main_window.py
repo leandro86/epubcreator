@@ -1,4 +1,3 @@
-import copy
 import os
 import subprocess
 import re
@@ -9,7 +8,7 @@ from epubcreator.epubbase import ebook
 from epubcreator.converters import converter_factory
 from epubcreator.misc import settings_store, gui_utils
 from epubcreator.gui.forms import main_window_ui
-from epubcreator.gui import preferences, about, image_edit
+from epubcreator.gui import preferences, about
 from epubcreator import version, config
 
 
@@ -197,13 +196,6 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
             gui_utils.displayStdErrorDialog("Se ha perdido texto en la conversión. Por favor, repórtalo a los desarrolladores y adjunta "
                                             "el documento fuente.")
 
-    def _editCoverImage(self):
-        coverImage = self.metadataTabManager.basicMetadata.getCoverImage()
-        clonedCoverImage = coverImage.clone()
-
-        if image_edit.ImageEdit(clonedCoverImage, parent=self).exec() == QtGui.QDialog.Accepted:
-            self.metadataTabManager.basicMetadata.setCoverImage(clonedCoverImage)
-
     def _saveImages(self, outputDir):
         coverImage = self.metadataTabManager.basicMetadata.getCoverImage()
 
@@ -236,7 +228,3 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
         self.toolBar.visibilityChanged.connect(self.toggleToolBarAction.setChecked)
         self.quitAction.triggered.connect(self._close)
         self.aboutAction.triggered.connect(lambda: about.About(self).exec())
-        self.editCoverImageAction.triggered.connect(self._editCoverImage)
-
-        f = lambda coverImg: self.editCoverImageAction.setEnabled(coverImg is not None and settings_store.SettingsStore().allowImageProcessing)
-        self.metadataTabManager.basicMetadata.coverImageChanged.connect(f)
