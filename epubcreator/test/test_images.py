@@ -58,6 +58,11 @@ class CoverImageTest(unittest.TestCase):
         imageBytes = self._saveImage(image, "JPEG")
         self.assertEqual(type(images.CoverImage(imageBytes, allowProcessing=False)), images.CoverImage)
 
+    def test_cannot_load_progressive_image_when_allow_processing_is_false(self):
+        imageBytes = self._saveImage(self._createImage(600, 900), progressive=True)
+
+        self.assertRaises(images.ProgressiveImageError, lambda: images.CoverImage(imageBytes, allowProcessing=False))
+
     def test_image_with_wrong_dimensions_is_scaled_when_allow_processing_is_true(self):
         imageBytes = self._saveImage(self._createImage(500, 480))
 
@@ -76,6 +81,11 @@ class CoverImageTest(unittest.TestCase):
         self.assertEqual(type(images.CoverImage(imageBytes)), images.CoverImage)
 
         imageBytes = self._saveImage(image, "JPEG")
+        self.assertEqual(type(images.CoverImage(imageBytes)), images.CoverImage)
+
+    def test_can_load_progressive_image_when_allow_processing_is_true(self):
+        imageBytes = self._saveImage(self._createImage(600, 900), progressive=True)
+
         self.assertEqual(type(images.CoverImage(imageBytes)), images.CoverImage)
 
     def test_image_quality_is_automatically_lowered_when_size_exceeds_max_size_and_allow_processing_is_true(self):
@@ -136,7 +146,12 @@ class CoverImageTest(unittest.TestCase):
 
         coverImage = images.CoverImage(imageBytes)
         coverImageWithNoLogoBytes = coverImage.toBytes()
-        coverImage.insertLogo(images.CoverImage.BLACK_LOGO)
+
+        # ¡Cuidado el logo que elijo para hacer el test! Por defecto, al crear un objeto Image, este
+        # se llena de pixeles negros, con lo cual si le inserto el logo negro, el test va a fallar! La otra
+        # opción sería llenar el Image con pixeles de otro color si quisiera probar con el logo negro...
+        coverImage.insertLogo(images.CoverImage.WHITE_LOGO)
+
         coverImageWithLogoBytes = coverImage.toBytes()
 
         self.assertNotEqual(coverImageWithLogoBytes, coverImageWithNoLogoBytes)
@@ -144,9 +159,16 @@ class CoverImageTest(unittest.TestCase):
     def _createImage(self, width, height):
         return Image.new("RGB", (width, height))
 
-    def _saveImage(self, image, imageFormat="JPEG"):
+    def _saveImage(self, image, imageFormat="JPEG", progressive=False):
         buffer = io.BytesIO()
-        image.save(buffer, imageFormat, quality=100)
+
+        if not progressive:
+            # No puedo poner progressive en False: con que solo aparezca el kwarg "progressive" (sin importar el
+            # valor que tenga), ya guarda la imagen como progresiva...
+            image.save(buffer, imageFormat, quality=100)
+        else:
+            image.save(buffer, imageFormat, quality=100, progressive=True)
+
         return buffer.getvalue()
 
 

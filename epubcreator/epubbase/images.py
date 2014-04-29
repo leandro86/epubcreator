@@ -65,6 +65,9 @@ class CoverImage:
             if self._image.size != (CoverImage.WIDTH, CoverImage.HEIGHT):
                 raise InvalidDimensionsError()
 
+            if "progressive" in self._image.info:
+                raise ProgressiveImageError()
+
         self._quality = 100
         self._logo = CoverImage.NO_LOGO
 
@@ -104,13 +107,13 @@ class CoverImage:
 
         self._image = self._originalImage.copy()
 
-        # Ojo, al recargar la imagen, ahora la calidad vuelve a ser 100!
-        self._quality = 100
-
         logoImage = CoverImage._LOGOS[logo]
         self._image.paste(logoImage, mask=logoImage)
 
         self._logo = logo
+
+        # Ojo: al recargar la imagen, ahora la calidad vuelve a ser 100!
+        self._quality = 100
 
     def logo(self):
         return self._logo
@@ -173,4 +176,8 @@ class InvalidDimensionsError(Exception):
 
 
 class MaxSizeExceededError(Exception):
+    pass
+
+
+class ProgressiveImageError(Exception):
     pass

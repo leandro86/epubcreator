@@ -122,6 +122,11 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
                                                 "tamaño, habilite la opción para permitir el procesamiento de las imágenes desde el menú "
                                                 "Preferencias.".format(images.CoverImage.MAX_SIZE_IN_BYTES // 1000))
                 return
+            except images.ProgressiveImageError:
+                gui_utils.displayStdErrorDialog("La imagen de cubierta no puede ser abierta porque fue guardada en modo progresivo. Guárdela de "
+                                                "manera normal y vuelva a abrirla, o habilite la opción para permitir el procesamiento de las "
+                                                "imágenes desde el menú Preferencias.")
+                return
 
             self._refreshCoverImage()
             self.coverImageChanged.emit(self._coverImage)
