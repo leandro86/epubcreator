@@ -1,11 +1,13 @@
 import unittest
 import tempfile
 import datetime
+import io
 
 from lxml import etree
+from PIL import Image
 
 from epubcreator.pyepub.pyepubreader import epub
-from epubcreator.epubbase import ebook, ebook_data, ebook_metadata
+from epubcreator.epubbase import ebook, ebook_data, ebook_metadata, images
 
 
 class SynopsisTest(unittest.TestCase):
@@ -1306,12 +1308,16 @@ class ImagesTest(unittest.TestCase):
         self.assertTrue(self._common.outputEpub.hasFile("ex_libris.png"))
 
     def test_cover_image_content(self):
-        self._common.metadata.coverImage = "cover image"
+        image = Image.new("RGB", (600, 900))
+        buffer = io.BytesIO()
+        image.save(buffer, "JPEG")
+
+        self._common.metadata.coverImage = images.CoverImage(buffer.getvalue(), allowProcessing=False)
 
         self._common.generateEbook()
 
         coverImage = self._common.outputEpub.read(self._common.outputEpub.getFullPathToFile("cover.jpg"))
-        self.assertEqual(coverImage.decode(), "cover image")
+        self.assertEqual(coverImage, buffer.getvalue())
 
     def test_only_one_author_image_exists_when_no_authors_but_include_optional_files(self):
         self._common.metadata.authors.clear()
