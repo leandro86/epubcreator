@@ -90,6 +90,9 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
                 try:
                     fileName = eebook.save(outputDir)
 
+                    if settings.allowImageProcessing:
+                        self._saveImages(outputDir)
+
                     statusBarMsg = "ePub generado. "
 
                     if settings.sigilPath:
@@ -200,6 +203,13 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
 
         if cover_edit.CoverEdit(clonedCoverImage, self).exec() == QtGui.QDialog.Accepted:
             self.metadataTabManager.basicMetadata.setCoverImage(clonedCoverImage)
+
+    def _saveImages(self, outputDir):
+        coverImage = self.metadataTabManager.basicMetadata.getCoverImage()
+
+        if coverImage is not None:
+            with open(os.path.join(outputDir, "cover_web.jpg"), "wb") as file:
+                file.write(coverImage.toBytesForWeb())
 
     def _close(self):
         QtGui.qApp.closeAllWindows()

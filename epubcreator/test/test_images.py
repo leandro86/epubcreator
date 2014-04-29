@@ -156,6 +156,24 @@ class CoverImageTest(unittest.TestCase):
 
         self.assertNotEqual(coverImageWithLogoBytes, coverImageWithNoLogoBytes)
 
+    def test_cover_for_web(self):
+        image = self._createImage(600, 900)
+
+        data = image.load()
+
+        # Modifico los pixeles con diferentes colores para incrementar de tamaño la imagen.
+        for y in range(image.size[1]):
+            for x in range(image.size[0]):
+                data[x, y] = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+
+        imageBytes = self._saveImage(image)
+        coverImage = images.CoverImage(imageBytes)
+        coverImageBytesForWeb = coverImage.toBytesForWeb()
+        coverImageForWeb = Image.open(io.BytesIO(coverImageBytesForWeb))
+
+        self.assertEqual(coverImageForWeb.size, (400, 600))
+        self.assertLessEqual(len(coverImageBytesForWeb), 100 * 1000)
+
     def _createImage(self, width, height):
         return Image.new("RGB", (width, height))
 

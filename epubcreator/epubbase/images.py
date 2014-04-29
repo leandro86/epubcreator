@@ -15,6 +15,11 @@ class CoverImage:
     GLOW_LOGO = 2
     NO_LOGO = 3
 
+    # Dimensiones y tamaño de la imagen requerida para poner en la web.
+    WIDTH_FOR_WEB = 400
+    HEIGHT_FOR_WEB = 600
+    MAX_SIZE_IN_BYTES_FOR_WEB = 100 * 1000
+
     # Contiene los formatos de imágenes soportados. El primer elemento de cada tupla
     # indica el formato, y el segundo si es necesario realizarle un preprocesamiento para
     # abrirlo (toda imagen que no sea jpg debe ser convertida a jpg, lo que significa que
@@ -88,7 +93,10 @@ class CoverImage:
         self._quality = quality
 
     def size(self):
-        return len(self._saveImage(self.quality()))
+        if self._allowProcessing:
+            return len(self._getBytes(self._image, self.quality()))
+        else:
+            return len(self._originalImageBytes)
 
     def quality(self):
         return self._quality
@@ -130,10 +138,25 @@ class CoverImage:
         """
         if self._allowProcessing:
             if compressIfNecessary and self.size() > CoverImage.MAX_SIZE_IN_BYTES:
-                self._quality = self._findBestQuality()
-            return self._saveImage(self.quality())
+                self._quality = self._findBestQuality(self._image, CoverImage.MAX_SIZE_IN_BYTES)
+            return self._getBytes(self._image, self.quality())
         else:
             return self._originalImageBytes
+
+    def toBytesForWeb(self):
+        if not self._allowProcessing:
+            raise ValueError("Debe permitirse el procesamiento de la imagen para poder generar la cubierta para la web.")
+
+        image = self._image.resize((CoverImage.WIDTH_FOR_WEB, CoverImage.HEIGHT_FOR_WEB), resample=Image.ANTIALIAS)
+
+        # Veo primero si con la calidad actual que tiene la cubierta puedo generar una para la web que no sobrepase
+        # el tamaño máximo. Caso contrario, busco la mejor calidad.
+        imageBytes = self._getBytes(image, self.quality())
+        if len(imageBytes) <= CoverImage.MAX_SIZE_IN_BYTES_FOR_WEB:
+            return imageBytes
+        else:
+            quality = self._findBestQuality(image, CoverImage.MAX_SIZE_IN_BYTES_FOR_WEB)
+            return self._getBytes(image, quality)
 
     def clone(self):
         coverImage = CoverImage(self._originalImageBytes, self._allowProcessing)
@@ -147,19 +170,28 @@ class CoverImage:
 
         return coverImage
 
-    def _saveImage(self, quality=100):
-        if self._allowProcessing:
-            buffer = io.BytesIO()
-            self._image.save(buffer, "JPEG", quality=quality, optimize=True)
-            return buffer.getvalue()
-        else:
-            return self._originalImageBytes
+    def _getBytes(self, image, quality=100):
+        """
+        Retorna los bytes de un Image.
 
-    def _findBestQuality(self):
+        @param image: el Image del cual retornar los bytes.
+        @param quality: la calidad con la cual guardar la imagen.
+
+        @return: los bytes de la imagen.
+        """
+        buffer = io.BytesIO()
+        image.save(buffer, "JPEG", quality=quality, optimize=True)
+        return buffer.getvalue()
+
+    def _findBestQuality(self, image, maxSizeInBytes):
+        """
+        Dado un Image y un tamaño máximo en bytes, retorna un int con la mejor calidad posible para la imagen asegurando que el
+        tamaño resultante de la misma sea menor o igual al tamaño máximo en bytes.
+        """
         for quality in range(100, -1, -1):
-            imageBytes = self._saveImage(quality)
+            imageBytes = self._getBytes(image, quality)
 
-            if len(imageBytes) <= CoverImage.MAX_SIZE_IN_BYTES:
+            if len(imageBytes) <= maxSizeInBytes:
                 return quality
 
         raise Exception("Esto no debería pasar: no se encontró un nivel de compresión en el rango 0-100 capaz de reducir "
