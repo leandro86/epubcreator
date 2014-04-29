@@ -9,7 +9,7 @@ from epubcreator.epubbase import ebook
 from epubcreator.converters import converter_factory
 from epubcreator.misc import settings_store, gui_utils
 from epubcreator.gui.forms import main_window_ui
-from epubcreator.gui import preferences, about, cover_edit
+from epubcreator.gui import preferences, about, image_edit
 from epubcreator import version, config
 
 
@@ -201,7 +201,7 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
         coverImage = self.metadataTabManager.basicMetadata.getCoverImage()
         clonedCoverImage = coverImage.clone()
 
-        if cover_edit.CoverEdit(clonedCoverImage, self).exec() == QtGui.QDialog.Accepted:
+        if image_edit.ImageEdit(clonedCoverImage, parent=self).exec() == QtGui.QDialog.Accepted:
             self.metadataTabManager.basicMetadata.setCoverImage(clonedCoverImage)
 
     def _saveImages(self, outputDir):
