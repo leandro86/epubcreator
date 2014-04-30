@@ -15,15 +15,8 @@ class AbstractEpubBaseImage:
     HEIGHT = -1
     MAX_SIZE_IN_BYTES = -1
 
-    # Contiene los formatos de imágenes soportados. El primer elemento de cada tupla
-    # indica el formato, y el segundo si es necesario realizarle un preprocesamiento para
-    # abrirlo (toda imagen que no sea jpg debe ser convertida a jpg, lo que significa que
-    # allowProcessing debe ser True).
-    SUPPORTED_FORMATS = (("jpg", False), ("jpeg", False), ("bmp", True), ("png", True))
-
-    # Formatos de imágenes que no necesitan ser preprocesados (es decir, allowProcessing puede
-    # ser False: solo para los formatos jpg y jpeg).
-    _SAFE_FORMATS = tuple([f[0] for f in SUPPORTED_FORMATS if not f[1]])
+    _FORMATS_NO_NEED_PROCESSING = ("jpg", "jpeg")
+    _FORMATS_NEED_PROCESSING = ("png", "bmp")
 
     def __init__(self, file, allowProcessing=True):
         """
@@ -49,7 +42,7 @@ class AbstractEpubBaseImage:
             if self._image.size != (self.WIDTH, self.HEIGHT):
                 self._image = self._image.resize((self.WIDTH, self.HEIGHT), resample=Image.ANTIALIAS)
         else:
-            if self._image.format.lower() not in self._SAFE_FORMATS:
+            if self._image.format.lower() not in self._FORMATS_NO_NEED_PROCESSING:
                 raise ValueError("Debe permitirse el preprocesamiento para abrir una imagen de tipo '{0}'.".format(self._image.format))
 
             if not allowProcessing and len(imageBytes) > self.MAX_SIZE_IN_BYTES:
@@ -71,6 +64,10 @@ class AbstractEpubBaseImage:
         self._originalImageBytes = imageBytes
 
         self._allowProcessing = allowProcessing
+
+    @classmethod
+    def allowedFormatsToOpen(cls, allowProcessing):
+        return cls._FORMATS_NEED_PROCESSING + cls._FORMATS_NO_NEED_PROCESSING if allowProcessing else cls._FORMATS_NO_NEED_PROCESSING
 
     def setQuality(self, quality):
         if not self._allowProcessing:

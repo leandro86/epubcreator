@@ -29,12 +29,14 @@ class AuthorDataEdit(QtGui.QDialog, author_data_edit_dialog_ui.Ui_Dialog):
         self.authorGenderInput.setCurrentIndex(self.authorGenderInput.findText(AuthorDataEdit._GENDERS_TO_TEXT[self._author.gender]))
 
     def _openImageSelectionDialog(self):
-        imgFilter = "Imágenes ({0})".format(" ".join(("*.{0}".format(f[0]) for f in images.AuthorImage.SUPPORTED_FORMATS if not f[1])))
-        imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen", filter=imgFilter)
+        settings = settings_store.SettingsStore()
+
+        allowedFormatsToOpen = ("*.{0}".format(f) for f in images.AuthorImage.allowedFormatsToOpen(settings.allowImageProcessing))
+        imagesFilter = "Imágenes ({0})".format(" ".join(allowedFormatsToOpen))
+
+        imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen", filter=imagesFilter)
 
         if imageName:
-            settings = settings_store.SettingsStore()
-
             try:
                 image = images.AuthorImage(imageName, allowProcessing=settings.allowImageProcessing)
             except images.InvalidDimensionsError:

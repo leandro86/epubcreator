@@ -97,12 +97,14 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
             self.languageInput.addItem(languageName)
 
     def _changeCoverImage(self):
-        imgFilter = "Imágenes ({0})".format(" ".join(("*.{0}".format(f[0]) for f in images.CoverImage.SUPPORTED_FORMATS if not f[1])))
-        imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen", filter=imgFilter)
+        settings = settings_store.SettingsStore()
+
+        allowedFormatsToOpen = ("*.{0}".format(f) for f in images.CoverImage.allowedFormatsToOpen(settings.allowImageProcessing))
+        imagesFilter = "Imágenes ({0})".format(" ".join(allowedFormatsToOpen))
+
+        imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen", filter=imagesFilter)
 
         if imageName:
-            settings = settings_store.SettingsStore()
-
             try:
                 image = images.CoverImage(imageName, allowProcessing=settings.allowImageProcessing)
             except images.InvalidDimensionsError:
