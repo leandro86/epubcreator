@@ -136,7 +136,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
     def _editCoverImage(self):
         clonedCoverImage = self._coverImage.clone()
 
-        if image_edit.ImageEdit(clonedCoverImage, parent=self).exec() == QtGui.QDialog.Accepted:
+        if image_edit.ImageEdit(clonedCoverImage, parent=self.window()).exec() == QtGui.QDialog.Accepted:
             self.setCoverImage(clonedCoverImage)
 
     def _addAuthorToList(self):
