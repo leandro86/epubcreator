@@ -25,9 +25,6 @@ class AbstractEpubBaseImage:
     # ser False: solo para los formatos jpg y jpeg).
     _SAFE_FORMATS = tuple([f[0] for f in SUPPORTED_FORMATS if not f[1]])
 
-    # Las cubiertas transparentes solamente con los logos.
-    _LOGOS = {}
-
     def __init__(self, file, allowProcessing=True):
         """
         @param file: un string con el path de la imagen, o los bytes de la misma.
