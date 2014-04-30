@@ -202,6 +202,12 @@
    <header>epubcreator.gui.custom_widgets</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>authorGenderInput</tabstop>
+  <tabstop>ediAuthorImageButton</tabstop>
+  <tabstop>authorBiographyInput</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
