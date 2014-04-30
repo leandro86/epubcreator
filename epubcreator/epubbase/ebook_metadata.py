@@ -191,11 +191,20 @@ class Metadata:
     def clone(self):
         clonedMetadata = Metadata()
 
-        for k, v in ((k, v) for (k, v) in self.__dict__.items() if k != "coverImage"):
+        for k, v in ((k, v) for (k, v) in self.__dict__.items() if k not in ("coverImage", "authors", "translators", "ilustrators")):
             setattr(clonedMetadata, k, copy.deepcopy(v))
 
         if self.coverImage is not None:
             clonedMetadata.coverImage = self.coverImage.clone()
+
+        for author in self.authors:
+            clonedMetadata.authors.append(author.clone())
+
+        for ilustrator in self.ilustrators:
+            clonedMetadata.ilustrators.append(ilustrator.clone())
+
+        for translator in self.translators:
+            clonedMetadata.translators.append(translator.clone())
 
         return clonedMetadata
 
@@ -237,6 +246,14 @@ class Person:
         self.gender = gender
         self.image = image
         self.biography = biography
+
+    def clone(self):
+        clonedPerson = Person(self.name, self.fileAs, self.gender, None, self.biography)
+
+        if self.image:
+            clonedPerson.image = self.image.clone()
+
+        return clonedPerson
 
 
 class Genre:

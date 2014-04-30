@@ -35,11 +35,6 @@
        <string>Datos Adicionales</string>
       </attribute>
      </widget>
-     <widget class="AuthorMetadata" name="authorMetadata">
-      <attribute name="title">
-       <string>Datos del Autor</string>
-      </attribute>
-     </widget>
     </widget>
    </item>
   </layout>
@@ -53,12 +48,6 @@
   </customwidget>
   <customwidget>
    <class>AdditionalMetadata</class>
-   <extends>QWidget</extends>
-   <header>epubcreator.gui.metadata_tabs</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>AuthorMetadata</class>
    <extends>QWidget</extends>
    <header>epubcreator.gui.metadata_tabs</header>
    <container>1</container>

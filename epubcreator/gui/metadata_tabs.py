@@ -3,9 +3,9 @@ import datetime
 from PyQt4 import QtGui, QtCore
 
 from epubcreator.misc import language, gui_utils, settings_store
-from epubcreator.gui.forms import basic_metadata_widget_ui, additional_metadata_widget_ui, author_metadata_widget_ui
+from epubcreator.gui.forms import basic_metadata_widget_ui, additional_metadata_widget_ui
 from epubcreator.epubbase import ebook_metadata, images
-from epubcreator.gui import image_edit
+from epubcreator.gui import image_edit, author_data_edit
 
 
 class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
@@ -113,9 +113,9 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
                 return
             except images.MaxSizeExceededError:
                 gui_utils.displayStdErrorDialog("La imagen de cubierta excede el tamaño máximo permitido, que debe "
-                                                "ser de {0} kB. Si desea que la calidad de la imagen se ajuste automáticamente para reducir su "
-                                                "tamaño, habilite la opción para permitir el procesamiento de las imágenes desde el menú "
-                                                "Preferencias.".format(images.CoverImage.MAX_SIZE_IN_BYTES // 1000))
+                                                "ser menor o igual a {0} kB. Si desea que la calidad de la imagen se ajuste automáticamente "
+                                                "para reducir su tamaño, habilite la opción para permitir el procesamiento de las imágenes "
+                                                "desde el menú Preferencias.".format(images.CoverImage.MAX_SIZE_IN_BYTES // 1000))
                 return
             except images.ProgressiveImageError:
                 gui_utils.displayStdErrorDialog("La imagen de cubierta no puede ser abierta porque fue guardada en modo progresivo. Guárdela de "
@@ -160,6 +160,15 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
         if self.authorsList.currentItem() is not None:
             self.authorsList.takeItem(self.authorsList.row(self.authorsList.currentItem()))
 
+    def _editAuthorData(self, author):
+        clonedAuthor = author.clone()
+        canChooseGender = len(self.getAuthors()) == 1
+
+        if author_data_edit.AuthorDataEdit(clonedAuthor, canChooseGender=canChooseGender, parent=self).exec() == QtGui.QDialog.Accepted:
+            author.gender = clonedAuthor.gender
+            author.image = clonedAuthor.image
+            author.biography = clonedAuthor.biography
+
     def _populateCurrentAuthorData(self, selectedAuthor):
         if selectedAuthor is None:
             return
@@ -174,10 +183,14 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
     def _connectSignals(self):
         self.coverImage.clicked.connect(self._changeCoverImage)
         self.addAuthorButton.clicked.connect(self._addAuthorToList)
+
         self.authorsList.deleteKeyPressed.connect(self._removeSelectedAuthorFromList)
         self.authorsList.currentItemChanged.connect(self._populateCurrentAuthorData)
+        self.authorsList.itemDoubleClicked.connect(lambda item: self._editAuthorData(item.data(QtCore.Qt.UserRole)))
+
         self.authorInput.textChanged.connect(self._updateAuthorFileAs)
         self.authorInput.returnPressed.connect(self._addAuthorToList)
+
         self.authorFileAsInput.returnPressed.connect(self._addAuthorToList)
         self.editCoverImageButton.clicked.connect(self._editCoverImage)
 
@@ -411,116 +424,6 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget_ui.Ui_Additio
         self.ilustratorInput.textChanged.connect(self._updateIlustratorFileAs)
         self.ilustratorInput.returnPressed.connect(self._addIlustratorToList)
         self.ilustratorFileAsInput.returnPressed.connect(self._addIlustratorToList)
-
-
-class AuthorMetadata(QtGui.QWidget, author_metadata_widget_ui.Ui_AuthorMetadata):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setupUi(self)
-        self._extendUi()
-
-        # Guardo el texto del label porque cuando cargo una imagen luego no tengo manera de recuperar
-        # el texto.
-        self._authorImageText = self.authorImage.text()
-
-        self._connectSignals()
-
-    def setAuthors(self, authors):
-        """
-        Carga la lista de autores para editar su biografía e imagen.
-
-        @param authors: una lista de Person.
-        """
-        self.authorsTable.setRowCount(0)
-
-        if authors:
-            for author in authors:
-                row = self.authorsTable.rowCount()
-                self.authorsTable.insertRow(row)
-
-                combo = QtGui.QComboBox()
-
-                # Cuando hay varios autores, no interesa quién es autor o autora, ya que
-                # en el epubbase directamente se pone "Autores".
-                combo.setEnabled(len(authors) == 1)
-
-                combo.addItem("Autor")
-                combo.addItem("Autora")
-
-                combo.currentIndexChanged.connect(lambda index: self._saveAuthorGender(combo.itemText(index)))
-
-                item = QtGui.QTableWidgetItem(author.name)
-
-                # En el primer item de cada fila almaceno el autor.
-                item.setData(QtCore.Qt.UserRole, author)
-
-                self.authorsTable.setItem(row, 0, item)
-                self.authorsTable.setCellWidget(row, 1, combo)
-
-                self.authorBiographyInput.setEnabled(True)
-                self.authorImage.setEnabled(True)
-                self.authorsTable.selectRow(0)
-        else:
-            # Evito disparar la señal textChanged, porque sino se se dispara una excepción
-            # cuando se intenta obtener el autor seleccionado (que no lo hay, porque la tabla
-            # de autores va estar vacía)
-            self.authorBiographyInput.blockSignals(True)
-            self.authorBiographyInput.clear()
-            self.authorBiographyInput.blockSignals(False)
-
-            self.authorImage.setText(self._authorImageText)
-            self.authorBiographyInput.setEnabled(False)
-            self.authorImage.setEnabled(False)
-
-    def _populateAuthorData(self, current, previous):
-        if QtCore.QModelIndex.isValid(current):
-            currentAuthor = self._getCurrentAuthor()
-
-            self.authorBiographyInput.setPlainText(currentAuthor.biography)
-            self._changeAuthorImage(currentAuthor.image)
-
-    def _openImageSelectionDialog(self):
-        imageName = QtGui.QFileDialog.getOpenFileName(self, "Seleccionar Imagen", filter="Imágenes (*.jpg)")
-
-        if imageName:
-            with open(imageName, "rb") as file:
-                imgBytes = file.read()
-
-            self._changeAuthorImage(imgBytes)
-
-            currentSelectedAuthor = self._getCurrentAuthor()
-            currentSelectedAuthor.image = imgBytes
-
-    def _changeAuthorImage(self, imgBytes):
-        if imgBytes:
-            pixmap = QtGui.QPixmap()
-            pixmap.loadFromData(imgBytes)
-
-            self.authorImage.setPixmap(pixmap)
-        else:
-            self.authorImage.setText(self._authorImageText)
-
-    def _saveAuthorGender(self, newGenderText):
-        self._getCurrentAuthor().gender = ebook_metadata.Person.MALE_GENDER if newGenderText == "Autor" else ebook_metadata.Person.FEMALE_GENDER
-
-    def _saveAuthorBiography(self):
-        self._getCurrentAuthor().biography = self.authorBiographyInput.toPlainText().strip()
-
-    def _getCurrentAuthor(self):
-        return self.authorsTable.item(self.authorsTable.currentRow(), 0).data(QtCore.Qt.UserRole)
-
-    def _connectSignals(self):
-        self.authorsTable.selectionModel().currentRowChanged.connect(self._populateAuthorData)
-        self.authorImage.clicked.connect(self._openImageSelectionDialog)
-
-        # Guardo directamente el texto de la biografía cada vez que se realice un cambio
-        # en el control. Me evito de esta manera el tener que de alguna manera forzar el
-        # guardado cuando se va a generar el epub.
-        self.authorBiographyInput.textChanged.connect(self._saveAuthorBiography)
-
-    def _extendUi(self):
-        self.authorsTable.setColumnWidth(1, 160)
-        self.authorsTable.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Stretch)
 
 
 class ValidationException(Exception):

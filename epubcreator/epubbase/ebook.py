@@ -163,10 +163,6 @@ class Ebook(Options):
 
         outputEpub.addImageData(names.COVER_IMAGE_FILENAME, self._metadata.coverImage.toBytes())
 
-        authorsWithBiographyOrImage = (a for a in self._metadata.authors if a.biography or a.image)
-        for i, author in enumerate(authorsWithBiographyOrImage):
-            outputEpub.addImageData(names.generateAuthorImageFileName(i), author.image)
-
         # Agrego el resto de los archivos del epubbase.
         outputEpub.addImageData(names.EPL_LOGO_FILENAME, Ebook._epubBase.getEplLogoImage())
         outputEpub.addImageData(names.EX_LIBRIS_FILENAME, Ebook._epubBase.getExLibrisImage())
@@ -218,9 +214,10 @@ class Ebook(Options):
             for i, author in enumerate(authorsWithBiographyOrImage):
                 title = self._getTocTitleForAuthorFile() if i == 0 else None
                 imageName = names.generateAuthorImageFileName(i)
-
                 authorContent = Ebook._epubBase.getAuthor(author.biography, title, imageName)
+
                 outputEpub.addHtmlData(names.generateAuthorFileName(i), authorContent)
+                outputEpub.addImageData(imageName, author.image.toBytes())
 
         processSections(self._ebookData.iterNotesSections())
 
@@ -357,7 +354,7 @@ class Ebook(Options):
                 if not author.biography:
                     author.biography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
                 if not author.image:
-                    author.image = Ebook._epubBase.getAuthorImage()
+                    author.image = images.AuthorImage(Ebook._epubBase.getAuthorImage(), allowProcessing=False)
 
     def _getPersonsListAsText(self, persons):
         """

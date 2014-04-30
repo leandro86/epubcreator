@@ -583,7 +583,14 @@ class AuthorTest(unittest.TestCase):
         self.assertEqual(self._common.xpath(author, "x:body/x:div[@class = 'autor']/x:p[3]//text()"), ["Párrafo 3."])
 
     def test_author_biography_when_custom_image(self):
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="Párrafo 1.", image="bla"))
+        image = Image.new("RGB", (320, 400))
+        buffer = io.BytesIO()
+        image.save(buffer, "JPEG")
+
+        self._common.metadata.authors.append(ebook_metadata.Person("bla",
+                                                                   "bla",
+                                                                   biography="Párrafo 1.",
+                                                                   image=images.AuthorImage(buffer.getvalue(), allowProcessing=False)))
 
         self._common.generateEbook()
 
@@ -624,8 +631,12 @@ class AuthorTest(unittest.TestCase):
         self.assertEqual(self._common.xpath(firstAuthor, "x:body/x:h1[@class = 'oculto']/@title")[0], "Autores")
 
     def test_only_first_author_file_has_header_when_two_author_files(self):
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
+        image = Image.new("RGB", (320, 400))
+        buffer = io.BytesIO()
+        image.save(buffer, "JPEG")
+
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image=images.AuthorImage(buffer.getvalue(), allowProcessing=False)))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image=images.AuthorImage(buffer.getvalue(), allowProcessing=False)))
 
         self._common.generateEbook()
 
@@ -646,8 +657,12 @@ class AuthorTest(unittest.TestCase):
         self.assertTrue(self._common.xpath(author, "x:body/x:div[@class = 'vineta']/x:img/@src")[0].endswith("autor.jpg"))
 
     def test_image_reference_when_two_author_files(self):
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
+        image = Image.new("RGB", (320, 400))
+        buffer = io.BytesIO()
+        image.save(buffer, "JPEG")
+
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image=images.AuthorImage(buffer.getvalue(), allowProcessing=False)))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image=images.AuthorImage(buffer.getvalue(), allowProcessing=False)))
 
         self._common.generateEbook()
 
@@ -674,10 +689,14 @@ class AuthorTest(unittest.TestCase):
         self.assertEqual(htmlFiles[-2], "autor.xhtml")
 
     def test_player_order_when_multiple_author_files(self):
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
+        image = Image.new("RGB", (320, 400))
+        buffer = io.BytesIO()
+        image.save(buffer, "JPEG")
+
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image=images.AuthorImage(buffer.getvalue(), allowProcessing=False)))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image=images.AuthorImage(buffer.getvalue(), allowProcessing=False)))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image=images.AuthorImage(buffer.getvalue(), allowProcessing=False)))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image=images.AuthorImage(buffer.getvalue(), allowProcessing=False)))
 
         self._common.generateEbook()
 
@@ -1349,8 +1368,12 @@ class ImagesTest(unittest.TestCase):
         self.assertTrue("autor.jpg" in authorImages and "autor1.jpg" in authorImages)
 
     def test_two_author_images_exist_when_two_authors_and_both_have_biography_or_image(self):
+        image = Image.new("RGB", (320, 400))
+        buffer = io.BytesIO()
+        image.save(buffer, "JPEG")
+
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="bla"))
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="bla"))
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image=images.AuthorImage(buffer.getvalue(), allowProcessing=False)))
 
         self._common.generateEbook()
 
@@ -1359,20 +1382,31 @@ class ImagesTest(unittest.TestCase):
         self.assertTrue("autor.jpg" in authorImages and "autor1.jpg" in authorImages)
 
     def test_author_image_content(self):
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image="author image"))
+        image = Image.new("RGB", (320, 400))
+        buffer = io.BytesIO()
+        image.save(buffer, "JPEG")
+
+        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", image=images.AuthorImage(buffer.getvalue(), allowProcessing=False)))
 
         self._common.generateEbook()
 
         authorImage = self._common.outputEpub.read(self._common.outputEpub.getFullPathToFile("autor.jpg"))
-        self.assertEqual(authorImage.decode(), "author image")
+        self.assertEqual(authorImage, buffer.getvalue())
 
     def test_author_image_content_when_author_has_custom_biography(self):
-        self._common.metadata.authors.append(ebook_metadata.Person("bla", "bla", biography="bla", image="author image"))
+        image = Image.new("RGB", (320, 400))
+        buffer = io.BytesIO()
+        image.save(buffer, "JPEG")
+
+        self._common.metadata.authors.append(ebook_metadata.Person("bla",
+                                                                   "bla",
+                                                                   biography="bla",
+                                                                   image=images.AuthorImage(buffer.getvalue(), allowProcessing=False)))
 
         self._common.generateEbook()
 
         authorImage = self._common.outputEpub.read(self._common.outputEpub.getFullPathToFile("autor.jpg"))
-        self.assertEqual(authorImage.decode(), "author image")
+        self.assertEqual(authorImage, buffer.getvalue())
 
 
 class MiscTest(unittest.TestCase):

@@ -5,20 +5,15 @@ from PIL import Image
 from epubcreator.epubbase import names
 
 
-class CoverImage:
-    WIDTH = 600
-    HEIGHT = 900
-    MAX_SIZE_IN_BYTES = 300 * 1000
+class AbstractEpubBaseImage:
+    """
+    Clase base para procesar la imágenes de cubierta y autores.
+    """
 
-    WHITE_LOGO = 0
-    BLACK_LOGO = 1
-    GLOW_LOGO = 2
-    NO_LOGO = 3
-
-    # Dimensiones y tamaño de la imagen requerida para poner en la web.
-    WIDTH_FOR_WEB = 400
-    HEIGHT_FOR_WEB = 600
-    MAX_SIZE_IN_BYTES_FOR_WEB = 100 * 1000
+    # Deben ser sobreescritos en las clases derivadas.
+    WIDTH = -1
+    HEIGHT = -1
+    MAX_SIZE_IN_BYTES = -1
 
     # Contiene los formatos de imágenes soportados. El primer elemento de cada tupla
     # indica el formato, y el segundo si es necesario realizarle un preprocesamiento para
@@ -35,9 +30,6 @@ class CoverImage:
 
     def __init__(self, file, allowProcessing=True):
         """
-        Clase para procesar la imagen de cubierta, redimensionarla según las medidas que
-        indica el epub base, insertarle el logo, etc.
-
         @param file: un string con el path de la imagen, o los bytes de la misma.
         @param allowProcessing: indica si se permite modificar la imagen. De no permitirse, entonces
                                 no puede aplicársele ningún tipo de procesamiento, lo que significa
@@ -54,30 +46,27 @@ class CoverImage:
         else:
             imageBytes = file
 
-        # Contiene la imagen actual con el logo, si fue insertado.
         self._image = Image.open(io.BytesIO(imageBytes))
 
         if allowProcessing:
-            if self._image.size != (CoverImage.WIDTH, CoverImage.HEIGHT):
-                self._image = self._image.resize((CoverImage.WIDTH, CoverImage.HEIGHT), resample=Image.ANTIALIAS)
+            if self._image.size != (self.WIDTH, self.HEIGHT):
+                self._image = self._image.resize((self.WIDTH, self.HEIGHT), resample=Image.ANTIALIAS)
         else:
-            if self._image.format.lower() not in CoverImage._SAFE_FORMATS:
+            if self._image.format.lower() not in self._SAFE_FORMATS:
                 raise ValueError("Debe permitirse el preprocesamiento para abrir una imagen de tipo '{0}'.".format(self._image.format))
 
-            if not allowProcessing and len(imageBytes) > CoverImage.MAX_SIZE_IN_BYTES:
+            if not allowProcessing and len(imageBytes) > self.MAX_SIZE_IN_BYTES:
                 raise MaxSizeExceededError()
 
-            if self._image.size != (CoverImage.WIDTH, CoverImage.HEIGHT):
+            if self._image.size != (self.WIDTH, self.HEIGHT):
                 raise InvalidDimensionsError()
 
             if "progressive" in self._image.info:
                 raise ProgressiveImageError()
 
         self._quality = 100
-        self._logo = CoverImage.NO_LOGO
 
-        # Contiene la imagen original, inalterada, de manera tal de que cuando deba insertar un logo pueda
-        # hacerlo sobre una imagen "limpia".
+        # Contiene la imagen original, inalterada, en caso de que deba realizarle algún tipo de procesamiento que requiera una imagen "limpia".
         self._originalImage = self._image
 
         # Contiene los bytes originales de la imagen. Los necesito para poder retornar la imagen intacta
@@ -101,31 +90,6 @@ class CoverImage:
     def quality(self):
         return self._quality
 
-    def insertLogo(self, logo):
-        """
-        Inserta un logo de epublibre en la imagen.
-
-        @param logo: uno de estos posibles valores: WHITE_LOGO, BLACK_LOGO, GLOW_LOGO.
-        """
-        if not self._allowProcessing:
-            raise ValueError("Debe permitirse el procesamiento de la imagen para poder insertarle un logo.")
-
-        if not CoverImage._LOGOS:
-            self._loadLogos()
-
-        self._image = self._originalImage.copy()
-
-        logoImage = CoverImage._LOGOS[logo]
-        self._image.paste(logoImage, mask=logoImage)
-
-        self._logo = logo
-
-        # Ojo: al recargar la imagen, ahora la calidad vuelve a ser 100!
-        self._quality = 100
-
-    def logo(self):
-        return self._logo
-
     def toBytes(self, compressIfNecessary=True):
         """
         Retorna los bytes de la imagen.
@@ -137,38 +101,20 @@ class CoverImage:
                                     previsualizarla.
         """
         if self._allowProcessing:
-            if compressIfNecessary and self.size() > CoverImage.MAX_SIZE_IN_BYTES:
-                self._quality = self._findBestQuality(self._image, CoverImage.MAX_SIZE_IN_BYTES)
+            if compressIfNecessary and self.size() > self.MAX_SIZE_IN_BYTES:
+                self._quality = self._findBestQuality(self._image, self.MAX_SIZE_IN_BYTES)
             return self._getBytes(self._image, self.quality())
         else:
             return self._originalImageBytes
 
-    def toBytesForWeb(self):
-        if not self._allowProcessing:
-            raise ValueError("Debe permitirse el procesamiento de la imagen para poder generar la cubierta para la web.")
-
-        image = self._image.resize((CoverImage.WIDTH_FOR_WEB, CoverImage.HEIGHT_FOR_WEB), resample=Image.ANTIALIAS)
-
-        # Veo primero si con la calidad actual que tiene la cubierta puedo generar una para la web que no sobrepase
-        # el tamaño máximo. Caso contrario, busco la mejor calidad.
-        imageBytes = self._getBytes(image, self.quality())
-        if len(imageBytes) <= CoverImage.MAX_SIZE_IN_BYTES_FOR_WEB:
-            return imageBytes
-        else:
-            quality = self._findBestQuality(image, CoverImage.MAX_SIZE_IN_BYTES_FOR_WEB)
-            return self._getBytes(image, quality)
-
     def clone(self):
-        coverImage = CoverImage(self._originalImageBytes, self._allowProcessing)
+        clonedImage = type(self)(self._originalImageBytes, self._allowProcessing)
 
         if self._allowProcessing:
-            if self.logo() != CoverImage.NO_LOGO:
-                coverImage.insertLogo(self.logo())
-
             if self.quality() != 100:
-                coverImage.setQuality(self.quality())
+                clonedImage.setQuality(self.quality())
 
-        return coverImage
+        return clonedImage
 
     def _getBytes(self, image, quality=100):
         """
@@ -197,10 +143,91 @@ class CoverImage:
         raise Exception("Esto no debería pasar: no se encontró un nivel de compresión en el rango 0-100 capaz de reducir "
                         "lo suficiente el tamaño de la imagen.")
 
+
+class CoverImage(AbstractEpubBaseImage):
+    WIDTH = 600
+    HEIGHT = 900
+    MAX_SIZE_IN_BYTES = 300 * 1000
+
+    WHITE_LOGO = 0
+    BLACK_LOGO = 1
+    GLOW_LOGO = 2
+    NO_LOGO = 3
+
+    # Dimensiones y tamaño de la imagen requerida para poner en la web.
+    WIDTH_FOR_WEB = 400
+    HEIGHT_FOR_WEB = 600
+    MAX_SIZE_IN_BYTES_FOR_WEB = 100 * 1000
+
+    # Las cubiertas transparentes solamente con los logos.
+    _LOGOS = {}
+
+    def __init__(self, file, allowProcessing=True):
+        super().__init__(file, allowProcessing)
+        self._logo = CoverImage.NO_LOGO
+
+    def insertLogo(self, logo):
+        """
+        Inserta un logo de epublibre en la imagen.
+
+        @param logo: uno de estos posibles valores: WHITE_LOGO, BLACK_LOGO, GLOW_LOGO.
+        """
+        if not self._allowProcessing:
+            raise ValueError("Debe permitirse el procesamiento de la imagen para poder insertarle un logo.")
+
+        if not CoverImage._LOGOS:
+            self._loadLogos()
+
+        self._image = self._originalImage.copy()
+
+        logoImage = CoverImage._LOGOS[logo]
+        self._image.paste(logoImage, mask=logoImage)
+
+        self._logo = logo
+
+        # Ojo: al recargar la imagen, ahora la calidad vuelve a ser 100!
+        self._quality = 100
+
+    def logo(self):
+        return self._logo
+
+    def toBytesForWeb(self):
+        if not self._allowProcessing:
+            raise ValueError("Debe permitirse el procesamiento de la imagen para poder generar la cubierta para la web.")
+
+        image = self._image.resize((CoverImage.WIDTH_FOR_WEB, CoverImage.HEIGHT_FOR_WEB), resample=Image.ANTIALIAS)
+
+        # Veo primero si con la calidad actual que tiene la cubierta puedo generar una para la web que no sobrepase
+        # el tamaño máximo. Caso contrario, busco la mejor calidad.
+        imageBytes = self._getBytes(image, self.quality())
+        if len(imageBytes) <= CoverImage.MAX_SIZE_IN_BYTES_FOR_WEB:
+            return imageBytes
+        else:
+            quality = self._findBestQuality(image, CoverImage.MAX_SIZE_IN_BYTES_FOR_WEB)
+            return self._getBytes(image, quality)
+
+    def clone(self):
+        coverImage = CoverImage(self._originalImageBytes, self._allowProcessing)
+
+        if self._allowProcessing:
+            if self.logo() != CoverImage.NO_LOGO:
+                coverImage.insertLogo(self.logo())
+
+            if self.quality() != 100:
+                coverImage.setQuality(self.quality())
+
+        return coverImage
+
     def _loadLogos(self):
         CoverImage._LOGOS[CoverImage.WHITE_LOGO] = Image.open(names.getFullPathToFile(names.WHITE_LOGO_FOR_COVER))
         CoverImage._LOGOS[CoverImage.BLACK_LOGO] = Image.open(names.getFullPathToFile(names.BLACK_LOGO_FOR_COVER))
         CoverImage._LOGOS[CoverImage.GLOW_LOGO] = Image.open(names.getFullPathToFile(names.GLOW_LOGO_FOR_COVER))
+
+
+class AuthorImage(AbstractEpubBaseImage):
+    WIDTH = 320
+    HEIGHT = 400
+    MAX_SIZE_IN_BYTES = 300 * 1000
 
 
 class InvalidDimensionsError(Exception):
