@@ -1,7 +1,7 @@
 from PyQt4 import QtGui, QtCore
 
 from epubcreator.gui.forms import image_edit_dialog_ui
-from epubcreator.epubbase import images, names
+from epubcreator.epubbase import images, files
 
 
 class ImageEdit(QtGui.QDialog, image_edit_dialog_ui.Ui_Dialog):
@@ -13,12 +13,13 @@ class ImageEdit(QtGui.QDialog, image_edit_dialog_ui.Ui_Dialog):
     def __init__(self, image, imageType=COVER, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self._extendUi(imageType)
 
         if imageType == ImageEdit.COVER:
             self._logoImageWidgetsToLogos = {self.logo1Image: images.CoverImage.BLACK_LOGO,
                                              self.logo2Image: images.CoverImage.WHITE_LOGO,
                                              self.logo3Image: images.CoverImage.GLOW_LOGO}
+
+        self._extendUi(imageType)
 
         self._image = image
 
@@ -61,24 +62,23 @@ class ImageEdit(QtGui.QDialog, image_edit_dialog_ui.Ui_Dialog):
         self.setWindowFlags(QtCore.Qt.Window)
 
         if imageType == ImageEdit.COVER:
-            if not ImageEdit._LOGOS:
-                ImageEdit._LOGOS[images.CoverImage.BLACK_LOGO] = QtGui.QPixmap(names.getFullPathToFile(names.BLACK_LOGO_PREVIEW))
-                ImageEdit._LOGOS[images.CoverImage.WHITE_LOGO] = QtGui.QPixmap(names.getFullPathToFile(names.WHITE_LOGO_PREVIEW))
-                ImageEdit._LOGOS[images.CoverImage.GLOW_LOGO] = QtGui.QPixmap(names.getFullPathToFile(names.GLOW_LOGO_PREVIEW))
-
-            self.logo1Image.setPixmap(ImageEdit._LOGOS[images.CoverImage.BLACK_LOGO])
-            self.logo2Image.setPixmap(ImageEdit._LOGOS[images.CoverImage.WHITE_LOGO])
-            self.logo3Image.setPixmap(ImageEdit._LOGOS[images.CoverImage.GLOW_LOGO])
+            self._loadLogos()
         else:
             # La única razón por la que tuve que usar un frame para los logos, en lugar de utilizar
             # directamente un layout: para poder ocultarlo cuando quiero editar la imagen de un autor.
             self.logosFrame.hide()
 
+    def _loadLogos(self):
+        for logoImageWidget, logo in self._logoImageWidgetsToLogos.items():
+            pixmap = QtGui.QPixmap()
+            pixmap.loadFromData(images.CoverImage.logoPreviewToBytes(logo))
+            logoImageWidget.setPixmap(pixmap)
+
     def _connectSignals(self, imageType):
         if imageType == ImageEdit.COVER:
-            for logoImage in self._logoImageWidgetsToLogos:
-                logoImage.entered.connect(self._logoImageApplyStyle)
-                logoImage.left.connect(self._logoImageRemoveStyle)
-                logoImage.clicked.connect(self._insertLogo)
+            for logoImageWidget in self._logoImageWidgetsToLogos:
+                logoImageWidget.entered.connect(self._logoImageApplyStyle)
+                logoImageWidget.left.connect(self._logoImageRemoveStyle)
+                logoImageWidget.clicked.connect(self._insertLogo)
 
         self.qualityInput.valueChanged.connect(self._compressImage)

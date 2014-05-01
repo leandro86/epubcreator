@@ -2,7 +2,7 @@ import io
 
 from PIL import Image
 
-from epubcreator.epubbase import names
+from epubcreator.epubbase import files
 
 
 class AbstractEpubBaseImage:
@@ -122,8 +122,6 @@ class AbstractEpubBaseImage:
 
         @param image: el Image del cual retornar los bytes.
         @param quality: la calidad con la cual guardar la imagen.
-
-        @return: los bytes de la imagen.
         """
         buffer = io.BytesIO()
         image.save(buffer, "JPEG", quality=quality, optimize=True)
@@ -160,11 +158,25 @@ class CoverImage(AbstractEpubBaseImage):
     MAX_SIZE_IN_BYTES_FOR_WEB = 100 * 1000
 
     # Las cubiertas transparentes solamente con los logos.
-    _LOGOS = {}
+    # Key: la constante identificando al logo.
+    # Value: un Image.
+    _LOGOS_COVER = {}
+
+    # Los logos en imágenes más pequeñas.
+    # Key: la constante identificando al logo.
+    # Value: los bytes con el logo.
+    _LOGOS_PREVIEW = {}
 
     def __init__(self, file, allowProcessing=True):
         super().__init__(file, allowProcessing)
         self._logo = CoverImage.NO_LOGO
+
+    @staticmethod
+    def logoPreviewToBytes(logo):
+        if not CoverImage._LOGOS_PREVIEW:
+            CoverImage._loadLogosPreview()
+
+        return CoverImage._LOGOS_PREVIEW[logo]
 
     def insertLogo(self, logo):
         """
@@ -175,12 +187,12 @@ class CoverImage(AbstractEpubBaseImage):
         if not self._allowProcessing:
             raise ValueError("Debe permitirse el procesamiento de la imagen para poder insertarle un logo.")
 
-        if not CoverImage._LOGOS:
-            self._loadLogos()
+        if not CoverImage._LOGOS_COVER:
+            self._loadLogosCover()
 
         self._image = self._originalImage.copy()
 
-        logoImage = CoverImage._LOGOS[logo]
+        logoImage = CoverImage._LOGOS_COVER[logo]
         self._image.paste(logoImage, mask=logoImage)
 
         self._logo = logo
@@ -218,10 +230,16 @@ class CoverImage(AbstractEpubBaseImage):
 
         return coverImage
 
-    def _loadLogos(self):
-        CoverImage._LOGOS[CoverImage.WHITE_LOGO] = Image.open(names.getFullPathToFile(names.WHITE_LOGO_FOR_COVER))
-        CoverImage._LOGOS[CoverImage.BLACK_LOGO] = Image.open(names.getFullPathToFile(names.BLACK_LOGO_FOR_COVER))
-        CoverImage._LOGOS[CoverImage.GLOW_LOGO] = Image.open(names.getFullPathToFile(names.GLOW_LOGO_FOR_COVER))
+    @staticmethod
+    def _loadLogosPreview():
+        CoverImage._LOGOS_PREVIEW[CoverImage.WHITE_LOGO] = files.EpubBaseFiles.getFile(files.EpubBaseFiles.WHITE_LOGO_PREVIEW)
+        CoverImage._LOGOS_PREVIEW[CoverImage.BLACK_LOGO] = files.EpubBaseFiles.getFile(files.EpubBaseFiles.BLACK_LOGO_PREVIEW)
+        CoverImage._LOGOS_PREVIEW[CoverImage.GLOW_LOGO] = files.EpubBaseFiles.getFile(files.EpubBaseFiles.GLOW_LOGO_PREVIEW)
+
+    def _loadLogosCover(self):
+        CoverImage._LOGOS_COVER[CoverImage.WHITE_LOGO] = Image.open(io.BytesIO(files.EpubBaseFiles.getFile(files.EpubBaseFiles.WHITE_LOGO_FOR_COVER)))
+        CoverImage._LOGOS_COVER[CoverImage.BLACK_LOGO] = Image.open(io.BytesIO(files.EpubBaseFiles.getFile(files.EpubBaseFiles.BLACK_LOGO_FOR_COVER)))
+        CoverImage._LOGOS_COVER[CoverImage.GLOW_LOGO] = Image.open(io.BytesIO(files.EpubBaseFiles.getFile(files.EpubBaseFiles.GLOW_LOGO_FOR_COVER)))
 
 
 class AuthorImage(AbstractEpubBaseImage):
