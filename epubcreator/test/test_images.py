@@ -174,8 +174,18 @@ class CoverImageTest(unittest.TestCase):
         self.assertEqual(coverImageForWeb.size, (400, 600))
         self.assertLessEqual(len(coverImageBytesForWeb), 100 * 1000)
 
-    def _createImage(self, width, height):
-        return Image.new("RGB", (width, height))
+    def test_can_load_image_in_mode_P_and_save_it_as_jpg(self):
+        # Por defecto, _saveImage guarda la imagen en formato jpg, pero jpg no soporta el modo "P", por eso
+        # es que debo guardarla como png, que para propósitos del test no tiene importancia: lo único que me
+        # interesa es que CoverImage sea capaz de abrir una imagen en modo "P" y poder guardarla como jpg.
+        imageBytes = self._saveImage(self._createImage(600, 900, mode="P"), imageFormat="PNG")
+
+        coverImage = images.CoverImage(imageBytes)
+
+        self.assertTrue(len(coverImage.toBytes()) > 0)
+
+    def _createImage(self, width, height, mode="RGB"):
+        return Image.new(mode, (width, height))
 
     def _saveImage(self, image, imageFormat="JPEG", progressive=False):
         buffer = io.BytesIO()

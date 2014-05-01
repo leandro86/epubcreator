@@ -38,6 +38,12 @@ class AbstractEpubBaseImage:
 
         self._image = Image.open(io.BytesIO(imageBytes))
 
+        # Creo que jpg no soporta el modo "P": al menos cuando quiero guardar la imagen como jpg, me tira error.
+        # La ayuda de pillow dice: P (8-bit pixels, mapped to any other mode using a color palette)
+        # En dicho caso, convierto la imagen a modo "RGB".
+        if self._image.mode == "P":
+            self._image = self._image.convert("RGB")
+
         if allowProcessing:
             if self._image.size != (self.WIDTH, self.HEIGHT):
                 self._image = self._image.resize((self.WIDTH, self.HEIGHT), resample=Image.ANTIALIAS)
