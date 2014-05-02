@@ -18,11 +18,7 @@ class Ebook(Options):
         super().__init__(**options)
 
         self._ebookData = ebookData or ebook_data.EbookData()
-        self._metadata = metadata.clone() if metadata else ebook_metadata.Metadata()
-
-        # Hay algunos datos que indefectiblemente deben estar en el epub, por más
-        # que el usuario no los haya especificado.
-        self._setDefaultMetadata()
+        self._metadata = metadata or ebook_metadata.Metadata()
 
     def save(self, file):
         """
@@ -53,19 +49,24 @@ class Ebook(Options):
             return epubName
 
     def _addEpubBaseFiles(self, outputEpub):
+        synopsis = self._metadata.synopsis or ebook_metadata.Metadata.DEFAULT_SYNOPSIS
+        title = self._metadata.title or ebook_metadata.Metadata.DEFAULT_TITLE
+        editor = self._metadata.editor or ebook_metadata.Metadata.DEFAULT_EDITOR
+        coverModification = self._metadata.coverModification or ebook_metadata.Metadata.DEFAULT_COVER_MODIFICATION
+        coverImage = self._metadata.coverImage or images.CoverImage(files.EpubBaseFiles.getFile(files.EpubBaseFiles.COVER_IMAGE_FILENAME))
         publicationYear = self._metadata.publicationDate.year if self._metadata.publicationDate else ""
-
-        author = self._getPersonsListAsText(self._metadata.authors)[0]
+        authors = self._metadata.authors or [ebook_metadata.Person(ebook_metadata.Metadata.DEFAULT_AUTHOR, ebook_metadata.Metadata.DEFAULT_AUTHOR)]
+        author = self._getPersonsListAsText(authors)[0]
         translator = self._getPersonsListAsText(self._metadata.translators)[0]
         ilustrator = self._getPersonsListAsText(self._metadata.ilustrators)[0]
 
         # Agrego los xhtml requeridos, excepto autor.xhtml, que debe ir despúes de las secciones.
         outputEpub.addHtmlData(files.EpubBaseFiles.COVER_FILENAME, files.EpubBaseFiles.getFile(files.EpubBaseFiles.COVER_FILENAME))
-        outputEpub.addHtmlData(files.EpubBaseFiles.SYNOPSIS_FILENAME, files.EpubBaseFiles.getSynopsis(self._metadata.synopsis))
+        outputEpub.addHtmlData(files.EpubBaseFiles.SYNOPSIS_FILENAME, files.EpubBaseFiles.getSynopsis(synopsis))
         outputEpub.addHtmlData(files.EpubBaseFiles.TITLE_FILENAME, files.EpubBaseFiles.getTitle(author,
-                                                                                                self._metadata.title,
+                                                                                                title,
                                                                                                 self._metadata.subtitle,
-                                                                                                self._metadata.editor,
+                                                                                                editor,
                                                                                                 self._metadata.collectionName,
                                                                                                 self._metadata.subCollectionName,
                                                                                                 self._metadata.collectionVolume))
@@ -75,13 +76,14 @@ class Ebook(Options):
                                                                                               translator,
                                                                                               ilustrator,
                                                                                               self._metadata.coverDesigner,
-                                                                                              self._metadata.coverModification,
-                                                                                              self._metadata.editor))
+                                                                                              coverModification,
+                                                                                              editor))
 
         if self._metadata.dedication or self._options.includeOptionalFiles:
-            outputEpub.addHtmlData(files.EpubBaseFiles.DEDICATION_FILENAME, files.EpubBaseFiles.getDedication(self._metadata.dedication))
+            dedication = self._metadata.dedication or ebook_metadata.Metadata.DEFAULT_DEDICATION
+            outputEpub.addHtmlData(files.EpubBaseFiles.DEDICATION_FILENAME, files.EpubBaseFiles.getDedication(dedication))
 
-        outputEpub.addImageData(files.EpubBaseFiles.COVER_IMAGE_FILENAME, self._metadata.coverImage.toBytes())
+        outputEpub.addImageData(files.EpubBaseFiles.COVER_IMAGE_FILENAME, coverImage.toBytes())
 
         # Agrego el resto de los archivos del epubbase.
         outputEpub.addImageData(files.EpubBaseFiles.EPL_LOGO_FILENAME, files.EpubBaseFiles.getFile(files.EpubBaseFiles.EPL_LOGO_FILENAME))
@@ -123,16 +125,26 @@ class Ebook(Options):
         outputEpub.addNavPoint(files.EpubBaseFiles.COVER_FILENAME, "Cubierta")
 
         # El título del libro debe ser la segunda entrada en la toc.
-        outputEpub.addNavPoint(files.EpubBaseFiles.TITLE_FILENAME, self._metadata.title)
+        outputEpub.addNavPoint(files.EpubBaseFiles.TITLE_FILENAME, self._metadata.title or ebook_metadata.Metadata.DEFAULT_TITLE)
 
         processSections(self._ebookData.iterTextSections())
 
-        authorsWithBiographyOrImage = [a for a in self._metadata.authors if a.biography or a.image]
+        authors = self._metadata.authors or [ebook_metadata.Person(ebook_metadata.Metadata.DEFAULT_AUTHOR, ebook_metadata.Metadata.DEFAULT_AUTHOR)]
+
+        # Veo a qué autor debo agregarle su biografía o imagen para que se incluya autor.xhtml y autor.jpg.
+        for author in authors:
+            if author.biography or author.image or self._options.includeOptionalFiles:
+                if not author.biography:
+                    author.biography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
+                if not author.image:
+                    author.image = images.AuthorImage(files.EpubBaseFiles.getFile(files.EpubBaseFiles.AUTHOR_IMAGE_FILENAME), allowProcessing=False)
+
+        authorsWithBiographyOrImage = [a for a in authors if a.biography or a.image]
         if authorsWithBiographyOrImage:
-            outputEpub.addNavPoint(files.EpubBaseFiles.AUTHOR_FILENAME, self._getTocTitleForAuthorFile())
+            outputEpub.addNavPoint(files.EpubBaseFiles.AUTHOR_FILENAME, self._getTocTitleForAuthorFile(authors))
 
             for i, author in enumerate(authorsWithBiographyOrImage):
-                title = self._getTocTitleForAuthorFile() if i == 0 else None
+                title = self._getTocTitleForAuthorFile(authors) if i == 0 else None
                 imageName = files.EpubBaseFiles.generateAuthorImageFileName(i)
                 authorContent = files.EpubBaseFiles.getAuthor(author.biography, title, imageName)
 
@@ -146,7 +158,8 @@ class Ebook(Options):
             outputEpub.addImageData(image.name, image.content)
 
     def _addMetadata(self, outputEpub):
-        author = self._getPersonsListAsText(self._metadata.authors)
+        authors = self._metadata.authors or [ebook_metadata.Person(ebook_metadata.Metadata.DEFAULT_AUTHOR, ebook_metadata.Metadata.DEFAULT_AUTHOR)]
+        author = self._getPersonsListAsText(authors)
 
         # Agrego semántica a cubierta.xhtml.
         outputEpub.addReference(files.EpubBaseFiles.COVER_FILENAME, "Cover", "cover")
@@ -154,33 +167,35 @@ class Ebook(Options):
         # Es necesario agregarle semántica a cover.jpg, sino algunos ereaders no la reconocen como imagen de portada.
         outputEpub.addCustomMetadata("cover", files.EpubBaseFiles.COVER_IMAGE_FILENAME)
 
-        outputEpub.addTitle(self._metadata.title)
+        outputEpub.addTitle(self._metadata.title or ebook_metadata.Metadata.DEFAULT_TITLE)
         outputEpub.addAuthor(author[0], author[1])
-        outputEpub.addLanguage(self._metadata.language)
+        outputEpub.addLanguage(self._metadata.language or ebook_metadata.Metadata.DEFAULT_LANGUAGE)
 
-        if self._metadata.synopsis == ebook_metadata.Metadata.DEFAULT_SYNOPSIS:
-            outputEpub.addDescription("Sinopsis")
-        else:
+        if self._metadata.synopsis:
             # En la sinopsis (el campo description) en los metadatos, no puedo tener saltos de línea. Podría directamente
             # eliminarlos, pero entonces el texto del párrafo B quedaría pegado al del párrafo A. Por eso es que reemplazo
             # los saltos de línea por un espacio.
             outputEpub.addDescription(utils.removeTags(self._metadata.synopsis.replace("\n", " ")))
+        else:
+            outputEpub.addDescription("Sinopsis")
 
         outputEpub.addPublisher("ePubLibre")
 
-        if self._metadata.genres:
-            # Ordeno los géneros alfabéticamente.
-            self._metadata.genres.sort(key=lambda x: (x.genreType, x.genre, x.subGenre))
+        # El tipo de género no interesa si debo poner uno por defecto, dado que no aparece en los metadatos del epub.
+        genres = self._metadata.genres or [ebook_metadata.Genre("bla", "Género", "Subgéneros")]
 
-            genres = []
-            previousGenre = ""
-            for genre in self._metadata.genres:
-                if genre.genre != previousGenre:
-                    genres.append(genre.genre)
-                    previousGenre = genre.genre
-                genres.append(genre.subGenre)
+        # Ordeno los géneros alfabéticamente.
+        genres.sort(key=lambda x: (x.genreType, x.genre, x.subGenre))
 
-            outputEpub.addSubject(", ".join(genres))
+        genresText = []
+        previousGenre = ""
+        for genre in genres:
+            if genre.genre != previousGenre:
+                genresText.append(genre.genre)
+                previousGenre = genre.genre
+            genresText.append(genre.subGenre)
+
+        outputEpub.addSubject(", ".join(genresText))
 
         if self._metadata.translators:
             translator = self._getPersonsListAsText(self._metadata.translators)
@@ -210,8 +225,10 @@ class Ebook(Options):
             outputEpub.addCustomMetadata("calibre:series_index", series_index)
 
     def _getOutputFileName(self):
+        authors = self._metadata.authors or [ebook_metadata.Person(ebook_metadata.Metadata.DEFAULT_AUTHOR, ebook_metadata.Metadata.DEFAULT_AUTHOR)]
+
         fileName = []
-        authorsFileAs = [author.fileAs for author in self._metadata.authors]
+        authorsFileAs = [author.fileAs for author in authors]
         if len(authorsFileAs) < 3:
             fileName.append(" & ".join(authorsFileAs))
         else:
@@ -231,50 +248,13 @@ class Ebook(Options):
             else:
                 fileName.append(collection)
 
-        fileName.append(self._metadata.title)
-        fileName.append(" [{0}] (r1.0 {1})".format(self._metadata.bookId, self._metadata.editor))
+        fileName.append(self._metadata.title or ebook_metadata.Metadata.DEFAULT_TITLE)
+
+        bookId = self._metadata.bookId or ebook_metadata.Metadata.DEFAULT_BOOK_ID
+        editor = self._metadata.editor or ebook_metadata.Metadata.DEFAULT_EDITOR
+        fileName.append(" [{0}] (r1.0 {1})".format(bookId, editor))
 
         return utils.removeSpecialCharacters("{0}.epub".format("".join(fileName)))
-
-    def _setDefaultMetadata(self):
-        if not self._metadata.synopsis:
-            self._metadata.synopsis = ebook_metadata.Metadata.DEFAULT_SYNOPSIS
-
-        if not self._metadata.title:
-            self._metadata.title = ebook_metadata.Metadata.DEFAULT_TITLE
-
-        if not self._metadata.dedication and self._options.includeOptionalFiles:
-            self._metadata.dedication = ebook_metadata.Metadata.DEFAULT_DEDICATION
-
-        if not self._metadata.bookId:
-            self._metadata.bookId = ebook_metadata.Metadata.DEFAULT_BOOK_ID
-
-        if not self._metadata.editor:
-            self._metadata.editor = ebook_metadata.Metadata.DEFAULT_EDITOR
-
-        if not self._metadata.language:
-            self._metadata.language = ebook_metadata.Metadata.DEFAULT_LANGUAGE
-
-        if not self._metadata.genres:
-            # El tipo de género no interesa, dado que no aparece en los metadatos del epub.
-            self._metadata.genres.append(ebook_metadata.Genre("bla", "Género", "Subgéneros"))
-
-        if not self._metadata.coverModification:
-            self._metadata.coverModification = ebook_metadata.Metadata.DEFAULT_COVER_MODIFICATION
-
-        if not self._metadata.coverImage:
-            self._metadata.coverImage = images.CoverImage(files.EpubBaseFiles.getFile(files.EpubBaseFiles.COVER_IMAGE_FILENAME))
-
-        if not self._metadata.authors:
-            self._metadata.authors.append(ebook_metadata.Person(ebook_metadata.Metadata.DEFAULT_AUTHOR, ebook_metadata.Metadata.DEFAULT_AUTHOR))
-
-        # Veo a qué autor debo agregarle su biografía o imagen para que se incluya autor.xhtml y autor.jpg.
-        for author in self._metadata.authors:
-            if author.biography or author.image or self._options.includeOptionalFiles:
-                if not author.biography:
-                    author.biography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
-                if not author.image:
-                    author.image = images.AuthorImage(files.EpubBaseFiles.getFile(files.EpubBaseFiles.AUTHOR_IMAGE_FILENAME), allowProcessing=False)
 
     def _getPersonsListAsText(self, persons):
         """
@@ -287,9 +267,7 @@ class Ebook(Options):
         """
         return " & ".join((p.name for p in persons)), " & ".join((p.fileAs for p in persons))
 
-    def _getTocTitleForAuthorFile(self):
-        authors = self._metadata.authors
-
+    def _getTocTitleForAuthorFile(self, authors):
         if not authors or (len(authors) == 1 and authors[0].gender == ebook_metadata.Person.MALE_GENDER):
             return "Autor"
         else:

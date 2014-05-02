@@ -1,5 +1,4 @@
 import datetime
-import copy
 import math
 
 
@@ -187,26 +186,6 @@ class Metadata:
             self._publicationDate = value
         else:
             raise ValueError("Date expected.")
-
-    def clone(self):
-        clonedMetadata = Metadata()
-
-        for k, v in ((k, v) for (k, v) in self.__dict__.items() if k not in ("coverImage", "authors", "translators", "ilustrators")):
-            setattr(clonedMetadata, k, copy.deepcopy(v))
-
-        if self.coverImage is not None:
-            clonedMetadata.coverImage = self.coverImage.clone()
-
-        for author in self.authors:
-            clonedMetadata.authors.append(author.clone())
-
-        for ilustrator in self.ilustrators:
-            clonedMetadata.ilustrators.append(ilustrator.clone())
-
-        for translator in self.translators:
-            clonedMetadata.translators.append(translator.clone())
-
-        return clonedMetadata
 
     @staticmethod
     def convertNameToFileAsFormat(name):
