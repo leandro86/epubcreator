@@ -130,26 +130,21 @@ class Ebook(Options):
         processSections(self._ebookData.iterTextSections())
 
         authors = self._metadata.authors or [ebook_metadata.Person(ebook_metadata.Metadata.DEFAULT_AUTHOR, ebook_metadata.Metadata.DEFAULT_AUTHOR)]
+        authorsWithBiographyOrImage = [a for a in authors if a.biography or a.image or self._options.includeOptionalFiles]
 
-        # Veo a qué autor debo agregarle su biografía o imagen para que se incluya autor.xhtml y autor.jpg.
-        for author in authors:
-            if author.biography or author.image or self._options.includeOptionalFiles:
-                if not author.biography:
-                    author.biography = ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
-                if not author.image:
-                    author.image = images.AuthorImage(files.EpubBaseFiles.getFile(files.EpubBaseFiles.AUTHOR_IMAGE_FILENAME), allowProcessing=False)
+        for i, author in enumerate(authorsWithBiographyOrImage):
+            biography = author.biography or ebook_metadata.Metadata.DEFAULT_AUTHOR_BIOGRAPHY
+            image = author.image or images.AuthorImage(files.EpubBaseFiles.getFile(files.EpubBaseFiles.AUTHOR_IMAGE_FILENAME), allowProcessing=False)
 
-        authorsWithBiographyOrImage = [a for a in authors if a.biography or a.image]
-        if authorsWithBiographyOrImage:
+            title = self._getTocTitleForAuthorFile(authors) if i == 0 else None
+            imageName = files.EpubBaseFiles.generateAuthorImageFileName(i)
+            authorContent = files.EpubBaseFiles.getAuthor(biography, title, imageName)
+
+            outputEpub.addHtmlData(files.EpubBaseFiles.generateAuthorFileName(i), authorContent)
+            outputEpub.addImageData(imageName, image.toBytes())
+
+        if len(authorsWithBiographyOrImage) > 0:
             outputEpub.addNavPoint(files.EpubBaseFiles.AUTHOR_FILENAME, self._getTocTitleForAuthorFile(authors))
-
-            for i, author in enumerate(authorsWithBiographyOrImage):
-                title = self._getTocTitleForAuthorFile(authors) if i == 0 else None
-                imageName = files.EpubBaseFiles.generateAuthorImageFileName(i)
-                authorContent = files.EpubBaseFiles.getAuthor(author.biography, title, imageName)
-
-                outputEpub.addHtmlData(files.EpubBaseFiles.generateAuthorFileName(i), authorContent)
-                outputEpub.addImageData(imageName, author.image.toBytes())
 
         processSections(self._ebookData.iterNotesSections())
 
