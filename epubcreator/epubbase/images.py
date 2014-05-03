@@ -49,7 +49,7 @@ class AbstractEpubBaseImage:
                 self._image = self._image.resize((self.WIDTH, self.HEIGHT), resample=Image.ANTIALIAS)
         else:
             if self._image.format.lower() not in self._FORMATS_NO_NEED_PROCESSING:
-                raise ValueError("Debe permitirse el preprocesamiento para abrir una imagen de tipo '{0}'.".format(self._image.format))
+                raise ValueError("Debe permitirse el procesamiento de las imágenes para abrir una imagen de tipo '{0}'.".format(self._image.format))
 
             if not allowProcessing and len(imageBytes) > self.MAX_SIZE_IN_BYTES:
                 raise MaxSizeExceededError()
