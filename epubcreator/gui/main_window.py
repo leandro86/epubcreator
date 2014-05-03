@@ -213,12 +213,21 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
 
         if preferences.Preferences(self).exec() == QtGui.QDialog.Accepted:
             if previousAllowImageProcessing != settings.allowImageProcessing:
-                wasCoverImageSet = self.metadataTabManager.basicMetadata.getCoverImage() is not None
-                self.metadataTabManager.basicMetadata.setCoverImage(None)
+                coverImage = self.metadataTabManager.basicMetadata.getCoverImage()
+                authors = self.metadataTabManager.basicMetadata.getAuthors()
+                wasAuthorWithImage = False
 
-                if wasCoverImageSet:
+                if coverImage:
+                    self.metadataTabManager.basicMetadata.setCoverImage(None)
+
+                for author in authors:
+                    if author.image:
+                        wasAuthorWithImage = True
+                    author.image = None
+
+                if coverImage or wasAuthorWithImage:
                     gui_utils.displayInformationDialog("La opción para permitir el procesamiento de las imágenes del ePub base ha cambiado de "
-                                                       "valor. Debe cargar nuevamente la imagen de cubierta.")
+                                                       "valor. Debe cargar nuevamente las imágenes de cubierta y autores.")
 
     def _connectSignals(self):
         self.openFileAction.triggered.connect(self._openFile)
