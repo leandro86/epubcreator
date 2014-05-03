@@ -1,11 +1,10 @@
-import zipfile
 import os
 
 from lxml import etree
 
 from epubcreator.converters import converter_base
 from epubcreator.epubbase import ebook_data
-from epubcreator.converters.docx import utils, styles, footnotes
+from epubcreator.converters.docx import utils, styles, footnotes, docx
 from epubcreator.misc.options import Option
 
 
@@ -19,21 +18,17 @@ class DocxConverter(converter_base.AbstractConverter):
 
     _MAX_HEADING_NUMBER = 6
 
-    _DOCUMENT_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"
-    _STYLES_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"
-    _FOOTNOTES_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml"
-
-    # De haber imágenes, deben estar en este directorio dentro del docx.
-    _MEDIA_FILES_PATH = "word/media"
-
     def __init__(self, inputFilePath, **options):
         super().__init__(inputFilePath, **options)
 
-        self._documentXml = None
-        self._documentRelsXml = None
-        self._styles = None
-        self._footnotes = None
-        self._mediaFiles = {}
+        self._docx = docx.Docx(inputFilePath)
+
+        self._documentXml = etree.parse(self._docx.document())
+        self._styles = styles.Styles(self._docx.styles()) if self._docx.hasStyles() else None
+        self._footnotes = footnotes.Footnotes(self._docx.footnotes()) if self._docx.hasFootnotes() else None
+
+        # Contiene el nombre de las imágenes que ya fueron agregadas al ebook.
+        self._images = set()
 
         # El objeto Section actual en el cual estoy escribiendo.
         self._currentSection = None
@@ -65,14 +60,13 @@ class DocxConverter(converter_base.AbstractConverter):
         # Un objeto EbookData.
         self._ebookData = None
 
-        self._openDocx()
-
     def convert(self):
         self._titles = []
         self._headingLevelBase = DocxConverter._MAX_HEADING_NUMBER + 1
         self._footnotesId = []
         self._ebookData = ebook_data.EbookData()
         self._isProcessingFootnotes = False
+        self._images = set()
 
         self._processDocument()
 
@@ -87,44 +81,6 @@ class DocxConverter(converter_base.AbstractConverter):
         footnotesText = "".join(self._footnotes.getRawText()) if self._footnotes else ""
 
         return docText + footnotesText
-
-    def _openDocx(self):
-        with zipfile.ZipFile(self._inputFilePath) as docx:
-            contentTypesXml = etree.parse(docx.open("[Content_Types].xml"))
-
-            path = '/ct:Types/ct:Override[@ContentType = "{0}"]/@PartName'
-
-            docPath = utils.xpath(contentTypesXml, path.format(DocxConverter._DOCUMENT_CONTENT_TYPE))[0]
-            docPath = docPath.strip("/")
-            self._documentXml = etree.parse(docx.open(docPath))
-
-            stylesPath = utils.xpath(contentTypesXml, path.format(DocxConverter._STYLES_CONTENT_TYPE))[0]
-            self._styles = styles.Styles(docx.open(stylesPath.strip("/")))
-
-            footnotesPath = utils.xpath(contentTypesXml, path.format(DocxConverter._FOOTNOTES_CONTENT_TYPE))
-            if footnotesPath:
-                footnotesPath = footnotesPath[0].strip("/")
-
-                footnotesDir, footnoteFileName = os.path.split(footnotesPath)
-                footnotesRelsPath = footnotesDir + "/_rels/" + footnoteFileName + ".rels"
-
-                try:
-                    footnotesRels = docx.open(footnotesRelsPath)
-                except KeyError:
-                    footnotesRels = None
-
-                self._footnotes = footnotes.Footnotes(docx.open(footnotesPath), footnotesRels)
-
-            docDir, docFileName = os.path.split(docPath)
-            docRelsPath = docDir + "/_rels/" + docFileName + ".rels"
-
-            try:
-                self._documentRelsXml = etree.parse(docx.open(docRelsPath))
-            except KeyError:
-                self._documentRelsXml = None
-
-            for imgPath in [name for name in docx.namelist() if name.startswith(DocxConverter._MEDIA_FILES_PATH)]:
-                self._mediaFiles[os.path.split(imgPath)[1]] = docx.read(imgPath)
 
     def _processDocument(self):
         self._currentSection = self._ebookData.createTextSection()
@@ -507,23 +463,19 @@ class DocxConverter(converter_base.AbstractConverter):
         self._currentSection.closeNote()
 
     def _processImage(self, imageId):
-        imageName = self._getImageName(imageId)
+        imageFullName = self._docx.documentTarget(imageId) if not self._isProcessingFootnotes else self._docx.footnotesTarget(imageId)
+        imageName = os.path.split(imageFullName)[-1]
+
         self._currentSection.appendImg(imageName)
 
-        if not any(i for i in self._ebookData.iterImages() if i.name == imageName):
-            self._ebookData.addImage(imageName, self._mediaFiles[imageName])
+        if not imageName in self._images:
+            self._ebookData.addImage(imageName, self._docx.read(imageFullName))
+            self._images.add(imageName)
 
     def _processAlternateContent(self, alternateContent):
         pathToTxbxContent = "mc:Choice/w:drawing/wp:inline/a:graphic/a:graphicData/wps:wsp/wps:txbx/w:txbxContent"
         txbxContent = utils.find(alternateContent, pathToTxbxContent)
         self._processMainContent(txbxContent, "span")
-
-    def _getImageName(self, rId):
-        if not self._isProcessingFootnotes:
-            imagePath = utils.xpath(self._documentRelsXml, "rels:Relationship[@Id = '{0}']/@Target".format(rId))[0]
-            return os.path.split(imagePath)[1]
-        else:
-            return self._footnotes.getImageName(rId)
 
     def _getNextParagraph(self, paragraph):
         # Debo tener en cuenta los saltos de página en este método. Si el párrafo
