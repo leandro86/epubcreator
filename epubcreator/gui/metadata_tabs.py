@@ -12,6 +12,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self._extendUi()
 
         # Un objeto CoverImage.
         self._coverImage = None
@@ -26,9 +27,6 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
 
         # Por defecto, el combobox del lenguaje muestra "español".
         self.languageInput.setCurrentIndex(self.languageInput.findText(language.Language.getLanguageName("es")))
-
-        # En el campo id del libro solo pueden ingresar números.
-        self.idInput.setValidator(QtGui.QIntValidator(self))
 
         self._connectSignals()
 
@@ -182,6 +180,26 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
     def _updateAuthorFileAs(self, authorName):
         self.authorFileAsInput.setText(ebook_metadata.Metadata.convertNameToFileAsFormat(authorName.strip()))
 
+    def _showContextMenuForAuthorsList(self, pos):
+        selectedItem = self.authorsList.itemAt(pos)
+
+        if selectedItem is not None:
+            selectedAuthor = selectedItem.data(QtCore.Qt.UserRole)
+
+            action = QtGui.QAction("Editar Autor", self.authorsList)
+            action.triggered.connect(lambda: self._editAuthorData(selectedAuthor))
+
+            menu = QtGui.QMenu()
+            menu.addAction(action)
+
+            menu.exec(self.authorsList.mapToGlobal(pos))
+
+    def _extendUi(self):
+        # En el campo id del libro solo pueden ingresar números.
+        self.idInput.setValidator(QtGui.QIntValidator(self))
+
+        self.authorsList.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+
     def _connectSignals(self):
         self.coverImage.clicked.connect(self._changeCoverImage)
         self.addAuthorButton.clicked.connect(self._addAuthorToList)
@@ -189,6 +207,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
         self.authorsList.deleteKeyPressed.connect(self._removeSelectedAuthorFromList)
         self.authorsList.currentItemChanged.connect(self._populateCurrentAuthorData)
         self.authorsList.itemDoubleClicked.connect(lambda item: self._editAuthorData(item.data(QtCore.Qt.UserRole)))
+        self.authorsList.customContextMenuRequested.connect(self._showContextMenuForAuthorsList)
 
         self.authorInput.textChanged.connect(self._updateAuthorFileAs)
         self.authorInput.returnPressed.connect(self._addAuthorToList)
