@@ -18,10 +18,10 @@ class DocxConverter(converter_base.AbstractConverter):
 
     _MAX_HEADING_NUMBER = 6
 
-    def __init__(self, inputFilePath, **options):
-        super().__init__(inputFilePath, **options)
+    def __init__(self, file, **options):
+        super().__init__(file, **options)
 
-        self._docx = docx.Docx(inputFilePath)
+        self._docx = docx.Docx(file)
 
         self._documentXml = etree.parse(self._docx.document())
         self._styles = styles.Styles(self._docx.styles()) if self._docx.hasStyles() else None
