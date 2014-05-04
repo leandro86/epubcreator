@@ -4,13 +4,13 @@ from epubcreator.converters.docx import utils
 
 
 class Styles:
-    def __init__(self, stylesXml):
+    def __init__(self, file):
         # Un diccionario donde:
         # key   ->  id del estilo.
         # value ->  una tupla de tres elementos: el nombre del estilo
         #                                        el nombre tal como debe ir en el epub al ser usado como clase, si es un estilo custom, sino None
         #                                        una lista de strings con los formatos que el estilo tiene aplicado
-        self._stylesIdToName = self._readStyles(stylesXml)
+        self._stylesIdToName = self._readStyles(file)
 
     def hasParagraphHeadingStyle(self, paragraph):
         styleId = self.getParagraphStyleId(paragraph)

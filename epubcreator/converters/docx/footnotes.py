@@ -4,8 +4,8 @@ from epubcreator.converters.docx import utils
 
 
 class Footnotes:
-    def __init__(self, footnotes):
-        self._footnotesXml = etree.parse(footnotes)
+    def __init__(self, file):
+        self._footnotesXml = etree.parse(file)
 
     def getFootnote(self, footnoteId):
         return utils.xpath(self._footnotesXml, 'w:footnote[@w:id = "{0}"]'.format(footnoteId))[0]
