@@ -21,6 +21,8 @@ class SettingsStore(QtCore.QSettings):
         --  Un atributo por cada opción de la clase Ebook. La diferencia en el nombre del atributo
             con el procedimiento descrito arriba radica en que el prefijo de cada atributo
             es: "epubOutput".
+
+        --  Todas las keys del diccionario _SETTINGS.
     """
 
     _SETTINGS_GROUP = "userPreferences"
