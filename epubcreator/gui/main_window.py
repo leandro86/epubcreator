@@ -51,7 +51,8 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
         self._writeSettings()
 
     def _openFile(self):
-        fileName = QtGui.QFileDialog.getOpenFileName(self, "", self._lastFolderOpen, "Docx (*.docx)")
+        fileFilter = "Todos los archivos (*.{0})".format("*.".join(f.FILE_TYPE for f in converter_factory.ConverterFactory.getAllConverters()))
+        fileName = QtGui.QFileDialog.getOpenFileName(self, "", self._lastFolderOpen, fileFilter)
 
         if fileName:
             self._workingFilePath = fileName
