@@ -14,24 +14,23 @@ PAGE_BREAK_ON_END = 1
 NO_PAGE_BREAK = 2
 
 
-def getRunFormats(run):
-    rpr = find(run, "w:rPr")
-    return getFormats(rpr)
+def getDisabledFormats(node):
+    """
+    Dado un nodo w:rPr o w:pPr, retorna los formatos que están aplicados pero deshabilitados.
 
+    @param node: un lxml Element.
 
-def getRunDisabledFormats(run):
+    @return: una lista de string con los formatos.
+    """
     disabledFormats = []
 
-    rpr = find(run, "w:rPr")
-
-    if rpr is not None:
-        for child in rpr:
-            if child.tag.endswith("}b") and getAttr(child, "w:val") == "0":
-                disabledFormats.append("strong")
-            elif child.tag.endswith("}i") and getAttr(child, "w:val") == "0":
-                disabledFormats.append("em")
-            elif child.tag.endswith("}u") and getAttr(child, "w:val") == "none":
-                disabledFormats.append("ins")
+    for child in node:
+        if child.tag.endswith("}b") and getAttr(child, "w:val") == "0":
+            disabledFormats.append("strong")
+        elif child.tag.endswith("}i") and getAttr(child, "w:val") == "0":
+            disabledFormats.append("em")
+        elif child.tag.endswith("}u") and getAttr(child, "w:val") == "none":
+            disabledFormats.append("ins")
 
     return disabledFormats
 
@@ -40,27 +39,26 @@ def getFormats(node, processSubAndSup=True):
     """
     Dado un nodo w:rPr o w:pPr, convierte los formatos que contiene y los retorna.
 
-    @param node: el lxml Element que contiene los nodos hijos con los formatos.
+    @param node: un lxml Element.
     @param processSubAndSup: indica si deben convertirse los subíndices y superíndices.
 
     @return: una lista de string con los formatos convertidos.
     """
     formats = []
 
-    if node is not None:
-        for child in node:
-            if child.tag.endswith("}b") and getAttr(child, "w:val") != "0":
-                formats.append("strong")
-            elif child.tag.endswith("}i") and getAttr(child, "w:val") != "0":
-                formats.append("em")
-            elif child.tag.endswith("}u") and getAttr(child, "w:val") != "none":
-                formats.append("ins")
-            elif child.tag.endswith("}vertAlign") and processSubAndSup:
-                val = getAttr(child, "w:val")
-                if val == "superscript":
-                    formats.append("sup")
-                elif val == "subscript":
-                    formats.append("sub")
+    for child in node:
+        if child.tag.endswith("}b") and getAttr(child, "w:val") != "0":
+            formats.append("strong")
+        elif child.tag.endswith("}i") and getAttr(child, "w:val") != "0":
+            formats.append("em")
+        elif child.tag.endswith("}u") and getAttr(child, "w:val") != "none":
+            formats.append("ins")
+        elif child.tag.endswith("}vertAlign") and processSubAndSup:
+            val = getAttr(child, "w:val")
+            if val == "superscript":
+                formats.append("sup")
+            elif val == "subscript":
+                formats.append("sub")
 
     return formats
 

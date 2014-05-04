@@ -75,6 +75,7 @@ class Styles:
                     styleName = utils.xpath(child, "w:name/@w:val")[0]
 
                     formatNode = utils.find(child, "w:rPr" if attr == "character" else "w:pPr")
+
                     # En los estilos, ignoro si tienen aplicado el formato subíndice o superíndice. Una de las
                     # razones es que abby finereader no parece utilizar este mecanismo al utilizar subs o sups, sino
                     # que utiliza directamente las etiquetas de formato en el run. Pero el motivo principal es que
@@ -82,7 +83,8 @@ class Styles:
                     # caso particular no debería procesarlos. Podría de alguna manera comprobar si el estilo es el
                     # que word usa para las referencias a las notas, y en ese caso ignorar el formato, pero esto
                     # solo me complicaría las cosas.
-                    styles[styleId] = (styleName, self._styleNameToClassName(styleName), utils.getFormats(formatNode, False))
+                    formats = utils.getFormats(formatNode, False) if formatNode is not None else []
+                    styles[styleId] = (styleName, self._styleNameToClassName(styleName), formats)
 
         return styles
 

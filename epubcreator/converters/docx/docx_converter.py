@@ -265,7 +265,10 @@ class DocxConverter(converter_base.AbstractConverter):
 
     def _processRun(self, run, previousRunFormats):
         styleId = self._styles.getRunStyleId(run)
-        runFormats = utils.getRunFormats(run)
+
+        rpr = utils.find(run, "w:rPr")
+        runFormats = utils.getFormats(rpr) if rpr is not None else []
+
         isLastRun = utils.getNextRun(run) is None
         needToCloseSpan = False
         needToOpenSpan = False
@@ -274,7 +277,8 @@ class DocxConverter(converter_base.AbstractConverter):
         # Si el run tiene aplicado un estilo, este estilo puede tener asociado formatos, por
         # ejemplo: negrita, cursiva, etc. Proceso también estos formatos.
         if styleId:
-            formats = runFormats + utils.getRunDisabledFormats(run)
+            disabledRunFormats = utils.getDisabledFormats(rpr) if rpr is not None else []
+            formats = runFormats + disabledRunFormats
             for f in (f for f in self._styles.getStyleFormats(styleId) if f not in formats):
                 runFormats.append(f)
 
