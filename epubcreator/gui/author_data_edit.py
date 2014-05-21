@@ -3,7 +3,7 @@ from PyQt4 import QtGui
 from epubcreator.gui.forms import author_data_edit_dialog_ui
 from epubcreator.gui import image_edit
 from epubcreator.epubbase import images, ebook_metadata
-from epubcreator.misc import gui_utils, settings_store
+from epubcreator.misc import gui_utils, settings_store, utils
 
 
 class AuthorDataEdit(QtGui.QDialog, author_data_edit_dialog_ui.Ui_Dialog):
@@ -61,7 +61,7 @@ class AuthorDataEdit(QtGui.QDialog, author_data_edit_dialog_ui.Ui_Dialog):
             self._changeAuthorImage(image)
 
     def _saveAuthorBiography(self):
-        self._author.biography = self.authorBiographyInput.toPlainText().strip()
+        self._author.biography = utils.removeControlCharacters(self.authorBiographyInput.toPlainText().strip())
 
     def _changeAuthorImage(self, authorImage):
         if authorImage:

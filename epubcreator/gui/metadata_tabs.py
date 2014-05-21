@@ -2,7 +2,7 @@ import datetime
 
 from PyQt4 import QtGui, QtCore
 
-from epubcreator.misc import language, gui_utils, settings_store
+from epubcreator.misc import language, gui_utils, settings_store, utils
 from epubcreator.gui.forms import basic_metadata_widget_ui, additional_metadata_widget_ui
 from epubcreator.epubbase import ebook_metadata, images
 from epubcreator.gui import image_edit, author_data_edit
@@ -63,7 +63,7 @@ class BasicMetadata(QtGui.QWidget, basic_metadata_widget_ui.Ui_BasicMetadata):
         return self.idInput.text().strip()
 
     def getSynopsis(self):
-        return self.synopsisInput.toPlainText().strip()
+        return utils.removeControlCharacters(self.synopsisInput.toPlainText().strip())
 
     def getCoverImage(self):
         """
@@ -259,7 +259,7 @@ class AdditionalMetadata(QtGui.QWidget, additional_metadata_widget_ui.Ui_Additio
                                           self, self.publicationDateInput)
 
     def getDedication(self):
-        return self.dedicationInput.toPlainText().strip()
+        return utils.removeControlCharacters(self.dedicationInput.toPlainText().strip())
 
     def getTranslators(self):
         """

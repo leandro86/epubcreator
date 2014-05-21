@@ -3,6 +3,8 @@ import re
 import difflib
 import pprint
 
+_controlChars = None
+
 
 def removeSpecialCharacters(s):
     """
@@ -38,3 +40,20 @@ def assertXhtmlsAreEqual(xml1, xml2):
         dif = [d for d in list(difflib.Differ().compare(lines1, lines2)) if d.startswith("+") or d.startswith("-")]
 
         raise AssertionError("Los xhtmls no son iguales:\n\n{0}".format(pprint.pformat(dif)))
+
+
+def removeControlCharacters(s):
+    """
+    Elimina todos los caracteres de control de un string, exceptuando \t, \r y \n.
+    """
+    global _controlChars
+
+    if _controlChars is None:
+        chars = set(chr(c) for c in range(32))
+
+        for c in ((chr(c) for c in (9, 10, 13))):
+            chars.remove(c)
+
+        _controlChars = re.compile("|".join(chars))
+
+    return _controlChars.sub("", s)
