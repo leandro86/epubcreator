@@ -4,17 +4,21 @@ import difflib
 import pprint
 
 _controlChars = None
+_invalidCharForFileName = None
 
 
-def removeSpecialCharacters(s):
+def toFileName(s):
     """
-    Elimina acentos y caracteres no latinos de un string.
-
-    @param s: el string del cual eliminar los caracteres.
-
-    @return: un string con los caracteres eliminados.
+    Elimina caracteres inválidos de un string para que pueda ser utilizado como nombre de
+    archivo en windows y linux.
     """
-    return unicodedata.normalize("NFKD", s).encode('ASCII', 'ignore').decode()
+    global _invalidCharForFileName
+
+    if _invalidCharForFileName is None:
+        _invalidCharForFileName = re.compile("|".join(("\\\\", "\\/", ":", "\*", "\?", '"', "<", ">", "\|")))
+
+    temp = unicodedata.normalize("NFKD", s).encode('ASCII', 'ignore').decode()
+    return _invalidCharForFileName.sub("", temp)
 
 
 def removeTags(s):

@@ -1299,7 +1299,7 @@ class EpubFileNameTest(unittest.TestCase):
         self.assertEqual(fileName, "Autor - Titulo [0000] (r1.0 Este es el editor).epub")
 
     def test_special_characters(self):
-        self._common.metadata.title = "Títúló dél libro"
+        self._common.metadata.title = "\Tí/túló dél: li||bro* que co?nt\"ie<ne> ñ"
         self._common.metadata.authors.append(ebook_metadata.Person("bla", "Éste es el áutór"))
         self._common.metadata.editor = "Esté es él edítór"
         self._common.metadata.collectionName = "Esta es la ságá"
@@ -1309,7 +1309,7 @@ class EpubFileNameTest(unittest.TestCase):
         fileName = self._common.generateEbook()
 
         self.assertEqual(fileName, "[Esta es la saga] [Esta es la serie 10] Este es el autor - "
-                                   "Titulo del libro [0000] (r1.0 Este es el editor).epub")
+                                   "Titulo del libro que contiene n [0000] (r1.0 Este es el editor).epub")
 
 
 class ImagesTest(unittest.TestCase):

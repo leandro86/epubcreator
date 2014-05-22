@@ -249,7 +249,7 @@ class Ebook(Options):
         editor = self._metadata.editor or ebook_metadata.Metadata.DEFAULT_EDITOR
         fileName.append(" [{0}] (r1.0 {1})".format(bookId, editor))
 
-        return utils.removeSpecialCharacters("{0}.epub".format("".join(fileName)))
+        return utils.toFileName("{0}.epub".format("".join(fileName)))
 
     def _getPersonsListAsText(self, persons):
         """
