@@ -174,7 +174,7 @@
         </property>
         <property name="icon">
          <iconset resource="../resources/images/images.qrc">
-          <normaloff>:/add_16x16.png</normaloff>:/add_16x16.png</iconset>
+          <normaloff>:/add.png</normaloff>:/add.png</iconset>
         </property>
         <property name="iconSize">
          <size>

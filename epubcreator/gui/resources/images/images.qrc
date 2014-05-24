@@ -1,9 +1,9 @@
 <RCC>
   <qresource prefix="/">
     <file>epub.png</file>
-    <file>open_24x24.png</file>  
-    <file>add_16x16.png</file>
-    <file>search_16x16.png</file>
+    <file>open.png</file>
+    <file>add.png</file>
+    <file>search.png</file>
     <file>epublibre_logo.png</file>
     <file>waiting.gif</file>
     <file>ok.png</file>

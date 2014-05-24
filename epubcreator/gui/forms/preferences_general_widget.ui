@@ -24,7 +24,7 @@
      </property>
      <property name="icon">
       <iconset resource="../resources/images/images.qrc">
-       <normaloff>:/search_16x16.png</normaloff>:/search_16x16.png</iconset>
+       <normaloff>:/search.png</normaloff>:/search.png</iconset>
      </property>
     </widget>
    </item>

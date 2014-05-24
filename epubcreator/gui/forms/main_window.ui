@@ -85,7 +85,7 @@
   <action name="openFileAction">
    <property name="icon">
     <iconset resource="../resources/images/images.qrc">
-     <normaloff>:/open_24x24.png</normaloff>:/open_24x24.png</iconset>
+     <normaloff>:/open.png</normaloff>:/open.png</iconset>
    </property>
    <property name="text">
     <string>Abrir</string>
