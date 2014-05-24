@@ -6,7 +6,7 @@ from epubcreator.epubbase import images, ebook_metadata
 from epubcreator.misc import gui_utils, settings_store, utils
 
 
-class AuthorDataEdit(QtGui.QDialog, author_data_edit_dialog_ui.Ui_Dialog):
+class AuthorDataEdit(QtGui.QDialog, author_data_edit_dialog_ui.Ui_AuthorData):
     _GENDERS_TO_TEXT = {ebook_metadata.Person.MALE_GENDER: "Autor",
                         ebook_metadata.Person.FEMALE_GENDER: "Autora"}
 
