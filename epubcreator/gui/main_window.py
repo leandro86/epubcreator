@@ -69,7 +69,14 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
             self._workingFilePath = fileName
             self.setWindowTitle("{0} - {1}".format(os.path.split(fileName)[-1], version.APP_NAME))
             self._lastFolderOpen = os.path.dirname(fileName)
+            self.closeFileAction.setEnabled(True)
             self._showMessageOnStatusBar("Archivo abierto.", 5000)
+
+    def _closeFile(self):
+        self._workingFilePath = ""
+        self.setWindowTitle(version.APP_NAME)
+        self.closeFileAction.setEnabled(False)
+        self._showMessageOnStatusBar("Archivo cerrado.", 5000)
 
     def _generateEpub(self):
         metadata = self.metadataTabManager.getEbookMetadata()
@@ -204,6 +211,7 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
         self.openFileAction.triggered.connect(self._openFile)
         self.generateEpubAction.triggered.connect(self._generateEpub)
         self.preferencesAction.triggered.connect(self._showPreferencesDialog)
+        self.closeFileAction.triggered.connect(self._closeFile)
         self.toggleToolBarAction.triggered.connect(self.toolBar.setVisible)
         self.toolBar.visibilityChanged.connect(self.toggleToolBarAction.setChecked)
         self.quitAction.triggered.connect(self._close)

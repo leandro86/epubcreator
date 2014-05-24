@@ -60,6 +60,7 @@
      <string>Archivo</string>
     </property>
     <addaction name="openFileAction"/>
+    <addaction name="closeFileAction"/>
     <addaction name="generateEpubAction"/>
     <addaction name="separator"/>
     <addaction name="preferencesAction"/>
@@ -135,12 +136,12 @@
     <enum>QAction::AboutRole</enum>
    </property>
   </action>
-  <action name="editCoverImageAction">
+  <action name="closeFileAction">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Editar Imagen de Cubierta</string>
+    <string>Cerrar</string>
    </property>
   </action>
  </widget>
