@@ -100,7 +100,7 @@
      <normaloff>:/epub.png</normaloff>:/epub.png</iconset>
    </property>
    <property name="text">
-    <string>Generar ePub</string>
+    <string>Generar Epub</string>
    </property>
   </action>
   <action name="preferencesAction">
