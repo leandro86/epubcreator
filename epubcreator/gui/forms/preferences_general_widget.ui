@@ -64,7 +64,7 @@
       <string/>
      </property>
      <property name="text">
-      <string>Permitir el procesamiento de las imágenes del ePub base</string>
+      <string>Permitir el procesamiento de las imágenes del epub base</string>
      </property>
     </widget>
    </item>
