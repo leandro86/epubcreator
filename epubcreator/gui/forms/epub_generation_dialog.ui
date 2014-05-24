@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Generando ePub...</string>
+   <string>Generando epub...</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -54,7 +54,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Generando ePub. Aguarde un momento...</string>
+        <string>Generando epub. Aguarde un momento...</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
