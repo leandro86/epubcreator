@@ -1,23 +1,12 @@
 import sys
-import traceback
 import sip
 
 from PyQt4 import QtGui, QtCore
 
-from epubcreator.misc import gui_utils
 from epubcreator.gui import main_window
 from epubcreator import config, version
 
-
-def handleUnknownException(exc_type, exc_value, exc_traceback):
-    exceptionMessage = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
-    gui_utils.displayExceptionErrorDialog(exceptionMessage)
-
-
 if __name__ == "__main__":
-    # Cualquier excepción no controlada que ocurra la redirijo a un método propio para manejarla.
-    sys.excepthook = handleUnknownException
-
     # Necesito llamar a este método porque sino pyqt crashea cuando se cierra python (al menos en windows).
     # No crashea siempre, sino que lo hace bajo alguna circunstancias. Por ejemplo, a mi me crasheaba cuando el form
     # tenía cerca de 11 o 12 widgets.

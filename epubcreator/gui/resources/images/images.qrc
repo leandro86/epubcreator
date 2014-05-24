@@ -5,5 +5,8 @@
     <file>add_16x16.png</file>
     <file>search_16x16.png</file>
     <file>epublibre_logo.png</file>
+    <file>waiting.gif</file>
+    <file>ok.png</file>
+    <file>warning.png</file>
   </qresource>
 </RCC>

@@ -3,34 +3,23 @@ from PyQt4 import QtCore, QtGui
 from epubcreator import version
 
 
-def displayStdErrorDialog(message, details=None):
+def displayStdErrorDialog(message, infoMessage=None, details=None):
     msgBox = QtGui.QMessageBox(QtGui.QApplication.activeWindow())
     msgBox.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
     msgBox.setModal(True)
     msgBox.setIcon(QtGui.QMessageBox.Critical)
     msgBox.setWindowTitle(version.APP_NAME)
-    msgBox.setText(message)
+
+    # Agrego algunos espacios en blanco de ser necesario porque sino el cuadro de diálogo es demasiado chico.
+    msgBox.setText("{0}{1}".format(message, " " * 30 if len(message) < 40 else ""))
 
     if details:
         msgBox.setDetailedText(details)
 
+    if infoMessage:
+        msgBox.setInformativeText(infoMessage)
+
     msgBox.setStandardButtons(QtGui.QMessageBox.Close)
-    msgBox.exec()
-
-
-def displayExceptionErrorDialog(exceptionMessage):
-    msgBox = QtGui.QMessageBox(QtGui.QApplication.activeWindow())
-    msgBox.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
-    msgBox.setModal(True)
-    msgBox.setIcon(QtGui.QMessageBox.Critical)
-    msgBox.setWindowTitle(version.APP_NAME)
-
-    # Agrego algunos espacios porque sino el diálogo es muy chico.
-    msgBox.setText("Se ha encontrado un problema desconocido.{0}".format(" " * 30))
-
-    msgBox.setInformativeText("Por favor, repórtalo a los desarrolladores.")
-    msgBox.setStandardButtons(QtGui.QMessageBox.Close)
-    msgBox.setDetailedText(exceptionMessage)
     msgBox.exec()
 
 
@@ -40,10 +29,7 @@ def displayInformationDialog(message):
     msgBox.setModal(True)
     msgBox.setIcon(QtGui.QMessageBox.Information)
     msgBox.setWindowTitle(version.APP_NAME)
-
-    # Agrego algunos espacios porque sino el diálogo es muy chico.
     msgBox.setText(message)
-
     msgBox.setStandardButtons(QtGui.QMessageBox.Ok)
     msgBox.exec()
 
