@@ -57,7 +57,7 @@
    </property>
    <widget class="QMenu" name="menuArchivo">
     <property name="title">
-     <string>Archivo</string>
+     <string>&amp;Archivo</string>
     </property>
     <addaction name="openFileAction"/>
     <addaction name="closeFileAction"/>
@@ -69,13 +69,13 @@
    </widget>
    <widget class="QMenu" name="menuVer">
     <property name="title">
-     <string>Ver</string>
+     <string>&amp;Ver</string>
     </property>
     <addaction name="toggleToolBarAction"/>
    </widget>
    <widget class="QMenu" name="menuAyuda">
     <property name="title">
-     <string>Ayuda</string>
+     <string>A&amp;yuda</string>
     </property>
     <addaction name="aboutAction"/>
    </widget>
@@ -89,10 +89,13 @@
      <normaloff>:/open.png</normaloff>:/open.png</iconset>
    </property>
    <property name="text">
-    <string>Abrir</string>
+    <string>&amp;Abrir</string>
    </property>
    <property name="toolTip">
     <string>Abrir Archivo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
   <action name="generateEpubAction">
@@ -101,12 +104,15 @@
      <normaloff>:/epub.png</normaloff>:/epub.png</iconset>
    </property>
    <property name="text">
-    <string>Generar Epub</string>
+    <string>&amp;Generar Epub</string>
+   </property>
+   <property name="shortcut">
+    <string>F10</string>
    </property>
   </action>
   <action name="preferencesAction">
    <property name="text">
-    <string>Preferencias</string>
+    <string>&amp;Preferencias</string>
    </property>
    <property name="menuRole">
     <enum>QAction::PreferencesRole</enum>
@@ -114,7 +120,7 @@
   </action>
   <action name="quitAction">
    <property name="text">
-    <string>Salir</string>
+    <string>&amp;Salir</string>
    </property>
    <property name="menuRole">
     <enum>QAction::QuitRole</enum>
@@ -130,7 +136,7 @@
   </action>
   <action name="aboutAction">
    <property name="text">
-    <string>Acerca de...</string>
+    <string>&amp;Acerca de...</string>
    </property>
    <property name="menuRole">
     <enum>QAction::AboutRole</enum>
@@ -141,7 +147,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Cerrar</string>
+    <string>&amp;Cerrar</string>
    </property>
   </action>
  </widget>
