@@ -256,16 +256,20 @@ class EpubGenerationRunner(QtCore.QObject):
                 rawText = converter.getRawText()
 
             eebook = ebook.Ebook(ebookData, self._metadata, **settings.getAllSettingsForEbook())
+            warnings = []
 
             if ebookData:
-                self._checkForMissingText(ebookData, rawText)
+                if self._checkForMissingText(ebookData, rawText):
+                    warnings.append("Se ha perdido texto en la conversión. Por favor, repórtalo a los desarrolladores y adjunta el "
+                                    "documento fuente.")
+                warnings += ebookData.warnings()
 
             fileName = eebook.save(self._outputDir)
 
             if settings.allowImageProcessing:
                 self._saveCoverForWeb()
 
-            self.finished.emit(fileName, ebookData.warnings())
+            self.finished.emit(fileName, warnings)
         except Exception:
             self.error.emit(sys.exc_info())
 
@@ -278,9 +282,7 @@ class EpubGenerationRunner(QtCore.QObject):
         # coincidir en un 100%: el documento fuente puede contener párrafos en blanco (tal vez con espacios
         # incluso, o no), por ejemplo, que tal vez no haya que convertir.
         isTextMissing = re.sub(r"\s+", "", rawText) != re.sub(r"\s+", "", sectionsText)
-
-        if isTextMissing:
-            ebookData.addWarning("Se ha perdido texto en la conversión. Por favor, repórtalo a los desarrolladores y adjunta el documento fuente.")
+        return isTextMissing
 
     def _saveCoverForWeb(self):
         if self._metadata.coverImage is not None:
