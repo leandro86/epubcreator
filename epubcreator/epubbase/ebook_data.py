@@ -12,6 +12,7 @@ class EbookData:
         self._images = []
         self._headingsCount = 0
         self._notesReferences = []
+        self._warnings = []
 
     def createTextSection(self):
         return TextSection(self)
@@ -42,6 +43,12 @@ class EbookData:
 
     def countNotesSections(self):
         return len(self._notesSections)
+
+    def addWarning(self, warning):
+        self._warnings.append(warning)
+
+    def warnings(self):
+        return self._warnings
 
     ### #################################################################################### ###
     ### Métodos visibles solamente a este módulo, con el único fin de ser usados por Section ###

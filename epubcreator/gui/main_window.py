@@ -235,7 +235,6 @@ class EpubGenerationRunner(QtCore.QObject):
         self._metadata = metadata
         self._outputDir = outputDir
         self._inputFile = inputFile
-        self._warnings = []
 
     def run(self):
         self._run()
@@ -266,7 +265,7 @@ class EpubGenerationRunner(QtCore.QObject):
             if settings.allowImageProcessing:
                 self._saveCoverForWeb()
 
-            self.finished.emit(fileName, self._warnings)
+            self.finished.emit(fileName, ebookData.warnings())
         except Exception:
             self.error.emit(sys.exc_info())
 
@@ -281,7 +280,7 @@ class EpubGenerationRunner(QtCore.QObject):
         isTextMissing = re.sub(r"\s+", "", rawText) != re.sub(r"\s+", "", sectionsText)
 
         if isTextMissing:
-            self._warnings.append("Se ha perdido texto en la conversión. Por favor, repórtalo a los desarrolladores y adjunta el documento fuente.")
+            ebookData.addWarning("Se ha perdido texto en la conversión. Por favor, repórtalo a los desarrolladores y adjunta el documento fuente.")
 
     def _saveCoverForWeb(self):
         if self._metadata.coverImage is not None:
