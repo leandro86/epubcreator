@@ -28,7 +28,7 @@ class DocxConverter(converter_base.AbstractConverter):
         self._footnotes = footnotes.Footnotes(self._docx.footnotes()) if self._docx.hasFootnotes() else None
 
         # Contiene el nombre de las imágenes que ya fueron agregadas al ebook.
-        self._images = set()
+        self._images = None
 
         # El objeto Section actual en el cual estoy escribiendo.
         self._currentSection = None
