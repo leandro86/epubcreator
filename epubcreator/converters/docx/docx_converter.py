@@ -77,7 +77,7 @@ class DocxConverter(converter_base.AbstractConverter):
         return self._ebookData
 
     def getRawText(self):
-        docText = "".join(utils.xpath(self._documentXml, "//w:t/text()"))
+        docText = "".join(utils.xpath(self._documentXml, "//w:t[not(ancestor::mc:Fallback)]/text()"))
         footnotesText = "".join(self._footnotes.getRawText()) if self._footnotes else ""
 
         return docText + footnotesText
