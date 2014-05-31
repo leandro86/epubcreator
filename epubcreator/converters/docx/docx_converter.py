@@ -477,9 +477,17 @@ class DocxConverter(converter_base.AbstractConverter):
             self._images.add(imageName)
 
     def _processAlternateContent(self, alternateContent):
-        pathToTxbxContent = "mc:Choice/w:drawing/wp:inline/a:graphic/a:graphicData/wps:wsp/wps:txbx/w:txbxContent"
-        txbxContent = utils.find(alternateContent, pathToTxbxContent)
-        self._processMainContent(txbxContent, "span")
+        paragraphs = utils.xpath(alternateContent, "mc:Choice//w:p")
+
+        # En mc:AlternateContent los párrafos generalmente se encuentran dentro de w:txtbxContent.
+        # Sin embargo, ese nodo puede contener otro nodo w:sdt, que a su vez puede contener párrafos...
+        # Lo que significa que necesito todos estos párrafos bajo un mismo padre, para poder procesarlos con
+        # el método _processMainContent, por eso es que los agrego directamente como hijos de AlternateContent.
+        for p in paragraphs:
+            alternateContent.append(p)
+            pass
+
+        self._processMainContent(alternateContent, "span")
 
     def _getNextParagraph(self, paragraph):
         # Debo tener en cuenta los saltos de página en este método. Si el párrafo
