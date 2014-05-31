@@ -1,5 +1,24 @@
 [
     {
+        "version": "0.2.1",
+        "date": "31/05/2014",
+        "changes": {
+            "misc": [
+                "Procesamiento de imágenes: se puede comprimir la imagen de cubierta y autor, redimensión automática, insertar el logo de epublibre a la imagen de cubierta y generar la cubierta para la web.",
+                "Agregados algunos atajos de teclado: CTRL-A para abrir un docx y F10 para generar el epub.",
+                "Se muestra una especie de diálogo de progreso al generar un epub.",
+                "Se eliminan caracteres no válidos del nombre de archivo del epub.",
+                "Bug corregido: si el campo de sinopsis o biografía de autor tenía caracteres de control, se producía un error al generar el epub."
+            ],
+            "docx": [
+                "Mejora el procesamiento de tablas.",
+                "Procesa saltos de líneas manuales (SHIFT+ENTER en Word).",
+                "Bug corregido: no se procesaban las tablas en las notas al pie.",
+                "Bug corregido relacionado con el procesamiento de cuadros de texto."
+            ]
+        }
+    },
+    {
         "version": "0.2.0",
         "date": "11/04/2014",
         "changes": {
