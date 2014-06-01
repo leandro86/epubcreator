@@ -17,3 +17,7 @@ class AbstractConverter(epubcreator.misc.options.Options):
 
     def getRawText(self):
         raise NotImplemented
+
+
+class InvalidFile(Exception):
+    pass

@@ -4,6 +4,7 @@ import zipfile
 from lxml import etree
 
 from epubcreator.converters.docx import utils
+from epubcreator.converters import converter_base
 
 
 class Docx:
@@ -12,7 +13,11 @@ class Docx:
     _FOOTNOTES = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes"
 
     def __init__(self, file):
-        self._docx = zipfile.ZipFile(file)
+        try:
+            self._docx = zipfile.ZipFile(file)
+        except zipfile.BadZipfile:
+            raise converter_base.InvalidFile("El docx no es un archivo zip.")
+
         self._namelist = frozenset(self._docx.namelist())
         self._documentDir, self._documentName = os.path.split(self._readDocumentFullPath())
         self._documentRelsByType, self._documentRelsById = self._readDocumentRels()
@@ -50,7 +55,7 @@ class Docx:
         documentName = utils.xpath(rels.getroot(), "/rels:Relationships/rels:Relationship[@Type = '{0}']/@Target".format(Docx._DOCUMENT))
 
         if not documentName:
-            raise InvalidDocx("No existe un document.xml")
+            raise converter_base.InvalidFile("No existe document.xml.")
 
         return documentName[0]
 
@@ -88,7 +93,3 @@ class Docx:
                     footnotesRelsById[idd] = target
 
         return footnotesRelsById
-
-
-class InvalidDocx(Exception):
-    pass

@@ -7,7 +7,7 @@ from PyQt4 import QtGui, QtCore, Qt
 import sys
 
 from epubcreator.epubbase import ebook
-from epubcreator.converters import converter_factory
+from epubcreator.converters import converter_factory, converter_base
 from epubcreator.misc import settings_store, gui_utils
 from epubcreator.gui.forms import main_window_ui
 from epubcreator.gui import preferences, about, epub_generation
@@ -122,9 +122,16 @@ class MainWindow(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
     def _epubGenerationError(self, exceptionInfo):
         self._epubGenerationThread.quit()
 
-        details = "".join(traceback.format_exception(exceptionInfo[0], exceptionInfo[1], exceptionInfo[2]))
-        gui_utils.displayStdErrorDialog("Ocurrió un error al generar el epub.", "Por favor, repórtalo a los desarrolladores.", details)
+        if exceptionInfo[0] == converter_base.InvalidFile:
+            message = "El archivo '{0}' no parece ser un {1} válido.".format(self._workingFilePath, os.path.splitext(self._workingFilePath)[1][1:])
+            infoMessage = ""
+            details = str(exceptionInfo[1])
+        else:
+            message = "Ocurrió un error al generar el epub."
+            infoMessage = "Por favor, repórtalo a los desarrolladores."
+            details = "".join(traceback.format_exception(exceptionInfo[0], exceptionInfo[1], exceptionInfo[2]))
 
+        gui_utils.displayStdErrorDialog(message, infoMessage, details)
         self._epubGenerationDialog.close()
 
     def _showMessageOnStatusBar(self, message, duration=0):
