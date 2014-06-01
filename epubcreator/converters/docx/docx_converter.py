@@ -28,14 +28,14 @@ class DocxConverter(converter_base.AbstractConverter):
         self._footnotes = footnotes.Footnotes(self._docx.footnotes()) if self._docx.hasFootnotes() else None
 
         # Contiene el nombre de las imágenes que ya fueron agregadas al ebook.
-        self._images = None
+        self._images = set()
 
         # El objeto Section actual en el cual estoy escribiendo.
         self._currentSection = None
 
         # Una lista de números con los niveles de heading. Utilizo esta lista para corregir el anidamiento de headings
         # en el docx. En todoo momento, siempre el último elemento de la lista (la cima de la pila) contiene el último título leído.
-        self._titles = None
+        self._titles = []
 
         # Representa cuál es, en un momento dado, el nivel de heading de primer nivel, es decir, el que vendría a ser
         # una entrada de primer nivel en la toc.
@@ -49,31 +49,25 @@ class DocxConverter(converter_base.AbstractConverter):
         # Como se ve, los dos primeros h3 vendrían a ser en realidad h1, pero están corridos. Lo mismo con los h2. No
         # puedo suponer que los h1 van a ser siempre mi título de nivel 1. Incluso puede darse el caso de una toc que
         # no tenga h1, sino que absolutamente todos los títulos estén corridos.
-        self._headingLevelBase = -1
+        self._headingLevelBase = DocxConverter._MAX_HEADING_NUMBER + 1
 
         # Una lista con los ids de las notas en el docx (que utilizo luego para obtener el contenido de la nota en footnotes.xml).
-        self._footnotesId = None
+        self._footnotesId = []
 
         # Indica si se está procesando el contenido de todas las notas al pie o el del documento principal.
         self._isProcessingFootnotes = False
 
         # Un objeto EbookData.
-        self._ebookData = None
+        self._ebookData = ebook_data.EbookData()
 
     def convert(self):
-        self._titles = []
-        self._headingLevelBase = DocxConverter._MAX_HEADING_NUMBER + 1
-        self._footnotesId = []
-        self._ebookData = ebook_data.EbookData()
-        self._isProcessingFootnotes = False
-        self._images = set()
-
         self._processDocument()
 
         if self._footnotesId:
             self._isProcessingFootnotes = True
             self._processFootnotes()
 
+        self._docx.close()
         return self._ebookData
 
     def getRawText(self):

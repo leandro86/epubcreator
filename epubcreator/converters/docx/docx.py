@@ -42,6 +42,9 @@ class Docx:
     def read(self, name):
         return self._docx.read(name)
 
+    def close(self):
+        self._docx.close()
+
     def _readDocumentFullPath(self):
         rels = etree.parse(self._docx.open("_rels/.rels"))
         documentName = utils.xpath(rels.getroot(), "/rels:Relationships/rels:Relationship[@Type = '{0}']/@Target".format(Docx._DOCUMENT))
