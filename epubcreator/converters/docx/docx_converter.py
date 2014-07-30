@@ -219,19 +219,9 @@ class DocxConverter(converter_base.AbstractConverter):
             imagesId = utils.getImagesId(paragraph)
 
             if imagesId:
-                if len(imagesId) == 1:
-                    self._currentSection.openTag("p", **{"class": "ilustra"})
-                    self._processImage(imagesId[0])
-                    self._currentSection.closeTag("p")
-                else:
-                    # Si hay varias imágenes en un mismo párrafo que no contiene texto, entonces
-                    # simplemente las agrego una detrás de otra.
-                    self._currentSection.openTag("p")
-
-                    for imageId in imagesId:
-                        self._processImage(imageId)
-
-                    self._currentSection.closeTag("p")
+                self._currentSection.openTag("p", **{"class": "ilustra"})
+                self._processParagraphContent(paragraph)
+                self._currentSection.closeTag("p")
 
         # Aun si el párrafo no tiene texto, debo cerrar el div que agrupa estilos si es necesario. Si no
         # lo hago, puede darse el caso de que el párrafo actual (sin texto) que estoy procesando tenga el
